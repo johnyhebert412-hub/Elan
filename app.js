@@ -4,7 +4,6 @@
   const STORAGE_KEY = "elan-clean-v0.5.0";
   const suggestedActions = {
     off: { title: "Choisir un petit départ", text: "Garde la journée légère avec une action simple.", action: "complete" },
-    finance: { title: "Vérifier ton solde", text: "Ouvre ton compte et regarde le montant disponible.", action: "complete" },
     house: { title: "Faire la vaisselle", text: "Un geste simple pour remettre l'espace en ordre.", action: "complete" },
     health: { title: "Boire de l'eau", text: "Prends quelques gorgées maintenant.", action: "complete" },
     productivity: { title: "Ouvrir la tâche", text: "Commence par rendre la tâche visible.", action: "complete" },
@@ -14,7 +13,6 @@
   };
   const domainInfo = {
     off: { total: 3, reward: "Temps relax" },
-    finance: { total: 4, reward: "Podcast" },
     house: { total: 3, reward: "Musique" },
     health: { total: 4, reward: "Repos doux" },
     productivity: { total: 3, reward: "Pause relax" },
@@ -57,14 +55,13 @@
   };
 
   const homeDomains = {
-    off: { title: "Congé", subtitle: "Journée plus légère, sans pression.", missions: [{ label: "Choisir une petite chose" }, { label: "Préparer un coin calme" }, { label: "Faire 5 minutes utiles" }, { label: "Sortir prendre l'air" }, { label: "Ranger un petit espace" }, { label: "Planifier un moment relax" }, { label: "Lire quelques pages" }, { label: "Préparer un thé ou café" }, { label: "Écouter de la musique douce" }, { label: "Faire une courte sieste" }, { label: "Écrire ce que tu ressens" }, { label: "Regarder par la fenêtre 2 minutes" }] },
-    house: { title: "Maison", subtitle: "Petits gestes pour avancer à la maison.", missions: [{ label: "Faire la vaisselle" }, { label: "Ranger une surface" }, { label: "Lancer une brassée" }, { label: "Ranger une pièce" }, { label: "Vider une poubelle" }, { label: "Essuyer un comptoir" }, { label: "Plier quelques vêtements" }, { label: "Nettoyer un coin rapide" }, { label: "Faire le lit" }, { label: "Sortir les poubelles" }, { label: "Passer le balai" }, { label: "Nettoyer le lavabo" }, { label: "Ranger les chaussures" }, { label: "Vider le lave-vaisselle" }, { label: "Essuyer la table" }, { label: "Ramasser ce qui traîne" }] },
-    finance: { title: "Finances", subtitle: "Budget simple, anti impulsivité.", missions: [{ label: "Vérifier le solde" }, { label: "Attendre avant un achat" }, { label: "Payer une facture" }, { label: "Noter une dépense" }, { label: "Annuler un abonnement inutile" }, { label: "Mettre un petit montant de côté" }, { label: "Lister les dépenses de la semaine" }, { label: "Vérifier les abonnements actifs" }, { label: "Comparer deux prix avant d'acheter" }, { label: "Faire une liste avant d'aller au magasin" }, { label: "Revoir un budget de catégorie" }, { label: "Éviter une dépense impulsive" }] },
-    productivity: { title: "Productivité", subtitle: "Démarrer sans te noyer.", missions: [{ label: "Ouvrir la tâche" }, { label: "Écrire une phrase" }, { label: "Timer 2 minutes" }, { label: "Nommer la prochaine étape" }, { label: "Fermer une distraction" }, { label: "Préparer le matériel" }, { label: "Lire une seule page" }, { label: "Envoyer un courriel en attente" }, { label: "Classer 5 fichiers" }, { label: "Écrire la liste du lendemain" }, { label: "Faire une tâche de moins de 2 minutes" }, { label: "Vider la boîte de réception" }, { label: "Identifier la tâche la plus importante" }, { label: "Fermer les onglets inutiles" }] },
-    couple: { title: "Temps couple/famille", subtitle: "Connexion simple.", missions: [{ label: "Envoyer un message gentil" }, { label: "Faire une attention" }, { label: "Demander comment ça va" }, { label: "Faire un câlin" }, { label: "Proposer 10 minutes ensemble" }, { label: "Écouter sans interrompre" }, { label: "Préparer quelque chose à manger ensemble" }, { label: "Regarder une vidéo ensemble" }, { label: "Dire merci pour quelque chose" }, { label: "Raconter une bonne chose de ta journée" }, { label: "Proposer une sortie simple" }, { label: "Laisser un petit mot" }] },
-    outside: { title: "Activité / extérieur", subtitle: "Bouger doucement.", missions: [{ label: "Mettre tes souliers" }, { label: "Sortir 2 minutes" }, { label: "Marcher 30 secondes" }, { label: "Ouvrir la porte" }, { label: "Prendre l'air dehors" }, { label: "Faire un mini tour" }, { label: "Marcher jusqu'au coin de rue" }, { label: "Étirer les jambes dehors" }, { label: "Observer ce qui t'entoure" }, { label: "Faire 5 minutes de vélo" }, { label: "S'asseoir dehors 5 minutes" }, { label: "Ramasser quelque chose en marchant" }] },
-    health: { title: "Santé", subtitle: "Énergie, sommeil, eau, médication.", missions: [{ label: "Boire de l'eau" }, { label: "Vérifier la médication" }, { label: "Bouger 2 minutes" }, { label: "Préparer le sommeil" }, { label: "Manger quelque chose simple" }, { label: "Étirer les épaules" }, { label: "Faire 5 respirations lentes" }, { label: "Manger un fruit" }, { label: "Boire un grand verre d'eau" }, { label: "Couper les écrans 30 min avant de dormir" }, { label: "Faire une courte marche" }, { label: "Prendre une douche" }, { label: "Se coucher à l'heure prévue" }, { label: "Prendre soin de ta peau" }] },
-    mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }, { label: "Bois un verre d'eau" }, { label: "Relâche tes épaules" }, { label: "Ferme les yeux 10 secondes" }, { label: "Nomme 3 choses que tu vois" }, { label: "Écoute un son autour de toi" }, { label: "Marche 30 secondes" }, { label: "Fais une pause écran" }] }
+    off: { title: "Congé", subtitle: "Journée plus légère, sans pression.", missions: [{ label: "Choisir une petite chose" }, { label: "Préparer un coin calme" }, { label: "Faire 5 minutes utiles" }, { label: "Sortir prendre l'air" }, { label: "Ranger un petit espace" }, { label: "Planifier un moment relax" }] },
+    house: { title: "Maison", subtitle: "Petits gestes pour avancer à la maison.", missions: [{ label: "Faire la vaisselle" }, { label: "Ranger une surface" }, { label: "Lancer une brassée" }, { label: "Ranger une pièce" }, { label: "Vider une poubelle" }, { label: "Essuyer un comptoir" }, { label: "Plier quelques vêtements" }, { label: "Nettoyer un coin rapide" }] },
+    productivity: { title: "Productivité", subtitle: "Démarrer sans te noyer.", missions: [{ label: "Ouvrir la tâche" }, { label: "Écrire une phrase" }, { label: "Timer 2 minutes" }, { label: "Nommer la prochaine étape" }, { label: "Fermer une distraction" }, { label: "Préparer le matériel" }] },
+    couple: { title: "Temps couple/famille", subtitle: "Connexion simple.", missions: [{ label: "Envoyer un message gentil" }, { label: "Faire une attention" }, { label: "Demander comment ça va" }, { label: "Faire un câlin" }, { label: "Proposer 10 minutes ensemble" }, { label: "Écouter sans interrompre" }] },
+    outside: { title: "Activité / extérieur", subtitle: "Bouger doucement.", missions: [{ label: "Mettre tes souliers" }, { label: "Sortir 2 minutes" }, { label: "Marcher 30 secondes" }, { label: "Ouvrir la porte" }, { label: "Prendre l'air dehors" }, { label: "Faire un mini tour" }] },
+    health: { title: "Santé", subtitle: "Énergie, sommeil, eau, médication.", missions: [{ label: "Boire de l'eau" }, { label: "Vérifier la médication" }, { label: "Bouger 2 minutes" }, { label: "Préparer le sommeil" }, { label: "Manger quelque chose simple" }, { label: "Étirer les épaules" }] },
+    mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }] }
   };
 
   const emergencyActions = [
@@ -101,14 +98,7 @@
     purchasedRewards: [],
     activeReward: null,
     history: [],
-    notifications: { important: false, summary: false },
-    budget: {
-      income: null,
-      payments: null,
-      bills: [],
-      actionsDone: [],
-      actionsDate: ""
-    }
+    notifications: { important: false, summary: false }
   };
 
   let state = loadState();
@@ -155,16 +145,7 @@
         purchasedRewards: Array.isArray(saved.purchasedRewards) ? saved.purchasedRewards : [],
         activeReward: (saved.activeReward && typeof saved.activeReward === "object") ? saved.activeReward : null,
         history: Array.isArray(saved.history) ? saved.history : [],
-        notifications: { ...defaultState.notifications, ...saved.notifications },
-        budget: saved.budget && typeof saved.budget === "object"
-          ? {
-              income: saved.budget.income ?? null,
-              payments: saved.budget.payments ?? null,
-              bills: Array.isArray(saved.budget.bills) ? saved.budget.bills : [],
-              actionsDone: Array.isArray(saved.budget.actionsDone) ? saved.budget.actionsDone : [],
-              actionsDate: saved.budget.actionsDate ?? ""
-            }
-          : { income: null, payments: null, bills: [], actionsDone: [], actionsDate: "" }
+        notifications: { ...defaultState.notifications, ...saved.notifications }
       };
       if (nextState.selectedDomain && !suggestedActions[nextState.selectedDomain]) {
         nextState.selectedDomain = "";
@@ -212,7 +193,6 @@
     document.querySelectorAll(".domain-panel").forEach((panel) => panel.classList.add("hidden"));
     panel.classList.remove("hidden");
     renderHomeSuggestion();
-    if (domain === "finance") renderBudget();
     showView("domains");
     panel.setAttribute("tabindex", "-1");
     window.requestAnimationFrame(() => {
@@ -235,9 +215,6 @@
     state.currentHomeDomain = domain;
     state.selectedDomain = domain;
     saveState();
-    // Réinitialiser l'état "Voir plus" quand on change de domaine
-    const suggestionsList = $("domain-suggestions");
-    if (suggestionsList) suggestionsList.dataset.expanded = "false";
     renderHomeSuggestion();
     renderSelectedDomain();
     // Basculer en mode "domaine actif" : masque le hero et la grille
@@ -336,12 +313,7 @@
         if (suggestionsEmptyState) {
           suggestionsEmptyState.classList.add("hidden");
         }
-        const SUGGESTIONS_INITIAL = 4;
-        const isExpanded = suggestionsList.dataset.expanded === "true";
-        const visible = isExpanded ? available : available.slice(0, SUGGESTIONS_INITIAL);
-        const hiddenCount = available.length - SUGGESTIONS_INITIAL;
-
-        const makeSuggestionBtn = (mission) => {
+        suggestionsList.replaceChildren(...available.map((mission) => {
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "suggestion-btn";
@@ -353,33 +325,7 @@
             toggleGoalSelection(mission.label, domain);
           });
           return btn;
-        };
-
-        const nodes = visible.map(makeSuggestionBtn);
-
-        if (!isExpanded && hiddenCount > 0) {
-          const moreBtn = document.createElement("button");
-          moreBtn.type = "button";
-          moreBtn.className = "suggestions-show-more";
-          moreBtn.textContent = `Voir ${hiddenCount} de plus`;
-          moreBtn.addEventListener("click", () => {
-            suggestionsList.dataset.expanded = "true";
-            renderSelectedDomain();
-          });
-          nodes.push(moreBtn);
-        } else if (isExpanded && available.length > SUGGESTIONS_INITIAL) {
-          const lessBtn = document.createElement("button");
-          lessBtn.type = "button";
-          lessBtn.className = "suggestions-show-more suggestions-show-less";
-          lessBtn.textContent = "Voir moins";
-          lessBtn.addEventListener("click", () => {
-            suggestionsList.dataset.expanded = "false";
-            renderSelectedDomain();
-          });
-          nodes.push(lessBtn);
-        }
-
-        suggestionsList.replaceChildren(...nodes);
+        }));
       }
     }
 
@@ -1021,9 +967,9 @@
     const panel = $("checkin-panel");
     const button = $("checkin-button");
     if (!panel || !button) return;
-    renderHistoryList();
     panel.classList.remove("hidden");
     button.setAttribute("aria-expanded", "true");
+    renderHistoryList();
   }
 
   function renderHistoryList() {
@@ -1064,6 +1010,17 @@
     panel.classList.add("hidden");
     button.setAttribute("aria-expanded", "false");
   }
+
+  window.elanOpenHistory = (event) => {
+    event?.preventDefault();
+    openCheckIn();
+  };
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#checkin-button")) return;
+    event.preventDefault();
+    openCheckIn();
+  }, true);
 
   function selectCheckIn(value) {
     selectedCheckIn = value;
@@ -1989,240 +1946,6 @@
     });
   }
 
-  // ─────────────────────────────────────────────
-  //  BUDGET
-  // ─────────────────────────────────────────────
-
-  const BUDGET_ACTIONS = [
-    "Vérifier mon solde",
-    "Payer une facture en attente",
-    "Attendre avant un achat",
-    "Mettre 5 $ de côté",
-    "Annuler un abonnement inutile",
-    "Noter une dépense de la semaine",
-    "Préparer le budget de la semaine"
-  ];
-
-  let budgetPauseInterval = null;
-  let budgetPauseSeconds = 0;
-
-  function budgetFmt(val) {
-    if (val === null || val === undefined) return "—";
-    return `${Number(val).toLocaleString("fr-CA")} $`;
-  }
-
-  function budgetDateLabel(dateStr) {
-    if (!dateStr) return "";
-    const d = new Date(dateStr + "T00:00:00");
-    const today = new Date();
-    const diff = Math.round((d - today) / 86400000);
-    if (diff === 0) return "Aujourd'hui";
-    if (diff === 1) return "Demain";
-    if (diff > 1 && diff <= 7) return `Dans ${diff} jours`;
-    return d.toLocaleDateString("fr-CA", { month: "short", day: "numeric" });
-  }
-
-  function budgetDateUrgency(dateStr) {
-    if (!dateStr) return "neutral";
-    const d = new Date(dateStr + "T00:00:00");
-    const today = new Date();
-    const diff = Math.round((d - today) / 86400000);
-    if (diff <= 2) return "urgent";
-    if (diff <= 7) return "soon";
-    return "neutral";
-  }
-
-  function budgetPauseStart() {
-    if (budgetPauseInterval) return;
-    budgetPauseSeconds = 600;
-    const btn = $("budget-pause-btn");
-    const timerEl = $("budget-pause-timer");
-    const countdown = $("budget-pause-countdown");
-    if (btn) btn.classList.add("hidden");
-    if (timerEl) timerEl.classList.remove("hidden");
-    function tick() {
-      budgetPauseSeconds -= 1;
-      const m = Math.floor(budgetPauseSeconds / 60);
-      const s = budgetPauseSeconds % 60;
-      if (countdown) countdown.textContent = `${m}:${String(s).padStart(2, "0")}`;
-      if (budgetPauseSeconds <= 0) {
-        clearInterval(budgetPauseInterval);
-        budgetPauseInterval = null;
-        if (countdown) countdown.textContent = "✓ Pause terminée";
-        const lbl = timerEl && timerEl.querySelector(".budget-pause-timer-label");
-        if (lbl) lbl.textContent = "C'est peut-être utile. Ou peut-être pas.";
-        window.setTimeout(() => {
-          if (btn) { btn.classList.remove("hidden"); btn.textContent = "⏱ Relancer 10 minutes"; }
-          if (timerEl) timerEl.classList.add("hidden");
-        }, 3000);
-      }
-    }
-    tick();
-    budgetPauseInterval = setInterval(tick, 1000);
-  }
-
-  function budgetTodayKey() {
-    return new Date().toISOString().slice(0, 10);
-  }
-
-  function renderBudget() {
-    const b = state.budget;
-
-    // Carte 1 — Cette semaine
-    const income = b.income;
-    const payments = b.payments;
-    const available = (income !== null && payments !== null) ? income - payments : null;
-    const incomeEl = $("budget-income-display");
-    const paymentsEl = $("budget-payments-display");
-    const availableEl = $("budget-available-display");
-    if (incomeEl) incomeEl.textContent = budgetFmt(income);
-    if (paymentsEl) paymentsEl.textContent = budgetFmt(payments);
-    if (availableEl) {
-      availableEl.textContent = budgetFmt(available);
-      availableEl.className = "budget-available-value" +
-        (available !== null && available < 0 ? " budget-available-negative" : "");
-    }
-
-    // Carte 3 — Paiements à venir (triés par date)
-    const billsList = $("budget-bills-list");
-    if (billsList) {
-      const sorted = [...b.bills].sort((x, y) => {
-        if (!x.date) return 1;
-        if (!y.date) return -1;
-        return x.date.localeCompare(y.date);
-      });
-      if (sorted.length === 0) {
-        billsList.innerHTML = "<li class=\"budget-bills-empty\">Aucun paiement ajouté.</li>";
-      } else {
-        billsList.replaceChildren(...sorted.slice(0, 6).map((bill) => {
-          const inAgenda = state.agenda.some(
-            (item) => item.text === `Paiement : ${bill.name}` && item.date === (bill.date || budgetTodayKey())
-          );
-          const urgency = budgetDateUrgency(bill.date);
-          const li = document.createElement("li");
-          li.className = `budget-bill-item budget-bill-${urgency}`;
-          li.innerHTML = `
-            <div class="budget-bill-urgency-dot"></div>
-            <div class="budget-bill-info">
-              <span class="budget-bill-name">${bill.name}</span>
-              <span class="budget-bill-date">${budgetDateLabel(bill.date)}</span>
-            </div>
-            <div class="budget-bill-actions">
-              <button class="budget-bill-agenda-btn${inAgenda ? " budget-bill-agenda-done" : ""}"
-                data-bill-id="${bill.id}" type="button"
-                ${inAgenda ? "disabled" : ""}>${inAgenda ? "📅 Ajouté" : "📅 Agenda"}</button>
-              <button class="budget-bill-delete-btn" data-delete-bill="${bill.id}" type="button" aria-label="Supprimer">✕</button>
-            </div>
-          `;
-          return li;
-        }));
-      }
-    }
-
-    // Carte 4 — Actions du jour (3 actions, rotation par date)
-    const actionsList = $("budget-actions-list");
-    if (actionsList) {
-      const todayStr = budgetTodayKey();
-      if (b.actionsDate !== todayStr) {
-        state.budget.actionsDone = [];
-        state.budget.actionsDate = todayStr;
-        saveState();
-      }
-      const seed = todayStr.split("-").reduce((acc, v) => acc + parseInt(v, 10), 0);
-      const pool = [...BUDGET_ACTIONS];
-      const selected = [];
-      for (let i = 0; i < 3 && pool.length > 0; i++) {
-        const idx = (seed + i * 3) % pool.length;
-        selected.push(pool.splice(idx, 1)[0]);
-      }
-      actionsList.replaceChildren(...selected.map((label) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.textContent = label;
-        const isDone = state.budget.actionsDone.includes(label);
-        if (isDone) btn.classList.add("done-action");
-        btn.addEventListener("click", () => {
-          if (isDone) {
-            state.budget.actionsDone = state.budget.actionsDone.filter((a) => a !== label);
-          } else {
-            state.budget.actionsDone = [...state.budget.actionsDone, label];
-            state.wins += 1;
-            state.coins += COINS_PER_TASK;
-            showSuccessToast(`✓ ${label} — +${COINS_PER_TASK} 🪙`);
-          }
-          saveState();
-          renderBudget();
-          renderShop();
-        });
-        return btn;
-      }));
-    }
-  }
-
-  function bindBudgetEvents() {
-    bindDynamic(document, "click", "#budget-edit-amounts", () => {
-      $("budget-edit-form")?.classList.toggle("hidden");
-    });
-    bindDynamic(document, "click", "#budget-save-amounts", () => {
-      const inc = parseFloat($("budget-income-input")?.value);
-      const pay = parseFloat($("budget-payments-input")?.value);
-      if (!isNaN(inc)) state.budget.income = inc;
-      if (!isNaN(pay)) state.budget.payments = pay;
-      saveState();
-      $("budget-edit-form")?.classList.add("hidden");
-      renderBudget();
-    });
-    bindDynamic(document, "click", "#budget-pause-btn", () => {
-      budgetPauseStart();
-    });
-    bindDynamic(document, "click", "#budget-add-bill", () => {
-      $("budget-bill-form")?.classList.toggle("hidden");
-    });
-    bindDynamic(document, "click", "#budget-save-bill", () => {
-      const name = $("budget-bill-name")?.value.trim();
-      const date = $("budget-bill-date")?.value;
-      if (!name) { showToast("Écris le nom du paiement."); return; }
-      const bill = { id: `${Date.now()}`, name, date: date || "" };
-      state.budget.bills = [...state.budget.bills, bill];
-      saveState();
-      if ($("budget-bill-name")) $("budget-bill-name").value = "";
-      if ($("budget-bill-date")) $("budget-bill-date").value = "";
-      $("budget-bill-form")?.classList.add("hidden");
-      renderBudget();
-    });
-    bindDynamic(document, "click", "[data-delete-bill]", (e) => {
-      const id = e.target.dataset.deleteBill;
-      state.budget.bills = state.budget.bills.filter((b) => b.id !== id);
-      saveState();
-      renderBudget();
-    });
-    bindDynamic(document, "click", ".budget-bill-agenda-btn:not([disabled])", (e) => {
-      const id = e.target.dataset.billId;
-      const bill = state.budget.bills.find((b) => b.id === id);
-      if (!bill) return;
-      const alreadyIn = state.agenda.some(
-        (item) => item.text === `Paiement : ${bill.name}` && item.date === (bill.date || budgetTodayKey())
-      );
-      if (alreadyIn) { showToast("Déjà dans l'agenda."); return; }
-      const item = {
-        id: `agenda-${Date.now()}`,
-        date: bill.date || budgetTodayKey(),
-        type: "paiement",
-        text: `Paiement : ${bill.name}`,
-        time: "",
-        reminder: "none",
-        notified: false,
-        done: false
-      };
-      state.agenda = [...state.agenda, item].slice(-80);
-      saveState();
-      renderAgenda();
-      renderBudget();
-      showSuccessToast(`📅 "${bill.name}" ajouté à l'agenda.`);
-    });
-  }
-
-
   function bindDynamic(root, event, selector, handler) {
     root.addEventListener(event, (e) => {
       if (e.target.closest(selector)) handler(e);
@@ -2235,6 +1958,19 @@
       if (!element) return;
       element.addEventListener(eventName, handler);
     };
+
+    bindById("checkin-button", "click", (event) => {
+      event.preventDefault();
+      openCheckIn();
+    });
+    bindById("close-checkin", "click", closeCheckIn);
+    const checkInButton = $("checkin-button");
+    if (checkInButton) {
+      checkInButton.onclick = (event) => {
+        event.preventDefault();
+        openCheckIn();
+      };
+    }
 
     document.querySelectorAll("[data-view-button]").forEach((button) => {
       button.addEventListener("click", () => showView(button.dataset.viewButton));
@@ -2295,8 +2031,6 @@
     bindById("choose-domain-button", "click", () => showView("domains"));
     $("quick-add-button")?.addEventListener("click", openQuickAdd);
     $("close-quick-add")?.addEventListener("click", closeQuickAdd);
-    $("checkin-button")?.addEventListener("click", openCheckIn);
-    $("close-checkin")?.addEventListener("click", closeCheckIn);
     $("save-checkin")?.addEventListener("click", saveCheckIn);
     $("checkin-note")?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") saveCheckIn();
@@ -2392,12 +2126,10 @@
     resumeChallengeTimer();
     resumeActiveRewardTimer();
     scheduleAgendaReminders();
-    renderBudget();
   }
 
   bindInstallEvents();
   bindEvents();
-  bindBudgetEvents();
   render();
   registerServiceWorker();
 }());

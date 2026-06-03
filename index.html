@@ -13,13 +13,19 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">Coach du quotidien</p>
-          <h1>Élan</h1>
+        <div class="topbar-main">
+          <div>
+            <p class="eyebrow">Coach du quotidien</p>
+            <h1>Élan</h1>
+          </div>
+          <button class="calm-badge" id="header-coin-badge" aria-label="Solde de pièces — ouvrir la boutique" data-view-button="shop">
+            <span id="header-coin-balance">🪙 0</span>
+          </button>
         </div>
-        <button class="calm-badge" id="header-coin-badge" aria-label="Solde de pièces — ouvrir la boutique" data-view-button="shop">
-          <span id="header-coin-balance">🪙 0</span>
-        </button>
+        <nav class="top-actions" aria-label="Navigation secondaire">
+          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
+          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
+        </nav>
       </header>
 
       <main>
@@ -44,7 +50,6 @@
             <p class="muted">Choisis un domaine</p>
             <div class="domain-choice-grid">
               <button data-select-domain="house">🧹 Maison</button>
-              <button data-select-domain="finance">💰 Finances</button>
               <button data-select-domain="health">💧 Santé</button>
               <button data-select-domain="productivity">🎯 Productivité</button>
               <button data-select-domain="outside">🌲 Activité / extérieur</button>
@@ -106,72 +111,10 @@
           </div>
           <div class="domain-grid">
             <button type="button" class="domain-tile domain-house" data-open-domain="house" aria-controls="domain-house"><strong>Maison</strong><span>Soulagement</span><em id="count-house">À commencer</em><span class="domain-meter"><i id="progress-house"></i></span></button>
-            <button type="button" class="domain-tile domain-finance" data-open-domain="finance" aria-controls="domain-finance"><strong>Finances</strong><span>Clarté</span><em id="count-finance">À commencer</em><span class="domain-meter"><i id="progress-finance"></i></span></button>
             <button type="button" class="domain-tile domain-health" data-open-domain="health" aria-controls="domain-health"><strong>Santé</strong><span>Énergie</span><em id="count-health">À commencer</em><span class="domain-meter"><i id="progress-health"></i></span></button>
             <button type="button" class="domain-tile domain-productivity" data-open-domain="productivity" aria-controls="domain-productivity"><strong>Productivité</strong><span>Démarrage</span><em id="count-productivity">À commencer</em><span class="domain-meter"><i id="progress-productivity"></i></span></button>
             <button type="button" class="domain-tile domain-outside" data-open-domain="outside" aria-controls="domain-outside"><strong>Activité / extérieur</strong><span>Mouvement</span><em id="count-outside">À commencer</em><span class="domain-meter"><i id="progress-outside"></i></span></button>
           </div>
-
-          <article id="domain-finance" class="card domain-panel hidden budget-panel">
-            <div class="card-header">
-              <h2>Budget</h2>
-              <button class="text-button" data-close-domain>Changer</button>
-            </div>
-            <p class="muted">Clarté financière. Une action à la fois.</p>
-
-            <!-- Carte 1 : Cette semaine -->
-            <div class="budget-card" id="budget-situation">
-              <p class="budget-card-label">Cette semaine</p>
-              <div class="budget-row">
-                <span>Revenus</span>
-                <span id="budget-income-display">—</span>
-              </div>
-              <div class="budget-row">
-                <span>Paiements fixes</span>
-                <span id="budget-payments-display">—</span>
-              </div>
-              <div class="budget-row budget-row-total">
-                <span>Argent disponible</span>
-                <span id="budget-available-display">—</span>
-              </div>
-              <button id="budget-edit-amounts" class="budget-edit-btn" type="button">Modifier les montants</button>
-              <div id="budget-edit-form" class="budget-edit-form hidden">
-                <label>Revenus ($)<input id="budget-income-input" type="number" min="0" placeholder="ex: 750" inputmode="numeric"></label>
-                <label>Paiements fixes ($)<input id="budget-payments-input" type="number" min="0" placeholder="ex: 286" inputmode="numeric"></label>
-                <button id="budget-save-amounts" class="primary" type="button">Enregistrer</button>
-              </div>
-            </div>
-
-            <!-- Carte 2 : Pause anti-impulsive -->
-            <div class="budget-card budget-pause-card">
-              <p class="budget-card-label budget-card-label-pause">Envie d'acheter quelque chose ?</p>
-              <p class="budget-pause-text">Attends 10 minutes. Si l'envie est encore là après, c'est peut-être utile.</p>
-              <button id="budget-pause-btn" class="budget-pause-btn" type="button">⏱ Lancer 10 minutes</button>
-              <div id="budget-pause-timer" class="budget-pause-timer hidden">
-                <span id="budget-pause-countdown">10:00</span>
-                <span class="budget-pause-timer-label">Reste calme. Tu as le contrôle.</span>
-              </div>
-            </div>
-
-            <!-- Carte 3 : Paiements à venir -->
-            <div class="budget-card">
-              <p class="budget-card-label">À venir</p>
-              <ul id="budget-bills-list" class="budget-bills-list"></ul>
-              <button id="budget-add-bill" class="add-small" type="button">+ Ajouter un paiement</button>
-              <div id="budget-bill-form" class="budget-edit-form hidden">
-                <label>Nom<input id="budget-bill-name" type="text" placeholder="ex: Loyer"></label>
-                <label>Date<input id="budget-bill-date" type="date"></label>
-                <button id="budget-save-bill" class="primary" type="button">Ajouter</button>
-              </div>
-            </div>
-
-            <!-- Carte 4 : Actions du jour -->
-            <div class="budget-card">
-              <p class="budget-card-label">Actions du jour</p>
-              <div id="budget-actions-list" class="task-list"></div>
-            </div>
-
-          </article>
 
           <article id="domain-house" class="card domain-panel hidden">
             <div class="card-header"><h2>Maison</h2><button class="text-button" data-close-domain>Changer</button></div>
@@ -440,10 +383,8 @@
         <button data-view-button="domains">Domaines</button>
         <button data-view-button="agenda">Agenda</button>
         <button data-view-button="shop">Boutique</button>
-        <button class="settings-nav-button" data-view-button="settings" aria-label="Paramètres">⚙️</button>
       </nav>
     </div>
-    <button id="checkin-button" class="checkin-button" type="button" aria-controls="checkin-panel" aria-expanded="false" aria-label="Historique des victoires">Historique</button>
     <section id="checkin-panel" class="checkin-panel hidden" aria-live="polite">
       <article class="checkin-card">
         <div class="card-header">
@@ -546,4 +487,3 @@
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   </body>
 </html>
-
