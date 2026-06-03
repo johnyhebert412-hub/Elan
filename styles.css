@@ -465,7 +465,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
 .agenda-calendar {
   display: grid;
   gap: 4px;
-  grid-template-columns: repeat(7, minmax(38px, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   width: 100%;
   overflow-x: auto;
   padding-bottom: 2px;
@@ -477,7 +477,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
 
 .agenda-weekdays {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 3px;
   color: var(--muted);
   font-size: 0.72rem;
@@ -499,6 +499,8 @@ input[type="date"], input[type="time"], input[type="text"], select {
   gap: 3px;
   justify-content: center;
   min-width: 0;
+  max-width: 100%;
+  width: 100%;
   padding: 3px;
 }
 
