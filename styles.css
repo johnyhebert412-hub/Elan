@@ -465,8 +465,9 @@ input[type="date"], input[type="time"], input[type="text"], select {
 .agenda-weekdays,
 .agenda-calendar {
   display: grid;
-  gap: 7px;
-  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  width: 100%;
 }
 
 .agenda-weekdays {
@@ -477,20 +478,19 @@ input[type="date"], input[type="time"], input[type="text"], select {
   text-align: center;
   text-transform: uppercase;
 }
-
 .agenda-day {
   align-items: center;
   aspect-ratio: 1;
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(214, 202, 184, 0.75);
-  border-radius: 15px;
+  border-radius: 12px;
   color: var(--ink);
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 3px;
   justify-content: center;
-  min-height: 44px;
-  padding: 5px;
+  min-width: 0;
+  padding: 3px;
 }
 
 .agenda-day strong {
