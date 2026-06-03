@@ -471,6 +471,9 @@ input[type="date"], input[type="time"], input[type="text"], select {
 }
 
 .agenda-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 700;
@@ -478,6 +481,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
   text-align: center;
   text-transform: uppercase;
 }
+
 .agenda-day {
   align-items: center;
   aspect-ratio: 1;
