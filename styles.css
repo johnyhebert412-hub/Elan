@@ -462,23 +462,14 @@ input[type="date"], input[type="time"], input[type="text"], select {
   min-height: 44px;
 }
 
+.agenda-weekdays,
 .agenda-calendar {
   display: grid;
-  gap: 4px;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
-
-.agenda-day {
-  overflow: hidden;
+  gap: 7px;
+  grid-template-columns: repeat(7, 1fr);
 }
 
 .agenda-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 3px;
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 700;
@@ -492,16 +483,14 @@ input[type="date"], input[type="time"], input[type="text"], select {
   aspect-ratio: 1;
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(214, 202, 184, 0.75);
-  border-radius: 12px;
+  border-radius: 15px;
   color: var(--ink);
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 5px;
   justify-content: center;
-  min-width: 0;
-  max-width: 100%;
-  width: 100%;
-  padding: 3px;
+  min-height: 44px;
+  padding: 5px;
 }
 
 .agenda-day strong {
@@ -1606,6 +1595,33 @@ body.goal-series-active.challenge-open .app-shell {
   font-size: 0.9rem;
   padding: 20px 10px;
   text-align: center;
+}
+
+.suggestions-show-more {
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--brand-light);
+  font-size: 0.82rem;
+  font-weight: 600;
+  grid-column: 1 / -1;
+  min-height: 40px;
+  padding: 8px 14px;
+  text-align: center;
+  transition: background 0.15s ease;
+}
+
+.suggestions-show-more:hover {
+  background: rgba(22, 84, 70, 0.06);
+}
+
+.suggestions-show-more:active {
+  background: rgba(22, 84, 70, 0.12);
+  transform: scale(0.98);
+}
+
+.suggestions-show-less {
+  color: var(--muted);
 }
 
 /* ── Panneau domaine complété ── */

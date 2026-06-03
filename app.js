@@ -57,14 +57,14 @@
   };
 
   const homeDomains = {
-    off: { title: "Congé", subtitle: "Journée plus légère, sans pression.", missions: [{ label: "Choisir une petite chose" }, { label: "Préparer un coin calme" }, { label: "Faire 5 minutes utiles" }, { label: "Sortir prendre l'air" }, { label: "Ranger un petit espace" }, { label: "Planifier un moment relax" }] },
-    house: { title: "Maison", subtitle: "Petits gestes pour avancer à la maison.", missions: [{ label: "Faire la vaisselle" }, { label: "Ranger une surface" }, { label: "Lancer une brassée" }, { label: "Ranger une pièce" }, { label: "Vider une poubelle" }, { label: "Essuyer un comptoir" }, { label: "Plier quelques vêtements" }, { label: "Nettoyer un coin rapide" }] },
-    finance: { title: "Finances", subtitle: "Budget simple, anti impulsivité.", missions: [{ label: "Vérifier le solde" }, { label: "Attendre avant un achat" }, { label: "Payer une facture" }, { label: "Noter une dépense" }, { label: "Annuler un abonnement inutile" }, { label: "Mettre un petit montant de côté" }] },
-    productivity: { title: "Productivité", subtitle: "Démarrer sans te noyer.", missions: [{ label: "Ouvrir la tâche" }, { label: "Écrire une phrase" }, { label: "Timer 2 minutes" }, { label: "Nommer la prochaine étape" }, { label: "Fermer une distraction" }, { label: "Préparer le matériel" }] },
-    couple: { title: "Temps couple/famille", subtitle: "Connexion simple.", missions: [{ label: "Envoyer un message gentil" }, { label: "Faire une attention" }, { label: "Demander comment ça va" }, { label: "Faire un câlin" }, { label: "Proposer 10 minutes ensemble" }, { label: "Écouter sans interrompre" }] },
-    outside: { title: "Activité / extérieur", subtitle: "Bouger doucement.", missions: [{ label: "Mettre tes souliers" }, { label: "Sortir 2 minutes" }, { label: "Marcher 30 secondes" }, { label: "Ouvrir la porte" }, { label: "Prendre l'air dehors" }, { label: "Faire un mini tour" }] },
-    health: { title: "Santé", subtitle: "Énergie, sommeil, eau, médication.", missions: [{ label: "Boire de l'eau" }, { label: "Vérifier la médication" }, { label: "Bouger 2 minutes" }, { label: "Préparer le sommeil" }, { label: "Manger quelque chose simple" }, { label: "Étirer les épaules" }] },
-    mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }] }
+    off: { title: "Congé", subtitle: "Journée plus légère, sans pression.", missions: [{ label: "Choisir une petite chose" }, { label: "Préparer un coin calme" }, { label: "Faire 5 minutes utiles" }, { label: "Sortir prendre l'air" }, { label: "Ranger un petit espace" }, { label: "Planifier un moment relax" }, { label: "Lire quelques pages" }, { label: "Préparer un thé ou café" }, { label: "Écouter de la musique douce" }, { label: "Faire une courte sieste" }, { label: "Écrire ce que tu ressens" }, { label: "Regarder par la fenêtre 2 minutes" }] },
+    house: { title: "Maison", subtitle: "Petits gestes pour avancer à la maison.", missions: [{ label: "Faire la vaisselle" }, { label: "Ranger une surface" }, { label: "Lancer une brassée" }, { label: "Ranger une pièce" }, { label: "Vider une poubelle" }, { label: "Essuyer un comptoir" }, { label: "Plier quelques vêtements" }, { label: "Nettoyer un coin rapide" }, { label: "Faire le lit" }, { label: "Sortir les poubelles" }, { label: "Passer le balai" }, { label: "Nettoyer le lavabo" }, { label: "Ranger les chaussures" }, { label: "Vider le lave-vaisselle" }, { label: "Essuyer la table" }, { label: "Ramasser ce qui traîne" }] },
+    finance: { title: "Finances", subtitle: "Budget simple, anti impulsivité.", missions: [{ label: "Vérifier le solde" }, { label: "Attendre avant un achat" }, { label: "Payer une facture" }, { label: "Noter une dépense" }, { label: "Annuler un abonnement inutile" }, { label: "Mettre un petit montant de côté" }, { label: "Lister les dépenses de la semaine" }, { label: "Vérifier les abonnements actifs" }, { label: "Comparer deux prix avant d'acheter" }, { label: "Faire une liste avant d'aller au magasin" }, { label: "Revoir un budget de catégorie" }, { label: "Éviter une dépense impulsive" }] },
+    productivity: { title: "Productivité", subtitle: "Démarrer sans te noyer.", missions: [{ label: "Ouvrir la tâche" }, { label: "Écrire une phrase" }, { label: "Timer 2 minutes" }, { label: "Nommer la prochaine étape" }, { label: "Fermer une distraction" }, { label: "Préparer le matériel" }, { label: "Lire une seule page" }, { label: "Envoyer un courriel en attente" }, { label: "Classer 5 fichiers" }, { label: "Écrire la liste du lendemain" }, { label: "Faire une tâche de moins de 2 minutes" }, { label: "Vider la boîte de réception" }, { label: "Identifier la tâche la plus importante" }, { label: "Fermer les onglets inutiles" }] },
+    couple: { title: "Temps couple/famille", subtitle: "Connexion simple.", missions: [{ label: "Envoyer un message gentil" }, { label: "Faire une attention" }, { label: "Demander comment ça va" }, { label: "Faire un câlin" }, { label: "Proposer 10 minutes ensemble" }, { label: "Écouter sans interrompre" }, { label: "Préparer quelque chose à manger ensemble" }, { label: "Regarder une vidéo ensemble" }, { label: "Dire merci pour quelque chose" }, { label: "Raconter une bonne chose de ta journée" }, { label: "Proposer une sortie simple" }, { label: "Laisser un petit mot" }] },
+    outside: { title: "Activité / extérieur", subtitle: "Bouger doucement.", missions: [{ label: "Mettre tes souliers" }, { label: "Sortir 2 minutes" }, { label: "Marcher 30 secondes" }, { label: "Ouvrir la porte" }, { label: "Prendre l'air dehors" }, { label: "Faire un mini tour" }, { label: "Marcher jusqu'au coin de rue" }, { label: "Étirer les jambes dehors" }, { label: "Observer ce qui t'entoure" }, { label: "Faire 5 minutes de vélo" }, { label: "S'asseoir dehors 5 minutes" }, { label: "Ramasser quelque chose en marchant" }] },
+    health: { title: "Santé", subtitle: "Énergie, sommeil, eau, médication.", missions: [{ label: "Boire de l'eau" }, { label: "Vérifier la médication" }, { label: "Bouger 2 minutes" }, { label: "Préparer le sommeil" }, { label: "Manger quelque chose simple" }, { label: "Étirer les épaules" }, { label: "Faire 5 respirations lentes" }, { label: "Manger un fruit" }, { label: "Boire un grand verre d'eau" }, { label: "Couper les écrans 30 min avant de dormir" }, { label: "Faire une courte marche" }, { label: "Prendre une douche" }, { label: "Se coucher à l'heure prévue" }, { label: "Prendre soin de ta peau" }] },
+    mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }, { label: "Bois un verre d'eau" }, { label: "Relâche tes épaules" }, { label: "Ferme les yeux 10 secondes" }, { label: "Nomme 3 choses que tu vois" }, { label: "Écoute un son autour de toi" }, { label: "Marche 30 secondes" }, { label: "Fais une pause écran" }] }
   };
 
   const emergencyActions = [
@@ -235,6 +235,9 @@
     state.currentHomeDomain = domain;
     state.selectedDomain = domain;
     saveState();
+    // Réinitialiser l'état "Voir plus" quand on change de domaine
+    const suggestionsList = $("domain-suggestions");
+    if (suggestionsList) suggestionsList.dataset.expanded = "false";
     renderHomeSuggestion();
     renderSelectedDomain();
     // Basculer en mode "domaine actif" : masque le hero et la grille
@@ -333,7 +336,12 @@
         if (suggestionsEmptyState) {
           suggestionsEmptyState.classList.add("hidden");
         }
-        suggestionsList.replaceChildren(...available.map((mission) => {
+        const SUGGESTIONS_INITIAL = 4;
+        const isExpanded = suggestionsList.dataset.expanded === "true";
+        const visible = isExpanded ? available : available.slice(0, SUGGESTIONS_INITIAL);
+        const hiddenCount = available.length - SUGGESTIONS_INITIAL;
+
+        const makeSuggestionBtn = (mission) => {
           const btn = document.createElement("button");
           btn.type = "button";
           btn.className = "suggestion-btn";
@@ -345,7 +353,33 @@
             toggleGoalSelection(mission.label, domain);
           });
           return btn;
-        }));
+        };
+
+        const nodes = visible.map(makeSuggestionBtn);
+
+        if (!isExpanded && hiddenCount > 0) {
+          const moreBtn = document.createElement("button");
+          moreBtn.type = "button";
+          moreBtn.className = "suggestions-show-more";
+          moreBtn.textContent = `Voir ${hiddenCount} de plus`;
+          moreBtn.addEventListener("click", () => {
+            suggestionsList.dataset.expanded = "true";
+            renderSelectedDomain();
+          });
+          nodes.push(moreBtn);
+        } else if (isExpanded && available.length > SUGGESTIONS_INITIAL) {
+          const lessBtn = document.createElement("button");
+          lessBtn.type = "button";
+          lessBtn.className = "suggestions-show-more suggestions-show-less";
+          lessBtn.textContent = "Voir moins";
+          lessBtn.addEventListener("click", () => {
+            suggestionsList.dataset.expanded = "false";
+            renderSelectedDomain();
+          });
+          nodes.push(lessBtn);
+        }
+
+        suggestionsList.replaceChildren(...nodes);
       }
     }
 
