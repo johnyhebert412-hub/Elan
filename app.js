@@ -87,6 +87,12 @@
       advanced: "Avancé"
     }
   };
+  const trainingRewardByLevel = {
+    beginner: 5,
+    intermediate: 10,
+    advanced: 15
+  };
+  const TRAINING_SKIP_PENALTY = 2;
 
   const trainingPrograms = {
     cardio: {
@@ -234,7 +240,7 @@
     activeReward: null,
     history: [],
     notifications: { important: false, summary: false },
-    training: { mode: "quick", type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false, customSteps: [] }
+    training: { mode: "quick", type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
   let state = loadState();
@@ -249,6 +255,10 @@
   let challengeCountdownId = null;
   let isCompletingChallenge = false;
   let activeRewardTimerId = null;
+  let trainingTimerId = null;
+  let trainingTimerStepKey = "";
+  let trainingTimerRemaining = 0;
+  let trainingTimerElapsed = false;
 
   function cloneState(value) {
     if (typeof structuredClone === "function") return structuredClone(value);
@@ -290,6 +300,8 @@
               started: Boolean(saved.training.started),
               currentStep: Number.isFinite(saved.training.currentStep) ? saved.training.currentStep : 0,
               completed: Boolean(saved.training.completed),
+              skippedSteps: Number.isFinite(saved.training.skippedSteps) ? Math.max(0, saved.training.skippedSteps) : 0,
+              lastReward: Number.isFinite(saved.training.lastReward) ? Math.max(0, saved.training.lastReward) : 0,
               customSteps: Array.isArray(saved.training.customSteps)
                 ? saved.training.customSteps
                     .filter((step) => step && typeof step.label === "string" && typeof step.amount === "string")
@@ -470,13 +482,99 @@
       if (currentStep) currentStep.textContent = step.label;
       if (currentAmount) currentAmount.textContent = step.amount;
       if (progressFill) progressFill.style.width = `${Math.round((currentStepIndex / totalSteps) * 100)}%`;
+      renderTrainingTimer(step, currentStepIndex);
     } else if (progressFill) {
       progressFill.style.width = isCompleted ? "100%" : "0%";
+      stopTrainingTimer();
+      $("training-step-timer")?.classList.add("hidden");
     }
 
     if (completeSummary && isCompleted) {
-      completeSummary.textContent = `${programLabel} complété. +${COINS_PER_TASK} pièces gagnées.`;
+      const reward = Number.isFinite(state.training?.lastReward) ? state.training.lastReward : trainingRewardForCurrentSession();
+      completeSummary.textContent = `${programLabel} complété. +${reward} jetons gagnés.`;
     }
+  }
+
+  function trainingRewardForCurrentSession() {
+    const baseReward = trainingRewardByLevel[state.training?.level] || trainingRewardByLevel.beginner;
+    const skippedSteps = Number.isFinite(state.training?.skippedSteps) ? state.training.skippedSteps : 0;
+    return Math.max(0, baseReward - skippedSteps * TRAINING_SKIP_PENALTY);
+  }
+
+  function parseTrainingDurationSeconds(amount) {
+    const text = String(amount || "").toLowerCase().replace(",", ".");
+    const cycleMatch = text.match(/(\d+)\s*cycles?.*?(\d+(?:\.\d+)?)\s*(?:s|sec|secs|seconde|secondes).*?(\d+(?:\.\d+)?)\s*(?:s|sec|secs|seconde|secondes)/);
+    if (cycleMatch) {
+      return Math.round(Number(cycleMatch[1]) * (Number(cycleMatch[2]) + Number(cycleMatch[3])));
+    }
+    const multipliedMatch = text.match(/(\d+)\s*x\s*(\d+(?:\.\d+)?)\s*(s|sec|secs|seconde|secondes|min|minute|minutes)/);
+    if (multipliedMatch) {
+      const value = Number(multipliedMatch[2]);
+      const unit = multipliedMatch[3];
+      return Math.round(Number(multipliedMatch[1]) * value * (unit.startsWith("min") ? 60 : 1));
+    }
+    const durationMatch = text.match(/(\d+(?:\.\d+)?)\s*(s|sec|secs|seconde|secondes|min|minute|minutes)/);
+    if (!durationMatch) return 0;
+    const value = Number(durationMatch[1]);
+    const unit = durationMatch[2];
+    return Math.round(value * (unit.startsWith("min") ? 60 : 1));
+  }
+
+  function renderTrainingTimer(step, stepIndex) {
+    const timer = $("training-step-timer");
+    if (!timer) return;
+    const seconds = parseTrainingDurationSeconds(step.amount);
+    if (!seconds) {
+      stopTrainingTimer();
+      timer.classList.add("hidden");
+      return;
+    }
+    const stepKey = `${state.training?.mode || "quick"}:${stepIndex}:${step.label}:${step.amount}`;
+    if (trainingTimerStepKey !== stepKey) {
+      stopTrainingTimer();
+      trainingTimerStepKey = stepKey;
+      trainingTimerRemaining = Math.max(1, seconds);
+      trainingTimerElapsed = false;
+      trainingTimerId = window.setInterval(tickTrainingTimer, 1000);
+    }
+    timer.classList.remove("hidden");
+    updateTrainingTimerDisplay();
+  }
+
+  function tickTrainingTimer() {
+    if (trainingTimerRemaining > 0) {
+      trainingTimerRemaining -= 1;
+    }
+    updateTrainingTimerDisplay();
+    if (trainingTimerRemaining <= 0) {
+      window.clearInterval(trainingTimerId);
+      trainingTimerId = null;
+      trainingTimerElapsed = true;
+      updateTrainingTimerDisplay();
+      if ("vibrate" in navigator) navigator.vibrate([15, 35, 15]);
+    }
+  }
+
+  function updateTrainingTimerDisplay() {
+    const display = $("training-timer-display");
+    const status = $("training-timer-status");
+    const completeButton = $("complete-training-step");
+    const remaining = Math.max(0, trainingTimerRemaining);
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    if (display) display.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    if (status) status.textContent = trainingTimerElapsed ? "Temps écoulé. Tu peux passer à l'étape suivante." : "Compte à rebours en cours.";
+    if (completeButton) completeButton.textContent = trainingTimerElapsed ? "Étape suivante" : "Terminé";
+  }
+
+  function stopTrainingTimer() {
+    window.clearInterval(trainingTimerId);
+    trainingTimerId = null;
+    trainingTimerStepKey = "";
+    trainingTimerRemaining = 0;
+    trainingTimerElapsed = false;
+    const completeButton = $("complete-training-step");
+    if (completeButton) completeButton.textContent = "Terminé";
   }
 
   function renderTrainingCustomList(list) {
@@ -518,14 +616,16 @@
 
   function setTrainingMode(mode) {
     if (!["quick", "custom"].includes(mode)) return;
-    state.training = { ...(state.training || defaultState.training), mode, started: false, currentStep: 0, completed: false };
+    stopTrainingTimer();
+    state.training = { ...(state.training || defaultState.training), mode, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
 
   function setTrainingType(type) {
     if (!trainingPrograms[type]) return;
-    state.training = { ...(state.training || defaultState.training), type, started: false, currentStep: 0, completed: false };
+    stopTrainingTimer();
+    state.training = { ...(state.training || defaultState.training), type, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
@@ -533,7 +633,8 @@
   function setTrainingLevel(level) {
     const type = trainingPrograms[state.training?.type] ? state.training.type : defaultState.training.type;
     if (!trainingPrograms[type]?.[level]) return;
-    state.training = { ...(state.training || defaultState.training), level, started: false, currentStep: 0, completed: false };
+    stopTrainingTimer();
+    state.training = { ...(state.training || defaultState.training), level, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
@@ -544,14 +645,15 @@
       showToast("Ajoute au moins un exercice.");
       return;
     }
-    state.training = { ...(state.training || defaultState.training), started: true, currentStep: 0, completed: false };
+    state.training = { ...(state.training || defaultState.training), started: true, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     showToast("Séance commencée. Une étape à la fois.");
   }
 
   function resetTrainingSession() {
-    state.training = { ...(state.training || defaultState.training), started: false, currentStep: 0, completed: false };
+    stopTrainingTimer();
+    state.training = { ...(state.training || defaultState.training), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -559,7 +661,8 @@
 
   function stopTrainingSession() {
     if (!state.training?.started) return;
-    state.training = { ...state.training, started: false, currentStep: 0, completed: false };
+    stopTrainingTimer();
+    state.training = { ...state.training, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     showToast("Séance arrêtée.");
@@ -575,27 +678,33 @@
 
   function advanceTrainingStep(skipped) {
     if (!state.training?.started || state.training.completed) return;
+    stopTrainingTimer();
     const { program } = currentTrainingProgram();
     const currentStepIndex = Math.min(Math.max(state.training.currentStep || 0, 0), program.steps.length - 1);
     const nextStepIndex = currentStepIndex + 1;
     if (nextStepIndex < program.steps.length) {
-      state.training = { ...state.training, currentStep: nextStepIndex };
+      state.training = { ...state.training, currentStep: nextStepIndex, skippedSteps: (state.training.skippedSteps || 0) + (skipped ? 1 : 0) };
       saveState();
       renderTrainingProgram();
       showToast(skipped ? `Exercice passé. ${nextStepIndex + 1}/${program.steps.length}` : `Exercice ${nextStepIndex + 1}/${program.steps.length}`);
       return;
+    }
+    if (skipped) {
+      state.training = { ...state.training, skippedSteps: (state.training.skippedSteps || 0) + 1 };
     }
     finishTrainingSession();
   }
 
   function finishTrainingSession() {
     const { program, label: programLabel } = currentTrainingProgram();
-    state.training = { ...state.training, started: false, currentStep: program.steps.length - 1, completed: true };
+    stopTrainingTimer();
+    const reward = trainingRewardForCurrentSession();
+    state.training = { ...state.training, started: false, currentStep: program.steps.length - 1, completed: true, lastReward: reward };
     state.wins += 1;
-    state.coins += COINS_PER_TASK;
+    state.coins += reward;
     state.history = [{
       label: `Séance Entraînement : ${programLabel}`,
-      coins: COINS_PER_TASK,
+      coins: reward,
       at: Date.now(),
       domain: "training"
     }, ...state.history].slice(0, 50);
@@ -603,7 +712,7 @@
     renderTrainingProgram();
     renderShop();
     renderHistoryList();
-    showSuccessToast(`Séance terminée. +${COINS_PER_TASK} pièces`);
+    showSuccessToast(`Séance terminée. +${reward} jetons gagnés`);
   }
 
   function addTrainingExercise() {
@@ -622,6 +731,8 @@
       started: false,
       currentStep: 0,
       completed: false,
+      skippedSteps: 0,
+      lastReward: 0,
       customSteps: [...customSteps, { label, amount }].slice(0, 12)
     };
     if (nameInput) nameInput.value = "";
@@ -633,7 +744,7 @@
 
   function removeTrainingExercise(index) {
     const customSteps = Array.isArray(state.training?.customSteps) ? state.training.customSteps : [];
-    state.training = { ...(state.training || defaultState.training), customSteps: customSteps.filter((_, itemIndex) => itemIndex !== index), started: false, currentStep: 0, completed: false };
+    state.training = { ...(state.training || defaultState.training), customSteps: customSteps.filter((_, itemIndex) => itemIndex !== index), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
@@ -644,7 +755,7 @@
     if (nextIndex < 0 || nextIndex >= customSteps.length) return;
     const [item] = customSteps.splice(index, 1);
     customSteps.splice(nextIndex, 0, item);
-    state.training = { ...(state.training || defaultState.training), customSteps, started: false, currentStep: 0, completed: false };
+    state.training = { ...(state.training || defaultState.training), customSteps, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }

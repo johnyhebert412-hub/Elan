@@ -575,6 +575,33 @@ p { line-height: 1.4; }
   margin: 0 0 12px;
 }
 
+.training-step-timer {
+  background: #eef7f2;
+  border: 1px solid var(--brand-light);
+  border-radius: 12px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+}
+
+.training-step-timer span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.training-step-timer strong {
+  color: var(--brand);
+  display: block;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.training-step-timer p {
+  margin: 7px 0 0;
+}
+
 .training-progress-track {
   background: #dfe9e3;
   border-radius: 999px;
