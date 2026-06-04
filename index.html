@@ -13,12 +13,8 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <nav class="top-actions" aria-label="Barre supérieure">
-          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
-          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
-        </nav>
         <div class="topbar-main">
-          <div>
+          <div class="topbar-brand">
             <p class="eyebrow">Coach du quotidien</p>
             <h1>Élan</h1>
           </div>
@@ -26,6 +22,10 @@
             <span id="header-coin-balance">🪙 0</span>
           </button>
         </div>
+        <nav class="top-actions" aria-label="Barre supérieure">
+          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
+          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
+        </nav>
       </header>
 
       <main>

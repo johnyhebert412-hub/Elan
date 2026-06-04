@@ -54,9 +54,14 @@ button:active { transform: scale(0.98); }
 
 .topbar-main {
   align-items: center;
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  min-height: 64px;
+}
+
+.topbar-brand {
+  grid-column: 2;
+  text-align: center;
 }
 
 .top-actions {
@@ -125,6 +130,8 @@ p { line-height: 1.4; }
   display: flex;
   font-size: .82rem;
   font-weight: 700;
+  grid-column: 3;
+  justify-self: end;
   min-height: 42px;
   padding: 8px 12px;
 }
