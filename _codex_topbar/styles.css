@@ -680,22 +680,6 @@ input[type="date"], input[type="time"], input[type="text"], select {
   gap: 10px;
 }
 
-.shop-category {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.shop-category + .shop-category {
-  margin-top: 6px;
-}
-
-.shop-category h3 {
-  color: var(--brand);
-  font-size: 0.86rem;
-  margin: 0;
-}
-
 .shop-item {
   align-items: center;
   background: var(--soft);
