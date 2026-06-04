@@ -123,8 +123,8 @@
       },
       intermediate: {
         duration: "3 min",
-        intensity: "Mod?r?e",
-        note: "Garde un rythme simple et r?gulier.",
+        intensity: "Modérée",
+        note: "Garde un rythme simple et régulier.",
         steps: [
           { label: "Jumping Jacks", amount: "60 secondes" },
           { label: "Genoux hauts", amount: "60 secondes" },
@@ -133,8 +133,8 @@
       },
       advanced: {
         duration: "3 min",
-        intensity: "?lev?e",
-        note: "Reste attentif ? tes sensations et ralentis si n?cessaire.",
+        intensity: "Élevée",
+        note: "Reste attentif à tes sensations et ralentis si nécessaire.",
         steps: [
           { label: "Burpees", amount: "45 secondes" },
           { label: "Mountain Climbers", amount: "60 secondes" },
@@ -148,28 +148,28 @@
         intensity: "Douce",
         note: "Prends ton temps et garde des mouvements simples.",
         steps: [
-          { label: "Squats", amount: "8 r?p?titions" },
-          { label: "Pompes", amount: "5 r?p?titions" },
+          { label: "Squats", amount: "8 répétitions" },
+          { label: "Pompes", amount: "5 répétitions" },
           { label: "Planche", amount: "20 secondes" }
         ]
       },
       intermediate: {
         duration: "3 min",
-        intensity: "Mod?r?e",
-        note: "Avance ?tape par ?tape, avec des pauses si n?cessaire.",
+        intensity: "Modérée",
+        note: "Avance étape par étape, avec des pauses si nécessaire.",
         steps: [
-          { label: "Squats", amount: "12 r?p?titions" },
-          { label: "Pompes", amount: "10 r?p?titions" },
+          { label: "Squats", amount: "12 répétitions" },
+          { label: "Pompes", amount: "10 répétitions" },
           { label: "Planche", amount: "30 secondes" }
         ]
       },
       advanced: {
         duration: "4 min",
-        intensity: "?lev?e",
-        note: "Garde le contr?le et r?duis le rythme si n?cessaire.",
+        intensity: "Élevée",
+        note: "Garde le contrôle et réduis le rythme si nécessaire.",
         steps: [
-          { label: "Squats", amount: "20 r?p?titions" },
-          { label: "Pompes", amount: "15 r?p?titions" },
+          { label: "Squats", amount: "20 répétitions" },
+          { label: "Pompes", amount: "15 répétitions" },
           { label: "Planche", amount: "60 secondes" }
         ]
       }
@@ -187,20 +187,20 @@
       },
       intermediate: {
         duration: "3 min",
-        intensity: "Mod?r?e",
+        intensity: "Modérée",
         note: "Garde un rythme stable et fais une pause au besoin.",
         steps: [
-          { label: "Fentes", amount: "10 r?p?titions" },
+          { label: "Fentes", amount: "10 répétitions" },
           { label: "Chaise", amount: "40 secondes" },
           { label: "Planche", amount: "40 secondes" }
         ]
       },
       advanced: {
         duration: "4 min",
-        intensity: "?lev?e",
-        note: "Garde les mouvements simples et r?duis l'intensit? si n?cessaire.",
+        intensity: "Élevée",
+        note: "Garde les mouvements simples et réduis l'intensité si nécessaire.",
         steps: [
-          { label: "Fentes", amount: "12 r?p?titions" },
+          { label: "Fentes", amount: "12 répétitions" },
           { label: "Chaise", amount: "60 secondes" },
           { label: "Planche", amount: "60 secondes" }
         ]
@@ -518,6 +518,7 @@
     const currentStepIndex = Math.min(Math.max(state.training?.currentStep || 0, 0), Math.max(totalSteps - 1, 0));
     const isStarted = Boolean(state.training?.started && !state.training?.completed);
     const isCompleted = Boolean(state.training?.completed);
+    panel.classList.toggle("training-active-domain", isStarted);
     document.querySelectorAll("[data-training-mode]").forEach((button) => {
       const active = button.dataset.trainingMode === mode;
       button.classList.toggle("selected", active);
@@ -535,6 +536,7 @@
     });
 
     const title = $("training-program-title");
+    const programCard = $("training-program-card");
     const steps = $("training-steps");
     const duration = $("training-duration");
     const intensity = $("training-intensity");
@@ -543,6 +545,7 @@
     const status = $("training-session-status");
     const activeStep = $("training-active-step");
     const stepCount = $("training-step-count");
+    const remainingSteps = $("training-remaining-steps");
     const currentStep = $("training-current-step");
     const currentAmount = $("training-current-amount");
     const progressFill = $("training-progress-fill");
@@ -554,8 +557,12 @@
     const customBuilder = $("training-custom-builder");
     const customList = $("training-custom-list");
 
-    if (quickBuilder) quickBuilder.classList.toggle("hidden", mode !== "quick");
-    if (customBuilder) customBuilder.classList.toggle("hidden", mode !== "custom");
+    if (quickBuilder) quickBuilder.classList.toggle("hidden", mode !== "quick" || isStarted);
+    if (customBuilder) customBuilder.classList.toggle("hidden", mode !== "custom" || isStarted);
+    if (programCard) {
+      programCard.classList.toggle("training-session-focused", isStarted);
+      programCard.classList.toggle("training-countdown-active", isStarted && trainingTimerPhase === "countdown");
+    }
 
     if (title) title.textContent = programTitle;
     if (steps) {
@@ -588,14 +595,16 @@
     if (isStarted && totalSteps) {
       const step = program.steps[currentStepIndex];
       if (stepCount) stepCount.textContent = `Exercice ${currentStepIndex + 1}/${totalSteps}`;
+      if (remainingSteps) remainingSteps.textContent = `Étapes restantes : ${Math.max(0, totalSteps - currentStepIndex - 1)}`;
       if (currentStep) currentStep.textContent = step.label;
       const hasTimer = parseTrainingDurationSeconds(step.amount) > 0;
       if (currentAmount) {
         currentAmount.textContent = step.amount;
-        currentAmount.classList.remove("hidden");
+        currentAmount.classList.toggle("hidden", hasTimer);
       }
       if (progressFill) progressFill.style.width = `${Math.round((currentStepIndex / totalSteps) * 100)}%`;
       renderTrainingTimer(step, currentStepIndex);
+      if (programCard) programCard.classList.toggle("training-countdown-active", trainingTimerPhase === "countdown");
     } else if (progressFill) {
       progressFill.style.width = isCompleted ? "100%" : "0%";
       stopTrainingTimer();
@@ -668,10 +677,12 @@
       if (trainingCountdownValue > 0) {
         trainingCountdownValue -= 1;
         updateTrainingTimerDisplay();
+        renderTrainingProgram();
         return;
       }
       trainingTimerPhase = "timer";
       updateTrainingTimerDisplay();
+      renderTrainingProgram();
       return;
     }
     if (trainingTimerRemaining > 0) {
@@ -691,15 +702,21 @@
     const display = $("training-timer-display");
     const status = $("training-timer-status");
     const completeButton = $("complete-training-step");
+    const countdownScreen = $("training-countdown-screen");
+    const countdownDisplay = $("training-countdown-display");
     if (trainingTimerPhase === "countdown") {
+      const countdownText = trainingCountdownValue > 0 ? String(trainingCountdownValue) : "GO !";
+      if (countdownScreen) countdownScreen.classList.remove("hidden");
+      if (countdownDisplay) countdownDisplay.textContent = countdownText;
       if (display) {
-        display.textContent = trainingCountdownValue > 0 ? String(trainingCountdownValue) : "GO !";
+        display.textContent = countdownText;
         display.classList.add("training-countdown-display");
       }
       if (status) status.textContent = trainingCountdownValue > 0 ? "Prépare-toi." : "C'est parti.";
       if (completeButton) completeButton.textContent = "Terminé";
       return;
     }
+    if (countdownScreen) countdownScreen.classList.add("hidden");
     const remaining = Math.max(0, trainingTimerRemaining);
     const minutes = Math.floor(remaining / 60);
     const seconds = remaining % 60;
@@ -707,7 +724,7 @@
       display.classList.remove("training-countdown-display");
       display.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     }
-    if (status) status.textContent = trainingTimerElapsed ? "Temps écoulé. Tu peux passer à l'étape suivante." : "Compte à rebours en cours.";
+    if (status) status.textContent = trainingTimerElapsed ? "Temps écoulé. Tu peux passer à l'étape suivante." : "";
     if (completeButton) completeButton.textContent = trainingTimerElapsed ? "Étape suivante" : "Terminé";
   }
 
@@ -720,6 +737,7 @@
     trainingTimerPhase = "idle";
     trainingCountdownValue = 3;
     $("training-timer-display")?.classList.remove("training-countdown-display");
+    $("training-countdown-screen")?.classList.add("hidden");
     const completeButton = $("complete-training-step");
     if (completeButton) completeButton.textContent = "Terminé";
   }

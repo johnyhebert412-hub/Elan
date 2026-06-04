@@ -576,8 +576,15 @@ p { line-height: 1.4; }
 
 .training-active-step h4 {
   color: var(--brand);
-  font-size: 1.08rem;
+  font-size: 1.24rem;
   margin: 3px 0 4px;
+}
+
+.training-remaining-steps {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin: 0 0 10px;
 }
 
 .training-current-amount {
@@ -617,6 +624,38 @@ p { line-height: 1.4; }
 
 .training-step-timer p {
   margin: 7px 0 0;
+}
+
+.training-countdown-screen {
+  align-items: center;
+  background: #eef7f2;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  text-align: center;
+  z-index: 50;
+}
+
+.training-countdown-screen strong {
+  color: var(--brand);
+  font-size: 5.8rem;
+  line-height: 1;
+}
+
+.training-active-domain .training-control,
+.training-active-domain .training-custom-builder,
+.training-session-focused .card-header,
+.training-session-focused #training-session-status,
+.training-session-focused #training-steps,
+.training-session-focused .training-meta,
+.training-session-focused #training-note,
+.training-session-focused > .button-row {
+  display: none;
+}
+
+.training-countdown-active #training-active-step {
+  display: none;
 }
 
 .training-progress-track {
