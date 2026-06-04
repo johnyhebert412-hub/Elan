@@ -597,7 +597,7 @@
 
     if (isCompleted) {
       const reward = Number.isFinite(state.training?.lastReward) ? state.training.lastReward : trainingRewardForCurrentSession();
-      if (completeSummary) completeSummary.textContent = "Séance terminée.";
+      if (completeSummary) completeSummary.textContent = "Activité terminée.";
       if (completeReward) {
         completeReward.textContent = reward > 0 ? `+${reward} jetons gagnés` : "";
         completeReward.classList.toggle("hidden", reward <= 0);
@@ -920,6 +920,7 @@
       $("view-home")?.classList.remove("domain-selected");
       return;
     }
+    card.classList.remove("hidden");
     $("selected-domain-title").textContent = detail.title;
     $("selected-domain-subtitle").textContent = detail.subtitle;
 
@@ -1244,7 +1245,7 @@
     const summary = $("series-complete-summary");
     const coinsEl = $("series-complete-coins");
     if (summary) {
-      summary.textContent = "Domaine terminé.";
+      summary.textContent = "Activité terminée.";
     }
     if (coinsEl) {
       coinsEl.textContent = totalCoins > 0 ? `+${totalCoins} pièces gagnées` : "";
@@ -1256,6 +1257,37 @@
 
   function closeSeriesComplete() {
     $("series-complete-overlay")?.classList.add("hidden");
+  }
+
+  function continueAfterSeriesComplete() {
+    closeSeriesComplete();
+    clearMaisonRuntimeState("continuer après maison");
+    saveState();
+    renderGoalQueue();
+    renderChallengeTimer();
+    selectHomeDomain("house");
+  }
+
+  function openShopAfterSeriesComplete() {
+    closeSeriesComplete();
+    clearMaisonRuntimeState("boutique après maison");
+    saveState();
+    renderGoalQueue();
+    renderChallengeTimer();
+    showView("shop");
+  }
+
+  function finishAfterSeriesComplete() {
+    closeSeriesComplete();
+    clearMaisonRuntimeState("terminer après maison");
+    state.currentHomeDomain = "";
+    state.selectedDomain = "";
+    saveState();
+    renderSelectedDomain();
+    renderGoalQueue();
+    renderChallengeTimer();
+    showView("home");
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   function continueAfterTrainingComplete() {
@@ -1279,7 +1311,34 @@
 
   function openShopAfterTrainingComplete() {
     $("training-complete-panel")?.classList.add("hidden");
+    state.training = {
+      ...(state.training || defaultState.training),
+      started: false,
+      completed: false,
+      currentStep: 0,
+      skippedSteps: 0,
+      lastReward: 0
+    };
+    saveState();
+    renderTrainingProgram();
     showView("shop");
+  }
+
+  function finishAfterTrainingComplete() {
+    $("training-complete-panel")?.classList.add("hidden");
+    state.training = {
+      ...(state.training || defaultState.training),
+      started: false,
+      completed: false,
+      currentStep: 0,
+      skippedSteps: 0,
+      lastReward: 0
+    };
+    saveState();
+    renderTrainingProgram();
+    closeDomain();
+    showView("domains");
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   function goalSelectionSummary(count) {
@@ -2931,6 +2990,7 @@
     bindById("reset-training-session", "click", resetTrainingSession);
     bindById("training-complete-continue", "click", continueAfterTrainingComplete);
     bindById("training-complete-shop", "click", openShopAfterTrainingComplete);
+    bindById("training-complete-finish", "click", finishAfterTrainingComplete);
     bindById("add-training-exercise", "click", addTrainingExercise);
     bindById("training-custom-name", "keydown", (event) => {
       if (event.key === "Enter") addTrainingExercise();
@@ -2953,11 +3013,9 @@
       showToast("Données effacées.");
     });
 
-    bindById("series-complete-close", "click", closeSeriesComplete);
-    bindById("series-complete-shop", "click", () => {
-      closeSeriesComplete();
-      showView("shop");
-    });
+    bindById("series-complete-close", "click", continueAfterSeriesComplete);
+    bindById("series-complete-shop", "click", openShopAfterSeriesComplete);
+    bindById("series-complete-finish", "click", finishAfterSeriesComplete);
     bindById("domain-restart", "click", restartDomain);
     bindById("domain-change", "click", closeSelectedDomain);
   }
