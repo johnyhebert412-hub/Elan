@@ -94,19 +94,34 @@
         duration: "10-12 min",
         intensity: "Douce",
         note: "Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.",
-        steps: ["Marche tranquille 5 min", "Marche rapide 5 min", "Respiration calme 1 min"]
+        steps: [
+          { label: "Marche tranquille", amount: "5 min" },
+          { label: "Marche rapide", amount: "5 min" },
+          { label: "Respiration calme", amount: "1 min" }
+        ]
       },
       intermediate: {
         duration: "12-15 min",
         intensity: "Modérée",
         note: "Garde un rythme que tu peux contrôler. Le but est de rester régulier.",
-        steps: ["Marche rapide 6 min", "Escaliers doux 3 min", "Intervalles simples 4 min", "Retour au calme 2 min"]
+        steps: [
+          { label: "Marche rapide", amount: "6 min" },
+          { label: "Escaliers doux", amount: "3 min" },
+          { label: "Intervalles simples", amount: "4 cycles de 30 s effort / 30 s repos" },
+          { label: "Retour au calme", amount: "2 min" }
+        ]
       },
       advanced: {
         duration: "16-20 min",
         intensity: "Élevée, contrôlée",
         note: "Reste attentif à tes sensations et garde une marge de sécurité.",
-        steps: ["Échauffement 4 min", "Intervalles rapides 6 min", "Course légère 6 min", "Effort soutenu 3 min", "Retour au calme 2 min"]
+        steps: [
+          { label: "Échauffement", amount: "4 min" },
+          { label: "Intervalles rapides", amount: "6 cycles de 30 s effort / 30 s repos" },
+          { label: "Course légère", amount: "6 min ou 800 m" },
+          { label: "Effort soutenu", amount: "3 min" },
+          { label: "Retour au calme", amount: "2 min" }
+        ]
       }
     },
     force: {
@@ -114,19 +129,36 @@
         duration: "8-10 min",
         intensity: "Douce",
         note: "Prends ton temps. La qualité du mouvement compte plus que la quantité.",
-        steps: ["Squats assistés", "Pompes au mur", "Planche courte", "Étirements doux"]
+        steps: [
+          { label: "Squats assistés", amount: "2 x 8 répétitions" },
+          { label: "Pompes au mur", amount: "2 x 8 répétitions" },
+          { label: "Planche courte", amount: "2 x 15 s" },
+          { label: "Étirements doux", amount: "2 min" }
+        ]
       },
       intermediate: {
         duration: "12-15 min",
         intensity: "Modérée",
         note: "Avance étape par étape, avec des pauses si nécessaire.",
-        steps: ["Squats", "Pompes adaptées", "Fentes", "Planche", "Retour au calme"]
+        steps: [
+          { label: "Squats", amount: "3 x 10 répétitions" },
+          { label: "Pompes adaptées", amount: "3 x 8 répétitions" },
+          { label: "Fentes", amount: "2 x 8 par côté" },
+          { label: "Planche", amount: "3 x 20 s" },
+          { label: "Retour au calme", amount: "2 min" }
+        ]
       },
       advanced: {
         duration: "16-20 min",
         intensity: "Élevée, contrôlée",
         note: "Structure l'effort, sans chercher à forcer au-delà de tes limites.",
-        steps: ["Échauffement articulaire", "Circuit force complet", "Pompes", "Squats", "Gainage"]
+        steps: [
+          { label: "Échauffement articulaire", amount: "4 min" },
+          { label: "Circuit force complet", amount: "3 tours" },
+          { label: "Pompes", amount: "3 x 12 répétitions" },
+          { label: "Squats", amount: "3 x 15 répétitions" },
+          { label: "Gainage", amount: "3 x 30 s" }
+        ]
       }
     },
     endurance: {
@@ -134,19 +166,35 @@
         duration: "10-12 min",
         intensity: "Douce",
         note: "Un rythme lent est valide. L'important est de commencer.",
-        steps: ["Circuit doux", "Pas sur place", "Montées de genoux lentes", "Respiration calme"]
+        steps: [
+          { label: "Circuit doux", amount: "2 tours" },
+          { label: "Pas sur place", amount: "3 min" },
+          { label: "Montées de genoux lentes", amount: "2 x 45 s" },
+          { label: "Respiration calme", amount: "1 min" }
+        ]
       },
       intermediate: {
         duration: "15 min",
         intensity: "Modérée",
         note: "Alterner effort et repos aide à garder une séance simple et tenable.",
-        steps: ["Circuit 15 minutes", "Alternance effort/repos", "Enchaînement complet", "Retour au calme"]
+        steps: [
+          { label: "Circuit continu", amount: "15 min" },
+          { label: "Alternance effort/repos", amount: "6 cycles de 45 s / 30 s" },
+          { label: "Enchaînement complet", amount: "2 tours" },
+          { label: "Retour au calme", amount: "2 min" }
+        ]
       },
       advanced: {
         duration: "18-22 min",
         intensity: "Élevée, structurée",
         note: "Garde les mouvements propres et réduis l'intensité si le rythme devient trop lourd.",
-        steps: ["Échauffement 4 min", "Circuit intense", "Intervalles courts", "Enchaînements avec peu de repos", "Retour au calme"]
+        steps: [
+          { label: "Échauffement", amount: "4 min" },
+          { label: "Circuit intense", amount: "4 tours" },
+          { label: "Intervalles courts", amount: "8 cycles de 30 s / 20 s" },
+          { label: "Enchaînements avec peu de repos", amount: "5 min" },
+          { label: "Retour au calme", amount: "3 min" }
+        ]
       }
     }
   };
@@ -186,7 +234,7 @@
     activeReward: null,
     history: [],
     notifications: { important: false, summary: false },
-    training: { type: "cardio", level: "beginner", started: false }
+    training: { type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false }
   };
 
   let state = loadState();
@@ -238,7 +286,9 @@
           ? {
               type: trainingPrograms[saved.training.type] ? saved.training.type : defaultState.training.type,
               level: trainingPrograms[saved.training.type]?.[saved.training.level] ? saved.training.level : defaultState.training.level,
-              started: Boolean(saved.training.started)
+              started: Boolean(saved.training.started),
+              currentStep: Number.isFinite(saved.training.currentStep) ? saved.training.currentStep : 0,
+              completed: Boolean(saved.training.completed)
             }
           : { ...defaultState.training }
       };
@@ -316,6 +366,10 @@
     const panel = $("domain-training");
     if (!panel) return;
     const { type, level, program } = currentTrainingProgram();
+    const totalSteps = program.steps.length;
+    const currentStepIndex = Math.min(Math.max(state.training?.currentStep || 0, 0), Math.max(totalSteps - 1, 0));
+    const isStarted = Boolean(state.training?.started && !state.training?.completed);
+    const isCompleted = Boolean(state.training?.completed);
     document.querySelectorAll("[data-training-type]").forEach((button) => {
       const active = button.dataset.trainingType === type;
       button.classList.toggle("selected", active);
@@ -334,12 +388,26 @@
     const intensityText = $("training-intensity-text");
     const note = $("training-note");
     const status = $("training-session-status");
+    const activeStep = $("training-active-step");
+    const stepCount = $("training-step-count");
+    const currentStep = $("training-current-step");
+    const currentAmount = $("training-current-amount");
+    const progressFill = $("training-progress-fill");
+    const completePanel = $("training-complete-panel");
+    const completeSummary = $("training-complete-summary");
+    const startButton = $("start-training-session");
 
     if (title) title.textContent = `${trainingLabels.type[type]} ${trainingLabels.level[level].toLowerCase()}`;
     if (steps) {
-      steps.replaceChildren(...program.steps.map((step) => {
+      steps.replaceChildren(...program.steps.map((step, index) => {
         const item = document.createElement("li");
-        item.textContent = step;
+        const label = document.createElement("strong");
+        label.textContent = step.label;
+        const amount = document.createElement("span");
+        amount.textContent = step.amount;
+        item.append(label, amount);
+        item.classList.toggle("active", isStarted && index === currentStepIndex);
+        item.classList.toggle("done", isStarted && index < currentStepIndex);
         return item;
       }));
     }
@@ -348,14 +416,31 @@
     if (intensityText) intensityText.textContent = program.intensity;
     if (note) note.textContent = program.note;
     if (status) {
-      status.classList.toggle("hidden", !state.training?.started);
-      status.textContent = state.training?.started ? "Séance lancée. Une étape à la fois." : "";
+      status.classList.toggle("hidden", !isStarted);
+      status.textContent = isStarted ? "Séance en cours. Une étape à la fois." : "";
+    }
+    if (activeStep) activeStep.classList.toggle("hidden", !isStarted);
+    if (completePanel) completePanel.classList.toggle("hidden", !isCompleted);
+    if (startButton) startButton.classList.toggle("hidden", isStarted || isCompleted);
+
+    if (isStarted) {
+      const step = program.steps[currentStepIndex];
+      if (stepCount) stepCount.textContent = `Exercice ${currentStepIndex + 1}/${totalSteps}`;
+      if (currentStep) currentStep.textContent = step.label;
+      if (currentAmount) currentAmount.textContent = step.amount;
+      if (progressFill) progressFill.style.width = `${Math.round((currentStepIndex / totalSteps) * 100)}%`;
+    } else if (progressFill) {
+      progressFill.style.width = isCompleted ? "100%" : "0%";
+    }
+
+    if (completeSummary && isCompleted) {
+      completeSummary.textContent = `${trainingLabels.type[type]} ${trainingLabels.level[level].toLowerCase()} complété. +${COINS_PER_TASK} pièces gagnées.`;
     }
   }
 
   function setTrainingType(type) {
     if (!trainingPrograms[type]) return;
-    state.training = { ...(state.training || defaultState.training), type, started: false };
+    state.training = { ...(state.training || defaultState.training), type, started: false, currentStep: 0, completed: false };
     saveState();
     renderTrainingProgram();
   }
@@ -363,23 +448,52 @@
   function setTrainingLevel(level) {
     const type = trainingPrograms[state.training?.type] ? state.training.type : defaultState.training.type;
     if (!trainingPrograms[type]?.[level]) return;
-    state.training = { ...(state.training || defaultState.training), level, started: false };
+    state.training = { ...(state.training || defaultState.training), level, started: false, currentStep: 0, completed: false };
     saveState();
     renderTrainingProgram();
   }
 
   function startTrainingSession() {
-    state.training = { ...(state.training || defaultState.training), started: true };
+    state.training = { ...(state.training || defaultState.training), started: true, currentStep: 0, completed: false };
     saveState();
     renderTrainingProgram();
     showToast("Séance commencée. Une étape à la fois.");
   }
 
   function resetTrainingSession() {
-    state.training = { ...(state.training || defaultState.training), started: false };
+    state.training = { ...(state.training || defaultState.training), started: false, currentStep: 0, completed: false };
     saveState();
     renderTrainingProgram();
     $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function completeTrainingStep() {
+    if (!state.training?.started || state.training.completed) return;
+    const { type, level, program } = currentTrainingProgram();
+    const currentStepIndex = Math.min(Math.max(state.training.currentStep || 0, 0), program.steps.length - 1);
+    const nextStepIndex = currentStepIndex + 1;
+    if (nextStepIndex < program.steps.length) {
+      state.training = { ...state.training, currentStep: nextStepIndex };
+      saveState();
+      renderTrainingProgram();
+      showToast(`Exercice ${nextStepIndex + 1}/${program.steps.length}`);
+      return;
+    }
+
+    state.training = { ...state.training, started: false, currentStep: program.steps.length - 1, completed: true };
+    state.wins += 1;
+    state.coins += COINS_PER_TASK;
+    state.history = [{
+      label: `Séance Entraînement : ${trainingLabels.type[type]} ${trainingLabels.level[level].toLowerCase()}`,
+      coins: COINS_PER_TASK,
+      at: Date.now(),
+      domain: "training"
+    }, ...state.history].slice(0, 50);
+    saveState();
+    renderTrainingProgram();
+    renderShop();
+    renderHistoryList();
+    showSuccessToast(`Séance terminée. +${COINS_PER_TASK} pièces`);
   }
 
   function selectHomeDomain(domain) {
@@ -2348,6 +2462,7 @@
       button.addEventListener("click", () => setTrainingLevel(button.dataset.trainingLevel));
     });
     bindById("start-training-session", "click", startTrainingSession);
+    bindById("complete-training-step", "click", completeTrainingStep);
     bindById("reset-training-session", "click", resetTrainingSession);
     bindById("finish-onboarding", "click", finishOnboarding);
 

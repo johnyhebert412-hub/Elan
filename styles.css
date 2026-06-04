@@ -417,9 +417,27 @@ p { line-height: 1.4; }
   background: var(--surface);
   border-radius: 12px;
   color: var(--ink);
+  display: flex;
+  flex-direction: column;
   font-size: 0.94rem;
   font-weight: 650;
+  gap: 4px;
   padding: 10px 12px;
+}
+
+.training-steps li.active {
+  border: 1px solid var(--brand-light);
+  box-shadow: inset 4px 0 0 var(--brand);
+}
+
+.training-steps li.done {
+  opacity: 0.62;
+}
+
+.training-steps li span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .training-meta {
@@ -457,6 +475,59 @@ p { line-height: 1.4; }
   font-weight: 700;
   margin: 12px 0;
   padding: 10px 12px;
+}
+
+.training-active-step {
+  background: var(--surface);
+  border: 1px solid var(--brand-light);
+  border-radius: 14px;
+  margin-top: 12px;
+  padding: 13px;
+}
+
+.training-active-step h4 {
+  color: var(--brand);
+  font-size: 1.08rem;
+  margin: 3px 0 4px;
+}
+
+.training-current-amount {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 0 12px;
+}
+
+.training-progress-track {
+  background: #dfe9e3;
+  border-radius: 999px;
+  height: 9px;
+  margin: 0 0 12px;
+  overflow: hidden;
+}
+
+.training-progress-track i {
+  background: var(--brand);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  transition: width 180ms ease;
+  width: 0;
+}
+
+.training-complete-panel {
+  background: #eef7f2;
+  border: 1px solid var(--brand-light);
+  border-radius: 14px;
+  margin-top: 12px;
+  padding: 14px;
+  text-align: center;
+}
+
+.training-complete-panel h4 {
+  color: var(--brand);
+  font-size: 1.1rem;
+  margin: 4px 0 6px;
 }
 
 .quick-add-panel {
