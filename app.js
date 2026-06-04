@@ -583,6 +583,27 @@
     return true;
   }
 
+  function updateFixedBarMetrics() {
+    const root = document.documentElement;
+    const bottomNav = document.querySelector(".bottom-nav");
+    const selectionDock = $("goal-selection-dock");
+    const activeBar = $("goal-queue-active-bar");
+    if (bottomNav) root.style.setProperty("--bottom-nav-height", `${Math.ceil(bottomNav.offsetHeight)}px`);
+    if (selectionDock) root.style.setProperty("--goal-selection-dock-height", `${Math.ceil(selectionDock.offsetHeight)}px`);
+    if (activeBar) root.style.setProperty("--goal-active-bar-height", `${Math.ceil(activeBar.offsetHeight)}px`);
+  }
+
+  function ensureGoalSelectionClearance() {
+    const dock = $("goal-selection-dock");
+    if (!dock || dock.classList.contains("hidden")) return;
+    const visiblePanel = Array.from(document.querySelectorAll(".domain-panel:not(.hidden)")).at(-1);
+    if (!visiblePanel) return;
+    const dockTop = dock.getBoundingClientRect().top;
+    const panelBottom = visiblePanel.getBoundingClientRect().bottom;
+    const overlap = panelBottom - dockTop + 12;
+    if (overlap > 0) window.scrollBy({ top: overlap, behavior: "smooth" });
+  }
+
   function renderGoalQueue() {
     const items = queuedItems();
     const isActive = Boolean(state.goalQueue?.active);
@@ -631,6 +652,8 @@
     }
 
     updateGoalSelectionButtons();
+    updateFixedBarMetrics();
+    window.requestAnimationFrame(ensureGoalSelectionClearance);
     renderChallengeTimer();
   }
 
@@ -822,6 +845,7 @@
 
     if (!challengeVisible) {
       panel?.classList.add("hidden");
+      updateFixedBarMetrics();
       return;
     }
 
@@ -865,6 +889,7 @@
       finishButton.classList.toggle("hidden", !["running", "done"].includes(challenge.status));
       finishButton.disabled = Boolean(challenge.rewardedAt) || isCompletingChallenge;
     }
+    updateFixedBarMetrics();
   }
 
   function playStartTone() {
@@ -1002,8 +1027,8 @@
     if (!state.history || !state.history.length) {
       list.replaceChildren();
       const empty = document.createElement("p");
-      empty.className = "history-empty-state";
-      empty.innerHTML = `<span class="history-empty-icon">🌱</span><span>Aucune victoire encore.<br>Complète une première action pour commencer !</span>`;
+      empty.className = "small-muted";
+      empty.textContent = "Aucune victoire encore. Complète une action pour commencer !";
       list.append(empty);
       return;
     }
@@ -1375,9 +1400,9 @@
     const count = $("agenda-count");
     if (count) count.textContent = `${items.length} item${items.length > 1 ? "s" : ""}`;
     if (!items.length) {
-      const empty = document.createElement("div");
-      empty.className = "agenda-empty-state";
-      empty.innerHTML = `<span class="agenda-empty-icon">📅</span><p>Rien de prévu ici.</p><p class="agenda-empty-hint">Ajoute une petite chose avec le bouton + si tu veux te souvenir de quelque chose.</p>`;
+      const empty = document.createElement("p");
+      empty.className = "small-muted";
+      empty.textContent = "Rien de prévu. Ajoute une petite chose si tu veux.";
       list.replaceChildren(empty);
       return;
     }
@@ -2190,6 +2215,8 @@
 
   bindInstallEvents();
   bindEvents();
+  window.addEventListener("resize", updateFixedBarMetrics);
   render();
+  updateFixedBarMetrics();
   registerServiceWorker();
 }());
