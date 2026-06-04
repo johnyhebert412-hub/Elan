@@ -1006,7 +1006,9 @@
           btn.textContent = mission.label;
           btn.setAttribute("aria-label", `Ajouter : ${mission.label}`);
           btn.addEventListener("click", () => {
-            startHouseSeries({ label: mission.label, domain });
+            state.selectedDomain = domain;
+            saveState();
+            toggleGoalSelection(mission.label, domain);
           });
           return btn;
         }));
@@ -1268,9 +1270,11 @@
     };
     saveState();
     renderTrainingProgram();
-    closeDomain();
+    document.querySelectorAll(".domain-panel").forEach((panel) => {
+      panel.classList.toggle("hidden", panel.id !== "domain-training");
+    });
     showView("domains");
-    window.scrollTo({ top: 0, behavior: "instant" });
+    $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function openShopAfterTrainingComplete() {
@@ -2841,7 +2845,7 @@
           saveState();
         }
         button.dataset.goalDomain = state.selectedDomain;
-        startHouseSeries({ label: button.dataset.complete, domain: state.selectedDomain });
+        toggleGoalSelection(button.dataset.complete, state.selectedDomain);
       });
     });
 
