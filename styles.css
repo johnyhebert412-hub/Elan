@@ -362,6 +362,13 @@ p { line-height: 1.4; }
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.training-mode-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.training-mode-row button,
 .training-choice-row button {
   background: var(--surface);
   border-color: var(--border);
@@ -375,10 +382,80 @@ p { line-height: 1.4; }
   text-align: center;
 }
 
+.training-mode-row button.selected,
 .training-choice-row button.selected {
   background: var(--brand);
   border-color: var(--brand);
   color: white;
+}
+
+.training-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.training-custom-builder {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.training-custom-form {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr;
+}
+
+.training-custom-form input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink);
+  min-height: 44px;
+  padding: 9px 11px;
+}
+
+.training-custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+  padding-left: 0;
+}
+
+.training-custom-list li {
+  align-items: center;
+  background: var(--surface);
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr auto;
+  padding: 10px 11px;
+}
+
+.training-custom-list strong,
+.training-custom-list span {
+  display: block;
+}
+
+.training-custom-list span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-top: 3px;
+}
+
+.training-custom-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.training-custom-actions button {
+  font-size: 0.78rem;
+  min-height: 34px;
+  padding: 6px 8px;
 }
 
 .training-program-card {
@@ -513,6 +590,18 @@ p { line-height: 1.4; }
   height: 100%;
   transition: width 180ms ease;
   width: 0;
+}
+
+.training-session-actions {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.training-session-actions button {
+  min-height: 42px;
+  padding-left: 6px;
+  padding-right: 6px;
 }
 
 .training-complete-panel {

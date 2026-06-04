@@ -127,6 +127,15 @@
             <p class="muted">Choisis un rythme simple. L'objectif est de bouger sans pression.</p>
 
             <div class="training-control">
+              <p class="domain-section-label">Mode</p>
+              <div class="training-mode-row" role="group" aria-label="Mode d'entraînement">
+                <button type="button" data-training-mode="quick">Programme rapide</button>
+                <button type="button" data-training-mode="custom">Créer ton programme</button>
+              </div>
+            </div>
+
+            <div id="training-quick-builder" class="training-builder">
+            <div class="training-control">
               <p class="domain-section-label">Type d'entraînement</p>
               <div class="training-choice-row" role="group" aria-label="Type d'entraînement">
                 <button type="button" data-training-type="cardio">Cardio</button>
@@ -143,6 +152,18 @@
                 <button type="button" data-training-level="advanced">Avancé</button>
               </div>
             </div>
+            </div>
+
+            <section id="training-custom-builder" class="training-custom-builder hidden" aria-labelledby="training-custom-title">
+              <p id="training-custom-title" class="domain-section-label">Ton programme</p>
+              <div class="training-custom-form">
+                <input id="training-custom-name" type="text" placeholder="Nom de l'exercice" autocomplete="off">
+                <input id="training-custom-amount" type="text" placeholder="Ex. 10 répétitions ou 45 s" autocomplete="off">
+                <button id="add-training-exercise" class="secondary" type="button">Ajouter</button>
+              </div>
+              <ol id="training-custom-list" class="training-custom-list"></ol>
+              <p class="small-muted">Ajoute au moins un exercice. L'ordre de la liste sera l'ordre de ta séance.</p>
+            </section>
 
             <section class="training-program-card" aria-labelledby="training-program-title">
               <div class="card-header">
@@ -164,7 +185,11 @@
                 <h4 id="training-current-step">Marche tranquille</h4>
                 <p id="training-current-amount" class="training-current-amount">5 min</p>
                 <div class="training-progress-track" aria-hidden="true"><i id="training-progress-fill"></i></div>
-                <button id="complete-training-step" class="primary wide" type="button">Terminé</button>
+                <div class="training-session-actions">
+                  <button id="complete-training-step" class="primary" type="button">Terminé</button>
+                  <button id="skip-training-step" class="secondary" type="button">Passer</button>
+                  <button id="stop-training-session" class="secondary" type="button">Arrêter</button>
+                </div>
               </section>
               <section id="training-complete-panel" class="training-complete-panel hidden" aria-live="polite">
                 <p class="domain-completed-icon" aria-hidden="true">✓</p>
