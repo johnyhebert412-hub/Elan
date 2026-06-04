@@ -13,14 +13,15 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <nav class="top-actions" aria-label="Barre supérieure">
-          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
-          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
-        </nav>
+        
         <div class="topbar-main">
           <div>
             <p class="eyebrow">Coach du quotidien</p>
             <h1>Élan</h1>
+<nav class="top-actions" aria-label="Barre supérieure">
+          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
+          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
+        </nav>
           </div>
           <button class="calm-badge" id="header-coin-badge" aria-label="Solde de pièces — ouvrir la boutique" data-view-button="shop">
             <span id="header-coin-balance">🪙 0</span>
