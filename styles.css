@@ -218,8 +218,9 @@ p { line-height: 1.4; }
 
 .selected-domain-card .task-list button.selected,
 .task-list button.selected {
-  background: var(--brand);
-  color: white;
+  background: rgba(22, 84, 70, 0.14);
+  border-color: rgba(22, 84, 70, 0.28);
+  color: var(--ink);
 }
 
 .add-small {
