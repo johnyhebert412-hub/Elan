@@ -495,7 +495,7 @@
   function renderTrainingProgram() {
     const panel = $("domain-training");
     if (!panel) return;
-    const { mode, type, level, title: programTitle, label: programLabel, program } = currentTrainingProgram();
+    const { mode, type, level, title: programTitle, program } = currentTrainingProgram();
     const totalSteps = program.steps.length;
     const currentStepIndex = Math.min(Math.max(state.training?.currentStep || 0, 0), Math.max(totalSteps - 1, 0));
     const isStarted = Boolean(state.training?.started && !state.training?.completed);
@@ -530,6 +530,7 @@
     const progressFill = $("training-progress-fill");
     const completePanel = $("training-complete-panel");
     const completeSummary = $("training-complete-summary");
+    const completeReward = $("training-complete-reward");
     const startButton = $("start-training-session");
     const quickBuilder = $("training-quick-builder");
     const customBuilder = $("training-custom-builder");
@@ -594,9 +595,16 @@
       $("training-step-timer")?.classList.add("hidden");
     }
 
-    if (completeSummary && isCompleted) {
+    if (isCompleted) {
       const reward = Number.isFinite(state.training?.lastReward) ? state.training.lastReward : trainingRewardForCurrentSession();
-      completeSummary.textContent = `${programLabel} complété. +${reward} jetons gagnés.`;
+      if (completeSummary) completeSummary.textContent = "Séance terminée.";
+      if (completeReward) {
+        completeReward.textContent = reward > 0 ? `+${reward} jetons gagnés` : "";
+        completeReward.classList.toggle("hidden", reward <= 0);
+      }
+    } else if (completeReward) {
+      completeReward.textContent = "";
+      completeReward.classList.add("hidden");
     }
   }
 
@@ -998,9 +1006,7 @@
           btn.textContent = mission.label;
           btn.setAttribute("aria-label", `Ajouter : ${mission.label}`);
           btn.addEventListener("click", () => {
-            state.selectedDomain = domain;
-            saveState();
-            toggleGoalSelection(mission.label, domain);
+            startHouseSeries({ label: mission.label, domain });
           });
           return btn;
         }));
@@ -1114,6 +1120,29 @@
     showToast(exists ? "Objectif retiré." : "Objectif ajouté à la série.");
   }
 
+  function startHouseSeries(mission) {
+    const item = typeof mission === "string"
+      ? { label: mission, domain: state.selectedDomain || state.currentHomeDomain || "house", completed: false }
+      : { label: mission?.label, domain: mission?.domain || state.selectedDomain || state.currentHomeDomain || "house", completed: false };
+    if (!item.label) return;
+    sanitizePersistedActivityState("avant démarrage mission maison");
+    if (state.activeChallenge) {
+      showToast("La série est déjà en cours.");
+      renderGoalQueue();
+      renderChallengeTimer();
+      return;
+    }
+    clearTrainingRuntimeState("démarrage mission maison");
+    debugActivityLog("démarrage activité", { type: "maison", count: 1, label: item.label });
+    state.selectedDomain = item.domain;
+    state.currentHomeDomain = item.domain;
+    state.goalQueue = { items: [item], active: true, currentIndex: 0 };
+    saveState();
+    renderGoalQueue();
+    renderSelectedDomain();
+    launchCurrentQueueGoal(item, { autoStart: true });
+  }
+
   function removeQueuedGoal(index) {
     if (state.goalQueue?.active) return;
     state.goalQueue.items = queuedItems().filter((_, itemIndex) => itemIndex !== index);
@@ -1134,10 +1163,13 @@
     launchCurrentQueueGoal();
   }
 
-  function launchCurrentQueueGoal() {
-    const item = currentQueueItem();
+  function launchCurrentQueueGoal(itemOverride = null, options = {}) {
+    const item = itemOverride || currentQueueItem();
     if (!state.goalQueue?.active || !item) return;
     openChallengeSetup(item.label, item.domain, { fromQueue: true });
+    if (options.autoStart) {
+      startChallenge();
+    }
     showToast(`Étape ${state.goalQueue.currentIndex + 1} / ${queuedItems().length} : ${item.label}`);
   }
 
@@ -1166,6 +1198,7 @@
       showSuccessToast("Bravo, domaine complété. ✓");
       showView("home");
       window.scrollTo({ top: 0, behavior: "instant" });
+      showSeriesComplete(items.length, items.length * COINS_PER_TASK);
       return true;
     }
     state.goalQueue = { items, active: true, currentIndex: nextIndex };
@@ -1209,12 +1242,11 @@
     const summary = $("series-complete-summary");
     const coinsEl = $("series-complete-coins");
     if (summary) {
-      summary.textContent = missionCount === 1
-        ? "Tu as complété 1 mission. Bien joué."
-        : `Tu as complété ${missionCount} missions. Bien joué.`;
+      summary.textContent = "Domaine terminé.";
     }
     if (coinsEl) {
-      coinsEl.textContent = `🪙 +${totalCoins} pièces gagnées`;
+      coinsEl.textContent = totalCoins > 0 ? `+${totalCoins} pièces gagnées` : "";
+      coinsEl.classList.toggle("hidden", totalCoins <= 0);
     }
     overlay.classList.remove("hidden");
     if ("vibrate" in navigator) navigator.vibrate([20, 60, 20]);
@@ -1222,6 +1254,28 @@
 
   function closeSeriesComplete() {
     $("series-complete-overlay")?.classList.add("hidden");
+  }
+
+  function continueAfterTrainingComplete() {
+    $("training-complete-panel")?.classList.add("hidden");
+    state.training = {
+      ...(state.training || defaultState.training),
+      started: false,
+      completed: false,
+      currentStep: 0,
+      skippedSteps: 0,
+      lastReward: 0
+    };
+    saveState();
+    renderTrainingProgram();
+    closeDomain();
+    showView("domains");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function openShopAfterTrainingComplete() {
+    $("training-complete-panel")?.classList.add("hidden");
+    showView("shop");
   }
 
   function goalSelectionSummary(count) {
@@ -1274,7 +1328,7 @@
     if (!host) return;
     const taskList = host.querySelector(".task-list");
     if (taskList) {
-      host.insertBefore(activeBar, taskList);
+      taskList.parentElement?.insertBefore(activeBar, taskList);
     } else {
       host.append(activeBar);
     }
@@ -2787,7 +2841,7 @@
           saveState();
         }
         button.dataset.goalDomain = state.selectedDomain;
-        toggleGoalSelection(button.dataset.complete, state.selectedDomain);
+        startHouseSeries({ label: button.dataset.complete, domain: state.selectedDomain });
       });
     });
 
@@ -2871,6 +2925,8 @@
     bindById("skip-training-step", "click", skipTrainingStep);
     bindById("stop-training-session", "click", stopTrainingSession);
     bindById("reset-training-session", "click", resetTrainingSession);
+    bindById("training-complete-continue", "click", continueAfterTrainingComplete);
+    bindById("training-complete-shop", "click", openShopAfterTrainingComplete);
     bindById("add-training-exercise", "click", addTrainingExercise);
     bindById("training-custom-name", "keydown", (event) => {
       if (event.key === "Enter") addTrainingExercise();
