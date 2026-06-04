@@ -27,27 +27,24 @@
     "Je suis motivé"
   ];
   const defaultShopRewards = [
-    { id: "pause-15", title: "Pause", category: "Detente", cost: 25, minutes: 15, rewardType: "timer" },
-    { id: "pause-30", title: "Pause", category: "Detente", cost: 40, minutes: 30, rewardType: "timer" },
-    { id: "pause-45", title: "Pause", category: "Detente", cost: 55, minutes: 45, rewardType: "timer" },
-    { id: "gaming-30", title: "Gaming", category: "Loisirs", cost: 40, minutes: 30, rewardType: "timer" },
-    { id: "gaming-45", title: "Gaming", category: "Loisirs", cost: 55, minutes: 45, rewardType: "timer" },
-    { id: "gaming-60", title: "Gaming", category: "Loisirs", cost: 70, minutes: 60, rewardType: "timer" },
-    { id: "temps-libre-30", title: "Temps libre", category: "Loisirs", cost: 40, minutes: 30, rewardType: "timer" },
-    { id: "temps-libre-45", title: "Temps libre", category: "Loisirs", cost: 55, minutes: 45, rewardType: "timer" },
-    { id: "temps-libre-60", title: "Temps libre", category: "Loisirs", cost: 70, minutes: 60, rewardType: "timer" },
-    { id: "lecture-20", title: "Lecture", category: "Calme", cost: 30, minutes: 20, rewardType: "timer" },
-    { id: "lecture-30", title: "Lecture", category: "Calme", cost: 40, minutes: 30, rewardType: "timer" },
-    { id: "lecture-45", title: "Lecture", category: "Calme", cost: 55, minutes: 45, rewardType: "timer" },
-    { id: "musique-20", title: "Musique", category: "Calme", cost: 30, minutes: 20, rewardType: "timer" },
-    { id: "musique-30", title: "Musique", category: "Calme", cost: 40, minutes: 30, rewardType: "timer" },
-    { id: "musique-45", title: "Musique", category: "Calme", cost: 55, minutes: 45, rewardType: "timer" },
-    { id: "relaxation-15", title: "Relaxation", category: "Calme", cost: 25, minutes: 15, rewardType: "timer" },
-    { id: "relaxation-20", title: "Relaxation", category: "Calme", cost: 30, minutes: 20, rewardType: "timer" },
-    { id: "relaxation-30", title: "Relaxation", category: "Calme", cost: 40, minutes: 30, rewardType: "timer" },
-    { id: "film", title: "Film", category: "Divertissement", cost: 60, uses: 1, rewardType: "free" },
-    { id: "soiree-detente", title: "Soiree detente", category: "Bonus", cost: 80, uses: 1, rewardType: "free" },
-    { id: "moment-special", title: "Moment special", category: "Bonus", cost: 70, uses: 1, rewardType: "free" }
+    { id: "pause-15", title: "Pause", category: "Detente", cost: 10, minutes: 15, rewardType: "timer" },
+    { id: "pause-30", title: "Pause", category: "Detente", cost: 18, minutes: 30, rewardType: "timer" },
+    { id: "pause-45", title: "Pause", category: "Detente", cost: 25, minutes: 45, rewardType: "timer" },
+    { id: "gaming-30", title: "Gaming", category: "Loisirs", cost: 20, minutes: 30, rewardType: "timer" },
+    { id: "gaming-45", title: "Gaming", category: "Loisirs", cost: 30, minutes: 45, rewardType: "timer" },
+    { id: "gaming-60", title: "Gaming", category: "Loisirs", cost: 40, minutes: 60, rewardType: "timer" },
+    { id: "lecture-20", title: "Lecture", category: "Calme", cost: 12, minutes: 20, rewardType: "timer" },
+    { id: "lecture-30", title: "Lecture", category: "Calme", cost: 18, minutes: 30, rewardType: "timer" },
+    { id: "lecture-45", title: "Lecture", category: "Calme", cost: 25, minutes: 45, rewardType: "timer" },
+    { id: "musique-20", title: "Musique", category: "Calme", cost: 10, minutes: 20, rewardType: "timer" },
+    { id: "musique-30", title: "Musique", category: "Calme", cost: 15, minutes: 30, rewardType: "timer" },
+    { id: "musique-45", title: "Musique", category: "Calme", cost: 22, minutes: 45, rewardType: "timer" },
+    { id: "relaxation-15", title: "Relaxation", category: "Detente", cost: 10, minutes: 15, rewardType: "timer" },
+    { id: "relaxation-30", title: "Relaxation", category: "Detente", cost: 18, minutes: 30, rewardType: "timer" },
+    { id: "relaxation-45", title: "Relaxation", category: "Detente", cost: 25, minutes: 45, rewardType: "timer" },
+    { id: "film", title: "Film", category: "Divertissement", cost: 50, uses: 1, rewardType: "free" },
+    { id: "soiree-detente", title: "Soirée détente", category: "Bonus", cost: 75, uses: 1, rewardType: "free" },
+    { id: "moment-special", title: "Moment spécial", category: "Bonus", cost: 100, uses: 1, rewardType: "free" }
   ];
   const shopCategories = [
     { id: "Detente", label: "Détente", icon: "☕" },
@@ -2501,8 +2498,6 @@
     if (shopFlow.step === "confirm") {
       shopFlow = { ...shopFlow, step: "variants", rewardId: "" };
     } else if (shopFlow.step === "variants") {
-      shopFlow = { ...shopFlow, step: "rewards", title: "", rewardType: "", rewardId: "" };
-    } else if (shopFlow.step === "rewards") {
       shopFlow = { step: "categories", category: "", title: "", rewardType: "", rewardId: "" };
     }
     renderShop();
@@ -2512,26 +2507,8 @@
     shopFlow = { step: "categories", category: "", title: "", rewardType: "", rewardId: "" };
   }
 
-  function shopRewardChoices(categoryId) {
-    const choices = new Map();
-    shopRewards()
-      .filter((reward) => rewardCategory(reward) === categoryId)
-      .forEach((reward) => {
-        const title = rewardTitle(reward);
-        if (!title) return;
-        const type = rewardType(reward);
-        const key = type + ":" + title;
-        if (!choices.has(key)) choices.set(key, { title, rewardType: type, category: categoryId });
-      });
-    return Array.from(choices.values());
-  }
-
-  function shopRewardVariants() {
-    return shopRewards().filter((reward) =>
-      rewardCategory(reward) === shopFlow.category &&
-      rewardTitle(reward) === shopFlow.title &&
-      rewardType(reward) === shopFlow.rewardType
-    );
+  function shopCategoryRewards(categoryId) {
+    return shopRewards().filter((reward) => rewardCategory(reward) === categoryId);
   }
 
   function selectedShopReward() {
@@ -2570,13 +2547,22 @@
     return button;
   }
 
+  function shopCancelButton() {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "secondary wide";
+    button.textContent = "Annuler";
+    button.addEventListener("click", shopBack);
+    return button;
+  }
+
   function renderShopFlow(list) {
     const nodes = [];
 
     if (shopFlow.step === "categories") {
       nodes.push(...shopCategories.map((category) =>
         shopChoiceCard(category.icon + " " + category.label, "Choisir cette catégorie", "Choisir", function() {
-          shopFlow = { step: "rewards", category: category.id, title: "", rewardType: "", rewardId: "" };
+          shopFlow = { step: "variants", category: category.id, title: "", rewardType: "", rewardId: "" };
           renderShop();
         })
       ));
@@ -2592,30 +2578,15 @@
     heading.append(title);
     nodes.push(heading);
 
-    if (shopFlow.step === "rewards") {
-      shopRewardChoices(shopFlow.category).forEach((choice) => {
-        nodes.push(shopChoiceCard(choice.title, choice.rewardType === "free" ? "Récompense libre" : "Récompense avec timer", "Choisir", function() {
-          shopFlow = { ...shopFlow, step: "variants", title: choice.title, rewardType: choice.rewardType, rewardId: "" };
-          renderShop();
-        }));
-      });
-      nodes.push(shopBackButton());
-      list.replaceChildren(...nodes);
-      return;
-    }
-
     if (shopFlow.step === "variants") {
-      const rewardHeading = document.createElement("section");
-      rewardHeading.className = "shop-category";
-      const rewardTitleEl = document.createElement("h3");
-      rewardTitleEl.textContent = shopFlow.title;
-      rewardHeading.append(rewardTitleEl);
-      nodes.push(rewardHeading);
-      shopRewardVariants().forEach((reward) => {
+      shopCategoryRewards(shopFlow.category).forEach((reward) => {
         const detail = rewardType(reward) === "free"
           ? reward.cost + " pièces - Récompense libre"
           : rewardMinutes(reward) + " min - " + reward.cost + " pièces";
-        nodes.push(shopChoiceCard(rewardType(reward) === "free" ? "1 utilisation" : rewardMinutes(reward) + " min", detail, "Choisir", function() {
+        const titleText = rewardType(reward) === "free"
+          ? rewardTitle(reward)
+          : rewardTitle(reward) + " " + rewardMinutes(reward) + " min";
+        nodes.push(shopChoiceCard(titleText, detail, "Acheter", function() {
           shopFlow = { ...shopFlow, step: "confirm", rewardId: reward.id };
           renderShop();
         }));
@@ -2636,7 +2607,7 @@
     confirmCard.className = "shop-item shop-confirm-card";
     const copy = document.createElement("div");
     const confirmTitle = document.createElement("strong");
-    confirmTitle.textContent = rewardTitle(reward);
+    confirmTitle.textContent = "Acheter " + rewardTitle(reward) + (rewardType(reward) === "free" ? " ?" : " " + rewardMinutes(reward) + " min ?");
     const duration = document.createElement("p");
     duration.className = "small-muted";
     duration.textContent = rewardType(reward) === "free" ? "1 utilisation" : rewardMinutes(reward) + " minutes";
@@ -2647,14 +2618,14 @@
     const buyButton = document.createElement("button");
     buyButton.type = "button";
     buyButton.className = canAfford ? "primary" : "secondary";
-    buyButton.textContent = canAfford ? "Acheter" : "Pas assez";
+    buyButton.textContent = canAfford ? "Confirmer" : "Pas assez";
     buyButton.disabled = !canAfford;
     buyButton.addEventListener("click", function() {
       resetShopFlow();
       unlockReward(reward, buyButton);
     });
     confirmCard.append(copy, buyButton);
-    nodes.push(confirmCard, shopBackButton());
+    nodes.push(confirmCard, shopCancelButton());
     list.replaceChildren(...nodes);
   }
 
