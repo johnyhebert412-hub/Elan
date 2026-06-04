@@ -97,109 +97,97 @@
   const trainingPrograms = {
     cardio: {
       beginner: {
-        duration: "10-12 min",
+        duration: "2-3 min",
         intensity: "Douce",
-        note: "Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.",
+        note: "Commence simplement et garde un rythme confortable.",
         steps: [
-          { label: "Marche tranquille", amount: "5 min" },
-          { label: "Marche rapide", amount: "5 min" },
-          { label: "Respiration calme", amount: "1 min" }
+          { label: "Marche rapide", amount: "60 sec", description: "Marche vite sur place." },
+          { label: "Montées de genoux", amount: "45 sec", description: "Monte les genoux un à la fois." },
+          { label: "Jumping Jacks", amount: "30 sec", description: "Ouvre et ferme les bras et les jambes." }
         ]
       },
       intermediate: {
-        duration: "12-15 min",
+        duration: "3 min",
         intensity: "Modérée",
-        note: "Garde un rythme que tu peux contrôler. Le but est de rester régulier.",
+        note: "Garde un rythme simple et régulier.",
         steps: [
-          { label: "Marche rapide", amount: "6 min" },
-          { label: "Escaliers doux", amount: "3 min" },
-          { label: "Intervalles simples", amount: "4 cycles de 30 s effort / 30 s repos" },
-          { label: "Retour au calme", amount: "2 min" }
+          { label: "Jumping Jacks", amount: "60 sec", description: "Ouvre et ferme les bras et les jambes." },
+          { label: "Montées de genoux", amount: "60 sec", description: "Monte les genoux un à la fois." },
+          { label: "Mountain Climbers", amount: "45 sec", description: "Ramène les genoux vers la poitrine." }
         ]
       },
       advanced: {
-        duration: "16-20 min",
-        intensity: "Élevée, contrôlée",
-        note: "Reste attentif à tes sensations et garde une marge de sécurité.",
+        duration: "3 min",
+        intensity: "Élevée",
+        note: "Reste attentif à tes sensations et ralentis si nécessaire.",
         steps: [
-          { label: "Échauffement", amount: "4 min" },
-          { label: "Intervalles rapides", amount: "6 cycles de 30 s effort / 30 s repos" },
-          { label: "Course légère", amount: "6 min ou 800 m" },
-          { label: "Effort soutenu", amount: "3 min" },
-          { label: "Retour au calme", amount: "2 min" }
+          { label: "Burpees", amount: "45 sec", description: "Descends au sol puis relève-toi." },
+          { label: "Mountain Climbers", amount: "60 sec", description: "Ramène les genoux vers la poitrine." },
+          { label: "Sprint sur place", amount: "60 sec", description: "Cours vite sur place." }
         ]
       }
     },
     force: {
       beginner: {
-        duration: "8-10 min",
+        duration: "2-3 min",
         intensity: "Douce",
-        note: "Prends ton temps. La qualité du mouvement compte plus que la quantité.",
+        note: "Prends ton temps et garde des mouvements simples.",
         steps: [
-          { label: "Squats assistés", amount: "2 x 8 répétitions" },
-          { label: "Pompes au mur", amount: "2 x 8 répétitions" },
-          { label: "Planche courte", amount: "2 x 15 s" },
-          { label: "Étirements doux", amount: "2 min" }
+          { label: "Squats", amount: "8 répétitions", description: "Plie les jambes puis remonte." },
+          { label: "Pompes", amount: "5 répétitions", description: "Descends puis remonte le corps." },
+          { label: "Planche", amount: "20 sec", description: "Garde le corps droit." }
         ]
       },
       intermediate: {
-        duration: "12-15 min",
+        duration: "3 min",
         intensity: "Modérée",
         note: "Avance étape par étape, avec des pauses si nécessaire.",
         steps: [
-          { label: "Squats", amount: "3 x 10 répétitions" },
-          { label: "Pompes adaptées", amount: "3 x 8 répétitions" },
-          { label: "Fentes", amount: "2 x 8 par côté" },
-          { label: "Planche", amount: "3 x 20 s" },
-          { label: "Retour au calme", amount: "2 min" }
+          { label: "Squats", amount: "12 répétitions", description: "Plie les jambes puis remonte." },
+          { label: "Pompes", amount: "10 répétitions", description: "Descends puis remonte le corps." },
+          { label: "Planche", amount: "30 sec", description: "Garde le corps droit." }
         ]
       },
       advanced: {
-        duration: "16-20 min",
-        intensity: "Élevée, contrôlée",
-        note: "Structure l'effort, sans chercher à forcer au-delà de tes limites.",
+        duration: "4 min",
+        intensity: "Élevée",
+        note: "Garde le contrôle et réduis le rythme si nécessaire.",
         steps: [
-          { label: "Échauffement articulaire", amount: "4 min" },
-          { label: "Circuit force complet", amount: "3 tours" },
-          { label: "Pompes", amount: "3 x 12 répétitions" },
-          { label: "Squats", amount: "3 x 15 répétitions" },
-          { label: "Gainage", amount: "3 x 30 s" }
+          { label: "Squats", amount: "20 répétitions", description: "Plie les jambes puis remonte." },
+          { label: "Pompes", amount: "15 répétitions", description: "Descends puis remonte le corps." },
+          { label: "Planche", amount: "60 sec", description: "Garde le corps droit." }
         ]
       }
     },
     endurance: {
       beginner: {
-        duration: "10-12 min",
+        duration: "4 min",
         intensity: "Douce",
-        note: "Un rythme lent est valide. L'important est de commencer.",
+        note: "Un rythme tranquille est suffisant pour commencer.",
         steps: [
-          { label: "Circuit doux", amount: "2 tours" },
-          { label: "Pas sur place", amount: "3 min" },
-          { label: "Montées de genoux lentes", amount: "2 x 45 s" },
-          { label: "Respiration calme", amount: "1 min" }
+          { label: "Marche rapide", amount: "2 min", description: "Marche vite sur place." },
+          { label: "Chaise", amount: "20 sec", description: "Dos au mur, jambes pliées." },
+          { label: "Planche", amount: "20 sec", description: "Garde le corps droit." }
         ]
       },
       intermediate: {
-        duration: "15 min",
+        duration: "3 min",
         intensity: "Modérée",
-        note: "Alterner effort et repos aide à garder une séance simple et tenable.",
+        note: "Garde un rythme stable et fais une pause au besoin.",
         steps: [
-          { label: "Circuit continu", amount: "15 min" },
-          { label: "Alternance effort/repos", amount: "6 cycles de 45 s / 30 s" },
-          { label: "Enchaînement complet", amount: "2 tours" },
-          { label: "Retour au calme", amount: "2 min" }
+          { label: "Fentes", amount: "10 répétitions", description: "Avance une jambe, descends, puis remonte." },
+          { label: "Chaise", amount: "40 sec", description: "Dos au mur, jambes pliées." },
+          { label: "Planche", amount: "40 sec", description: "Garde le corps droit." }
         ]
       },
       advanced: {
-        duration: "18-22 min",
-        intensity: "Élevée, structurée",
-        note: "Garde les mouvements propres et réduis l'intensité si le rythme devient trop lourd.",
+        duration: "4 min",
+        intensity: "Élevée",
+        note: "Garde les mouvements simples et réduis l'intensité si nécessaire.",
         steps: [
-          { label: "Échauffement", amount: "4 min" },
-          { label: "Circuit intense", amount: "4 tours" },
-          { label: "Intervalles courts", amount: "8 cycles de 30 s / 20 s" },
-          { label: "Enchaînements avec peu de repos", amount: "5 min" },
-          { label: "Retour au calme", amount: "3 min" }
+          { label: "Fentes", amount: "12 répétitions", description: "Avance une jambe, descends, puis remonte." },
+          { label: "Chaise", amount: "60 sec", description: "Dos au mur, jambes pliées." },
+          { label: "Planche", amount: "60 sec", description: "Garde le corps droit." }
         ]
       }
     }
@@ -457,6 +445,12 @@
         const amount = document.createElement("span");
         amount.textContent = step.amount;
         item.append(label, amount);
+        if (step.description) {
+          const description = document.createElement("p");
+          description.className = "training-step-description";
+          description.textContent = step.description;
+          item.append(description);
+        }
         item.classList.toggle("active", isStarted && index === currentStepIndex);
         item.classList.toggle("done", isStarted && index < currentStepIndex);
         return item;
@@ -480,6 +474,11 @@
       const step = program.steps[currentStepIndex];
       if (stepCount) stepCount.textContent = `Exercice ${currentStepIndex + 1}/${totalSteps}`;
       if (currentStep) currentStep.textContent = step.label;
+      const currentDescription = $("training-current-description");
+      if (currentDescription) {
+        currentDescription.textContent = step.description || "";
+        currentDescription.classList.toggle("hidden", !step.description);
+      }
       if (currentAmount) currentAmount.textContent = step.amount;
       if (progressFill) progressFill.style.width = `${Math.round((currentStepIndex / totalSteps) * 100)}%`;
       renderTrainingTimer(step, currentStepIndex);
