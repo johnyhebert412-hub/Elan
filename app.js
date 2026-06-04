@@ -27,20 +27,18 @@
     "Je suis motivé"
   ];
   const defaultShopRewards = [
-    { name: "Pause sans culpabilité", type: "Détente", cost: 20, duration: "10 min" },
-    { name: "Pause détente", type: "Détente", cost: 25, duration: "15 min" },
-    { name: "Moment calme", type: "Détente", cost: 25, duration: "20 min" },
-    { name: "Temps libre", type: "Détente", cost: 30, duration: "30 min" },
-    { name: "Musique relax", type: "Détente", cost: 15, duration: "15 min" },
-    { name: "30 min de jeu vidéo", type: "Jeux", cost: 45, duration: "30 min" },
-    { name: "Soirée jeux vidéo", type: "Jeux", cost: 90, duration: "60 min" },
-    { name: "30 min de vidéos", type: "Petit plaisir", cost: 30, duration: "30 min" },
-    { name: "Film ou série", type: "Petit plaisir", cost: 55, duration: "45 min" },
-    { name: "Collation plaisir", type: "Petit plaisir", cost: 20, duration: "1 collation" },
-    { name: "Sortie simple", type: "Sortie", cost: 75, duration: "45 min" },
-    { name: "Activité créative", type: "Petit plaisir", cost: 45, duration: "30 min" },
-    { name: "Activité loisir", type: "Petit plaisir", cost: 50, duration: "30 min" },
-    { name: "Petit achat prévu", type: "Achat planifié", cost: 100, duration: "achat prévu" }
+    { id: "pause-10", title: "Pause", category: "Detente", cost: 20, minutes: 10 },
+    { id: "pause-15", title: "Pause", category: "Detente", cost: 25, minutes: 15 },
+    { id: "pause-20", title: "Pause", category: "Detente", cost: 30, minutes: 20 },
+    { id: "gaming-10", title: "Gaming", category: "Loisirs", cost: 20, minutes: 10 },
+    { id: "gaming-20", title: "Gaming", category: "Loisirs", cost: 35, minutes: 20 },
+    { id: "temps-libre-15", title: "Temps libre", category: "Loisirs", cost: 25, minutes: 15 },
+    { id: "film-30", title: "Film", category: "Divertissement", cost: 40, minutes: 30 },
+    { id: "serie-20", title: "Serie", category: "Divertissement", cost: 30, minutes: 20 },
+    { id: "video-15", title: "Video", category: "Divertissement", cost: 25, minutes: 15 },
+    { id: "lecture-15", title: "Lecture", category: "Calme", cost: 25, minutes: 15 },
+    { id: "musique-15", title: "Musique", category: "Calme", cost: 25, minutes: 15 },
+    { id: "relaxation-10", title: "Relaxation", category: "Calme", cost: 20, minutes: 10 }
   ];
   const blockedRewardTerms = [
     "temps couple",
@@ -57,7 +55,11 @@
     "temps chasse",
     "chasse",
     "équipement chasse",
-    "petit projet personnel"
+    "petit projet personnel",
+    "youtube",
+    "netflix",
+    "xbox",
+    "playstation"
   ];
 
   const agendaTypeColors = {
@@ -2422,21 +2424,52 @@
   function shopRewards() {
     const personal = state.rewards
       .filter(isCoherentReward)
-      .filter((reward) => !defaultShopRewards.some((item) => item.name === reward))
-      .map((reward) => ({ name: reward, type: "Petit plaisir", cost: 25, duration: "10 min" }));
+      .filter((reward) => !defaultShopRewards.some((item) => item.title === reward))
+      .map((reward) => ({ id: `custom-${reward.toLowerCase().replace(/\s+/g, "-")}`, title: reward, category: "Temps libre", cost: 25, minutes: 10 }));
     return [...defaultShopRewards, ...personal];
+  }
+
+  function rewardTitle(reward) {
+    return String(reward?.title || reward?.name || "").trim();
+  }
+
+  function rewardCategory(reward) {
+    return reward?.category || reward?.type || "Temps libre";
+  }
+
+  function rewardMinutes(reward) {
+    if (Number.isFinite(reward?.minutes)) return Math.max(0, Math.round(reward.minutes));
+    if (Number.isFinite(reward?.durationMs)) return Math.max(1, Math.round(reward.durationMs / 60000));
+    const match = String(reward?.duration || "").match(/(\d+)/);
+    return match ? Math.max(1, Number(match[1])) : 10;
+  }
+
+  function aggregatePurchasedRewards() {
+    const groups = new Map();
+    state.purchasedRewards.forEach((reward) => {
+      const title = rewardTitle(reward);
+      if (!title) return;
+      const current = groups.get(title) || {
+        id: title.toLowerCase().replace(/\s+/g, "-"),
+        title,
+        category: rewardCategory(reward),
+        minutes: 0
+      };
+      current.minutes += rewardMinutes(reward);
+      groups.set(title, current);
+    });
+    return Array.from(groups.values());
   }
 
   function renderShop() {
     const list = $("shop-rewards");
     if (!list) return;
-    const coinText = `🪙 ${state.coins}`;
+    const coinText = `${state.coins} pieces`;
     const coinEl = $("coin-balance");
-    if (coinEl) coinEl.textContent = `${state.coins} pièce${state.coins > 1 ? "s" : ""}`;
+    if (coinEl) coinEl.textContent = `${state.coins} piece${state.coins > 1 ? "s" : ""}`;
     const headerBadge = $("header-coin-balance");
     if (headerBadge) headerBadge.textContent = coinText;
 
-    // Panel récompense active
     const panel = $("active-reward-panel");
     if (panel) {
       if (state.activeReward) {
@@ -2444,34 +2477,33 @@
         const remaining = Math.max(0, state.activeReward.endsAt - Date.now());
         const nameEl = $("active-reward-name");
         const timeEl = $("active-reward-time");
-        if (nameEl) nameEl.textContent = state.activeReward.name;
+        if (nameEl) nameEl.textContent = state.activeReward.name || state.activeReward.title || "Recompense";
         if (timeEl) timeEl.textContent = formatRemaining(remaining);
       } else {
         panel.classList.add("hidden");
       }
     }
 
-    // Mes récompenses achetées
     const purchasedSection = $("purchased-rewards-section");
     const purchasedList = $("purchased-rewards-list");
     if (purchasedSection && purchasedList) {
-      if (state.purchasedRewards.length > 0) {
+      const purchasedRewards = aggregatePurchasedRewards();
+      if (purchasedRewards.length > 0) {
         purchasedSection.classList.remove("hidden");
-        purchasedList.replaceChildren(...state.purchasedRewards.map(function(pr) {
+        purchasedList.replaceChildren(...purchasedRewards.map(function(pr) {
           var item = document.createElement("article");
           item.className = "shop-item";
           var copy = document.createElement("div");
           var title = document.createElement("strong");
-          title.textContent = pr.name;
+          title.textContent = pr.title;
           var detail = document.createElement("p");
           detail.className = "small-muted";
-          detail.textContent = pr.duration;
+          detail.textContent = `${pr.minutes} min`;
           copy.append(title, detail);
           var useBtn = document.createElement("button");
           useBtn.type = "button";
           useBtn.className = "primary";
           useBtn.textContent = "Utiliser";
-          useBtn.disabled = Boolean(state.activeReward);
           useBtn.addEventListener("click", function() { useReward(pr); });
           item.append(copy, useBtn);
           return item;
@@ -2481,14 +2513,13 @@
       }
     }
 
-    // Catalogue boutique
     const rewardsByType = shopRewards().reduce(function(groups, reward) {
-      const type = reward.type || "Petit plaisir";
+      const type = rewardCategory(reward);
       if (!groups[type]) groups[type] = [];
       groups[type].push(reward);
       return groups;
     }, {});
-    const typeOrder = ["Détente", "Jeux", "Petit plaisir", "Sortie", "Achat planifié"];
+    const typeOrder = ["Detente", "Loisirs", "Divertissement", "Calme", "Temps libre"];
     const sections = [];
     typeOrder.forEach(function(type) {
       const rewards = rewardsByType[type];
@@ -2500,26 +2531,26 @@
       const items = document.createElement("div");
       items.className = "shop-list";
       items.replaceChildren(...rewards.map(function(reward) {
-      var item = document.createElement("article");
-      item.className = "shop-item";
-      var copy = document.createElement("div");
-      var title = document.createElement("strong");
-      title.textContent = reward.name;
-      var detail = document.createElement("p");
-      detail.className = "small-muted";
-      detail.textContent = `${reward.cost} pièces · ${reward.duration}`;
-      copy.append(title, detail);
-      var canAfford = state.coins >= reward.cost;
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = canAfford ? "primary" : "secondary";
-      button.textContent = canAfford ? "Acheter" : "Pas assez";
-      button.disabled = !canAfford;
-      (function(r, btn) {
-        btn.addEventListener("click", function() { unlockReward(r, btn); });
-      }(reward, button));
-      item.append(copy, button);
-      return item;
+        var item = document.createElement("article");
+        item.className = "shop-item";
+        var copy = document.createElement("div");
+        var title = document.createElement("strong");
+        title.textContent = rewardTitle(reward);
+        var detail = document.createElement("p");
+        detail.className = "small-muted";
+        detail.textContent = `${reward.cost} pieces - ${rewardMinutes(reward)} min`;
+        copy.append(title, detail);
+        var canAfford = state.coins >= reward.cost;
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = canAfford ? "primary" : "secondary";
+        button.textContent = canAfford ? "Acheter" : "Pas assez";
+        button.disabled = !canAfford;
+        (function(r, btn) {
+          btn.addEventListener("click", function() { unlockReward(r, btn); });
+        }(reward, button));
+        item.append(copy, button);
+        return item;
       }));
       group.append(heading, items);
       sections.push(group);
@@ -2536,39 +2567,51 @@
 
   function unlockReward(reward, btn) {
     if (state.coins < reward.cost) {
-      showToast("Pas assez de pièces pour cette récompense.");
+      showToast("Pas assez de pieces pour cette recompense.");
       return;
     }
+    const title = rewardTitle(reward);
+    const minutes = rewardMinutes(reward);
+    if (!title || !minutes) return;
     if (btn) btn.disabled = true;
     state.coins -= reward.cost;
-    var purchased = {
-      id: Date.now() + "_" + Math.floor(Math.random() * 10000),
-      name: reward.name,
-      duration: reward.duration,
-      durationMs: parseDurationMs(reward.duration)
-    };
-    state.purchasedRewards = state.purchasedRewards.concat([purchased]);
+    const existing = state.purchasedRewards.find((item) => rewardTitle(item) === title);
+    if (existing) {
+      existing.title = title;
+      existing.name = title;
+      existing.category = rewardCategory(reward);
+      existing.minutes = rewardMinutes(existing) + minutes;
+      existing.duration = `${existing.minutes} min`;
+      existing.durationMs = existing.minutes * 60000;
+    } else {
+      state.purchasedRewards = state.purchasedRewards.concat([{
+        id: title.toLowerCase().replace(/\s+/g, "-"),
+        title,
+        name: title,
+        category: rewardCategory(reward),
+        minutes,
+        duration: `${minutes} min`,
+        durationMs: minutes * 60000
+      }]);
+    }
     saveState();
     renderShop();
-    showToast(reward.name + " ajouté à tes récompenses !");
+    showToast(title + " ajoute a tes recompenses !");
   }
 
   function useReward(purchased) {
-    if (state.activeReward) {
-      showToast("Une récompense est déjà en cours. Termine-la d'abord.");
-      return;
+    const title = rewardTitle(purchased);
+    state.purchasedRewards = state.purchasedRewards.filter(function(reward) {
+      return rewardTitle(reward) !== title;
+    });
+    if (state.activeReward && rewardTitle(state.activeReward) === title) {
+      window.clearInterval(activeRewardTimerId);
+      activeRewardTimerId = null;
+      state.activeReward = null;
     }
-    state.activeReward = {
-      id: purchased.id,
-      name: purchased.name,
-      duration: purchased.duration,
-      durationMs: purchased.durationMs,
-      endsAt: Date.now() + purchased.durationMs
-    };
-    state.purchasedRewards = state.purchasedRewards.filter(function(r) { return r.id !== purchased.id; });
     saveState();
-    startActiveRewardTimer();
     renderShop();
+    showToast(title + " utilise.");
   }
 
   function stopActiveReward() {
