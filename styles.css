@@ -1554,9 +1554,9 @@ body.goal-series-active.challenge-open .app-shell {
 
 .selected-missions-list button {
   align-items: center;
-  background: var(--brand);
-  border-color: var(--brand);
-  color: white;
+  background: rgba(22, 84, 70, 0.14);
+  border-color: rgba(22, 84, 70, 0.28);
+  color: var(--ink);
   display: flex;
   font-weight: 700;
   gap: 8px;
