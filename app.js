@@ -604,6 +604,24 @@
     if (overlap > 0) window.scrollBy({ top: overlap, behavior: "smooth" });
   }
 
+  function placeActiveGoalBar(activeBar, showActiveBar) {
+    if (!activeBar) return;
+    if (!showActiveBar) {
+      document.body.append(activeBar);
+      return;
+    }
+    const host = Array.from(document.querySelectorAll(".domain-panel:not(.hidden)")).at(-1)
+      || $("selected-domain-card")
+      || document.querySelector("main");
+    if (!host) return;
+    const taskList = host.querySelector(".task-list");
+    if (taskList) {
+      host.insertBefore(activeBar, taskList);
+    } else {
+      host.append(activeBar);
+    }
+  }
+
   function renderGoalQueue() {
     const items = queuedItems();
     const isActive = Boolean(state.goalQueue?.active);
@@ -637,6 +655,7 @@
     const progressFill = $("goal-queue-progress-fill");
     const showActiveBar = isActive && count > 0;
 
+    placeActiveGoalBar(activeBar, showActiveBar);
     if (activeBar) activeBar.classList.toggle("hidden", !showActiveBar);
     if (showActiveBar) {
       const currentIndex = state.goalQueue.currentIndex || 0;
