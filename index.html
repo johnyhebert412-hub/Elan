@@ -199,8 +199,13 @@
               <p id="training-note" class="small-muted">Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.</p>
               <section id="training-complete-panel" class="training-complete-panel hidden" aria-live="polite">
                 <p class="domain-completed-icon" aria-hidden="true">✓</p>
-                <h4>Séance terminée</h4>
-                <p id="training-complete-summary" class="small-muted">Bravo, séance complétée.</p>
+                <h4>Bravo !</h4>
+                <p id="training-complete-summary" class="small-muted">Séance terminée.</p>
+                <div id="training-complete-reward" class="training-complete-reward" aria-label="Jetons gagnés"></div>
+                <div class="button-row training-complete-actions">
+                  <button id="training-complete-shop" class="secondary" type="button">Aller à la boutique</button>
+                  <button id="training-complete-continue" class="primary" type="button">Continuer</button>
+                </div>
               </section>
               <div class="button-row">
                 <button id="start-training-session" class="primary" type="button">Commencer</button>
@@ -499,12 +504,12 @@
     <section id="series-complete-overlay" class="series-complete-overlay hidden" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="series-complete-title">
       <article class="series-complete-card">
         <div class="series-complete-icon" aria-hidden="true">✓</div>
-        <p class="step">Série terminée</p>
-        <h2 id="series-complete-title">Belle avancée !</h2>
+        <p class="step">Domaine terminé</p>
+        <h2 id="series-complete-title">Bravo !</h2>
         <p id="series-complete-summary" class="series-complete-summary"></p>
         <div class="series-complete-coins" id="series-complete-coins" aria-label="Pièces gagnées"></div>
         <div class="button-row series-complete-actions">
-          <button id="series-complete-shop" class="secondary" type="button">Voir la boutique</button>
+          <button id="series-complete-shop" class="secondary" type="button">Aller à la boutique</button>
           <button id="series-complete-close" class="primary" type="button">Continuer</button>
         </div>
       </article>
