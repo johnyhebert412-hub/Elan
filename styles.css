@@ -569,6 +569,11 @@ p { line-height: 1.4; }
   border-radius: 14px;
   margin-top: 12px;
   padding: 13px;
+  scroll-margin-top: 12px;
+}
+
+.training-active-step:focus {
+  outline: none;
 }
 
 .training-active-step h4 {
@@ -592,8 +597,9 @@ p { line-height: 1.4; }
   background: #eef7f2;
   border: 1px solid var(--brand-light);
   border-radius: 12px;
-  margin: 0 0 12px;
-  padding: 10px 12px;
+  margin: 8px 0 12px;
+  padding: 13px 12px;
+  text-align: center;
 }
 
 .training-step-timer span {
@@ -607,7 +613,7 @@ p { line-height: 1.4; }
 .training-step-timer strong {
   color: var(--brand);
   display: block;
-  font-size: 1.7rem;
+  font-size: 2.45rem;
   line-height: 1;
 }
 

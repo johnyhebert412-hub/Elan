@@ -479,7 +479,11 @@
         currentDescription.textContent = step.description || "";
         currentDescription.classList.toggle("hidden", !step.description);
       }
-      if (currentAmount) currentAmount.textContent = step.amount;
+      const hasTimer = parseTrainingDurationSeconds(step.amount) > 0;
+      if (currentAmount) {
+        currentAmount.textContent = step.amount;
+        currentAmount.classList.toggle("hidden", hasTimer);
+      }
       if (progressFill) progressFill.style.width = `${Math.round((currentStepIndex / totalSteps) * 100)}%`;
       renderTrainingTimer(step, currentStepIndex);
     } else if (progressFill) {
@@ -576,6 +580,18 @@
     if (completeButton) completeButton.textContent = "Terminé";
   }
 
+  function scrollToTrainingActiveStep() {
+    const activeStep = $("training-active-step");
+    if (!activeStep || activeStep.classList.contains("hidden")) return;
+    window.requestAnimationFrame(() => {
+      const rect = activeStep.getBoundingClientRect();
+      const targetTop = Math.max(0, window.scrollY + rect.top - 12);
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: targetTop, behavior: reducedMotion ? "auto" : "smooth" });
+      activeStep.focus({ preventScroll: true });
+    });
+  }
+
   function renderTrainingCustomList(list) {
     const customSteps = Array.isArray(state.training?.customSteps) ? state.training.customSteps : [];
     list.replaceChildren(...customSteps.map((step, index) => {
@@ -647,6 +663,7 @@
     state.training = { ...(state.training || defaultState.training), started: true, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
+    scrollToTrainingActiveStep();
     showToast("Séance commencée. Une étape à la fois.");
   }
 
@@ -685,6 +702,7 @@
       state.training = { ...state.training, currentStep: nextStepIndex, skippedSteps: (state.training.skippedSteps || 0) + (skipped ? 1 : 0) };
       saveState();
       renderTrainingProgram();
+      scrollToTrainingActiveStep();
       showToast(skipped ? `Exercice passé. ${nextStepIndex + 1}/${program.steps.length}` : `Exercice ${nextStepIndex + 1}/${program.steps.length}`);
       return;
     }

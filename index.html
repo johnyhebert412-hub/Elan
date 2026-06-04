@@ -173,23 +173,16 @@
                 </div>
                 <span id="training-intensity" class="training-badge">Douce</span>
               </div>
-              <ul id="training-steps" class="training-steps"></ul>
-              <div class="training-meta">
-                <p><span>Durée estimée</span><strong id="training-duration">10-12 min</strong></p>
-                <p><span>Intensité</span><strong id="training-intensity-text">Douce</strong></p>
-              </div>
-              <p id="training-note" class="small-muted">Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.</p>
-              <div id="training-session-status" class="training-session-status hidden" aria-live="polite">Séance lancée. Une étape à la fois.</div>
-              <section id="training-active-step" class="training-active-step hidden" aria-live="polite">
+              <section id="training-active-step" class="training-active-step hidden" aria-live="polite" tabindex="-1">
                 <p id="training-step-count" class="goal-queue-active-step">Exercice 1/3</p>
                 <h4 id="training-current-step">Marche tranquille</h4>
-                <p id="training-current-description" class="training-current-description">Marche vite sur place.</p>
-                <p id="training-current-amount" class="training-current-amount">5 min</p>
                 <div id="training-step-timer" class="training-step-timer hidden" aria-live="polite">
                   <span>Timer</span>
                   <strong id="training-timer-display">00:00</strong>
                   <p id="training-timer-status" class="small-muted"></p>
                 </div>
+                <p id="training-current-amount" class="training-current-amount">5 min</p>
+                <p id="training-current-description" class="training-current-description">Marche vite sur place.</p>
                 <div class="training-progress-track" aria-hidden="true"><i id="training-progress-fill"></i></div>
                 <div class="training-session-actions">
                   <button id="complete-training-step" class="primary" type="button">Terminé</button>
@@ -197,6 +190,13 @@
                   <button id="stop-training-session" class="secondary" type="button">Arrêter</button>
                 </div>
               </section>
+              <div id="training-session-status" class="training-session-status hidden" aria-live="polite">Séance lancée. Une étape à la fois.</div>
+              <ul id="training-steps" class="training-steps"></ul>
+              <div class="training-meta">
+                <p><span>Durée estimée</span><strong id="training-duration">10-12 min</strong></p>
+                <p><span>Intensité</span><strong id="training-intensity-text">Douce</strong></p>
+              </div>
+              <p id="training-note" class="small-muted">Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.</p>
               <section id="training-complete-panel" class="training-complete-panel hidden" aria-live="polite">
                 <p class="domain-completed-icon" aria-hidden="true">✓</p>
                 <h4>Séance terminée</h4>
