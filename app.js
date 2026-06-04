@@ -75,6 +75,82 @@
     mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }] }
   };
 
+  const trainingLabels = {
+    type: {
+      cardio: "Cardio",
+      force: "Force",
+      endurance: "Endurance"
+    },
+    level: {
+      beginner: "Débutant",
+      intermediate: "Intermédiaire",
+      advanced: "Avancé"
+    }
+  };
+
+  const trainingPrograms = {
+    cardio: {
+      beginner: {
+        duration: "10-12 min",
+        intensity: "Douce",
+        note: "Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.",
+        steps: ["Marche tranquille 5 min", "Marche rapide 5 min", "Respiration calme 1 min"]
+      },
+      intermediate: {
+        duration: "12-15 min",
+        intensity: "Modérée",
+        note: "Garde un rythme que tu peux contrôler. Le but est de rester régulier.",
+        steps: ["Marche rapide 6 min", "Escaliers doux 3 min", "Intervalles simples 4 min", "Retour au calme 2 min"]
+      },
+      advanced: {
+        duration: "16-20 min",
+        intensity: "Élevée, contrôlée",
+        note: "Reste attentif à tes sensations et garde une marge de sécurité.",
+        steps: ["Échauffement 4 min", "Intervalles rapides 6 min", "Course légère 6 min", "Effort soutenu 3 min", "Retour au calme 2 min"]
+      }
+    },
+    force: {
+      beginner: {
+        duration: "8-10 min",
+        intensity: "Douce",
+        note: "Prends ton temps. La qualité du mouvement compte plus que la quantité.",
+        steps: ["Squats assistés", "Pompes au mur", "Planche courte", "Étirements doux"]
+      },
+      intermediate: {
+        duration: "12-15 min",
+        intensity: "Modérée",
+        note: "Avance étape par étape, avec des pauses si nécessaire.",
+        steps: ["Squats", "Pompes adaptées", "Fentes", "Planche", "Retour au calme"]
+      },
+      advanced: {
+        duration: "16-20 min",
+        intensity: "Élevée, contrôlée",
+        note: "Structure l'effort, sans chercher à forcer au-delà de tes limites.",
+        steps: ["Échauffement articulaire", "Circuit force complet", "Pompes", "Squats", "Gainage"]
+      }
+    },
+    endurance: {
+      beginner: {
+        duration: "10-12 min",
+        intensity: "Douce",
+        note: "Un rythme lent est valide. L'important est de commencer.",
+        steps: ["Circuit doux", "Pas sur place", "Montées de genoux lentes", "Respiration calme"]
+      },
+      intermediate: {
+        duration: "15 min",
+        intensity: "Modérée",
+        note: "Alterner effort et repos aide à garder une séance simple et tenable.",
+        steps: ["Circuit 15 minutes", "Alternance effort/repos", "Enchaînement complet", "Retour au calme"]
+      },
+      advanced: {
+        duration: "18-22 min",
+        intensity: "Élevée, structurée",
+        note: "Garde les mouvements propres et réduis l'intensité si le rythme devient trop lourd.",
+        steps: ["Échauffement 4 min", "Circuit intense", "Intervalles courts", "Enchaînements avec peu de repos", "Retour au calme"]
+      }
+    }
+  };
+
   const emergencyActions = [
     "Prends 3 grandes respirations",
     "Touche 3 objets différents",
@@ -109,7 +185,8 @@
     purchasedRewards: [],
     activeReward: null,
     history: [],
-    notifications: { important: false, summary: false }
+    notifications: { important: false, summary: false },
+    training: { type: "cardio", level: "beginner", started: false }
   };
 
   let state = loadState();
@@ -156,7 +233,14 @@
         purchasedRewards: Array.isArray(saved.purchasedRewards) ? saved.purchasedRewards : [],
         activeReward: (saved.activeReward && typeof saved.activeReward === "object") ? saved.activeReward : null,
         history: Array.isArray(saved.history) ? saved.history : [],
-        notifications: { ...defaultState.notifications, ...saved.notifications }
+        notifications: { ...defaultState.notifications, ...saved.notifications },
+        training: saved.training && typeof saved.training === "object"
+          ? {
+              type: trainingPrograms[saved.training.type] ? saved.training.type : defaultState.training.type,
+              level: trainingPrograms[saved.training.type]?.[saved.training.level] ? saved.training.level : defaultState.training.level,
+              started: Boolean(saved.training.started)
+            }
+          : { ...defaultState.training }
       };
       if (nextState.selectedDomain && !suggestedActions[nextState.selectedDomain]) {
         nextState.selectedDomain = "";
@@ -204,6 +288,7 @@
     document.querySelectorAll(".domain-panel").forEach((panel) => panel.classList.add("hidden"));
     panel.classList.remove("hidden");
     renderHomeSuggestion();
+    if (domain === "training") renderTrainingProgram();
     showView("domains");
     panel.setAttribute("tabindex", "-1");
     window.requestAnimationFrame(() => {
@@ -215,6 +300,86 @@
 
   function closeDomain() {
     document.querySelectorAll(".domain-panel").forEach((panel) => panel.classList.add("hidden"));
+  }
+
+  function currentTrainingProgram() {
+    const type = trainingPrograms[state.training?.type] ? state.training.type : defaultState.training.type;
+    const level = trainingPrograms[type]?.[state.training?.level] ? state.training.level : defaultState.training.level;
+    return {
+      type,
+      level,
+      program: trainingPrograms[type][level]
+    };
+  }
+
+  function renderTrainingProgram() {
+    const panel = $("domain-training");
+    if (!panel) return;
+    const { type, level, program } = currentTrainingProgram();
+    document.querySelectorAll("[data-training-type]").forEach((button) => {
+      const active = button.dataset.trainingType === type;
+      button.classList.toggle("selected", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    document.querySelectorAll("[data-training-level]").forEach((button) => {
+      const active = button.dataset.trainingLevel === level;
+      button.classList.toggle("selected", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+
+    const title = $("training-program-title");
+    const steps = $("training-steps");
+    const duration = $("training-duration");
+    const intensity = $("training-intensity");
+    const intensityText = $("training-intensity-text");
+    const note = $("training-note");
+    const status = $("training-session-status");
+
+    if (title) title.textContent = `${trainingLabels.type[type]} ${trainingLabels.level[level].toLowerCase()}`;
+    if (steps) {
+      steps.replaceChildren(...program.steps.map((step) => {
+        const item = document.createElement("li");
+        item.textContent = step;
+        return item;
+      }));
+    }
+    if (duration) duration.textContent = program.duration;
+    if (intensity) intensity.textContent = program.intensity;
+    if (intensityText) intensityText.textContent = program.intensity;
+    if (note) note.textContent = program.note;
+    if (status) {
+      status.classList.toggle("hidden", !state.training?.started);
+      status.textContent = state.training?.started ? "Séance lancée. Une étape à la fois." : "";
+    }
+  }
+
+  function setTrainingType(type) {
+    if (!trainingPrograms[type]) return;
+    state.training = { ...(state.training || defaultState.training), type, started: false };
+    saveState();
+    renderTrainingProgram();
+  }
+
+  function setTrainingLevel(level) {
+    const type = trainingPrograms[state.training?.type] ? state.training.type : defaultState.training.type;
+    if (!trainingPrograms[type]?.[level]) return;
+    state.training = { ...(state.training || defaultState.training), level, started: false };
+    saveState();
+    renderTrainingProgram();
+  }
+
+  function startTrainingSession() {
+    state.training = { ...(state.training || defaultState.training), started: true };
+    saveState();
+    renderTrainingProgram();
+    showToast("Séance commencée. Une étape à la fois.");
+  }
+
+  function resetTrainingSession() {
+    state.training = { ...(state.training || defaultState.training), started: false };
+    saveState();
+    renderTrainingProgram();
+    $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function selectHomeDomain(domain) {
@@ -2176,6 +2341,14 @@
     document.querySelectorAll("[data-reward]").forEach((button) => {
       button.addEventListener("click", () => toggleSelection(button, "rewards", button.dataset.reward));
     });
+    document.querySelectorAll("[data-training-type]").forEach((button) => {
+      button.addEventListener("click", () => setTrainingType(button.dataset.trainingType));
+    });
+    document.querySelectorAll("[data-training-level]").forEach((button) => {
+      button.addEventListener("click", () => setTrainingLevel(button.dataset.trainingLevel));
+    });
+    bindById("start-training-session", "click", startTrainingSession);
+    bindById("reset-training-session", "click", resetTrainingSession);
     bindById("finish-onboarding", "click", finishOnboarding);
 
     bindById("reset-data", "click", () => {
@@ -2207,6 +2380,7 @@
     renderIdeas();
     renderRewards();
     renderShop();
+    renderTrainingProgram();
     renderSelectedDomain();
     renderDomainProgress();
     renderSettings();

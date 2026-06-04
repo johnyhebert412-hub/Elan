@@ -322,6 +322,7 @@ p { line-height: 1.4; }
 }
 
 .domain-house { --domain: #548069; --domain-soft: #e6f1eb; }
+.domain-training { --domain: #516d91; --domain-soft: #e8eef6; }
 .domain-meter {
   background: var(--domain-soft);
   border-radius: 999px;
@@ -342,6 +343,121 @@ p { line-height: 1.4; }
 }
 
 .next-card .primary { margin-top: 8px; width: 100%; }
+
+.training-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.training-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.training-choice-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.training-choice-row button {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--brand);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.15;
+  min-height: 46px;
+  min-width: 0;
+  padding: 9px 6px;
+  text-align: center;
+}
+
+.training-choice-row button.selected {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: white;
+}
+
+.training-program-card {
+  background: rgba(230, 238, 232, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.training-program-card h3 {
+  font-size: 1.12rem;
+  margin: 0;
+}
+
+.training-badge {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--brand);
+  flex: 0 0 auto;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 9px;
+}
+
+.training-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+}
+
+.training-steps li {
+  background: var(--surface);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 0.94rem;
+  font-weight: 650;
+  padding: 10px 12px;
+}
+
+.training-meta {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  margin: 12px 0;
+}
+
+.training-meta p {
+  background: var(--surface);
+  border-radius: 12px;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.training-meta span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.training-meta strong {
+  color: var(--brand);
+  font-size: 0.94rem;
+}
+
+.training-session-status {
+  background: var(--brand);
+  border-radius: 12px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 12px 0;
+  padding: 10px 12px;
+}
 
 .quick-add-panel {
   margin-bottom: 82px;

@@ -50,6 +50,7 @@
             <p class="muted">Choisis un domaine</p>
             <div class="domain-choice-grid">
               <button data-select-domain="house">🧹 Maison</button>
+              <button data-open-domain="training">🏃 Entraînement</button>
             </div>
           </article>
 
@@ -108,6 +109,7 @@
           </div>
           <div class="domain-grid">
             <button type="button" class="domain-tile domain-house" data-open-domain="house" aria-controls="domain-house"><strong>Maison</strong><span>Soulagement</span><em id="count-house">À commencer</em><span class="domain-meter"><i id="progress-house"></i></span></button>
+            <button type="button" class="domain-tile domain-training" data-open-domain="training" aria-controls="domain-training"><strong>Entraînement</strong><span>Séance guidée</span><em>Type + niveau</em><span class="domain-meter"><i></i></span></button>
           </div>
 
           <article id="domain-house" class="card domain-panel hidden">
@@ -118,6 +120,50 @@
               <button data-complete="Ranger une surface">Ranger une surface</button>
               <button data-complete="Lancer une brassée">Lancer une brassée</button>
             </div>
+          </article>
+
+          <article id="domain-training" class="card domain-panel training-panel hidden">
+            <div class="card-header"><h2>Entraînement</h2><button class="text-button" data-close-domain>Changer</button></div>
+            <p class="muted">Choisis un rythme simple. L'objectif est de bouger sans pression.</p>
+
+            <div class="training-control">
+              <p class="domain-section-label">Type d'entraînement</p>
+              <div class="training-choice-row" role="group" aria-label="Type d'entraînement">
+                <button type="button" data-training-type="cardio">Cardio</button>
+                <button type="button" data-training-type="force">Force</button>
+                <button type="button" data-training-type="endurance">Endurance</button>
+              </div>
+            </div>
+
+            <div class="training-control">
+              <p class="domain-section-label">Niveau</p>
+              <div class="training-choice-row" role="group" aria-label="Niveau d'entraînement">
+                <button type="button" data-training-level="beginner">Débutant</button>
+                <button type="button" data-training-level="intermediate">Intermédiaire</button>
+                <button type="button" data-training-level="advanced">Avancé</button>
+              </div>
+            </div>
+
+            <section class="training-program-card" aria-labelledby="training-program-title">
+              <div class="card-header">
+                <div>
+                  <p class="step">Programme proposé</p>
+                  <h3 id="training-program-title">Cardio débutant</h3>
+                </div>
+                <span id="training-intensity" class="training-badge">Douce</span>
+              </div>
+              <ul id="training-steps" class="training-steps"></ul>
+              <div class="training-meta">
+                <p><span>Durée estimée</span><strong id="training-duration">10-12 min</strong></p>
+                <p><span>Intensité</span><strong id="training-intensity-text">Douce</strong></p>
+              </div>
+              <p id="training-note" class="small-muted">Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.</p>
+              <div id="training-session-status" class="training-session-status hidden" aria-live="polite">Séance lancée. Une étape à la fois.</div>
+              <div class="button-row">
+                <button id="start-training-session" class="primary" type="button">Commencer</button>
+                <button id="reset-training-session" class="secondary" type="button">Changer</button>
+              </div>
+            </section>
           </article>
 
         </section>
