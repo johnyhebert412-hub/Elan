@@ -13,15 +13,14 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        
+        <nav class="top-actions" aria-label="Barre supérieure">
+          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
+          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
+        </nav>
         <div class="topbar-main">
           <div>
             <p class="eyebrow">Coach du quotidien</p>
             <h1>Élan</h1>
-<nav class="top-actions" aria-label="Barre supérieure">
-          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
-          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
-        </nav>
           </div>
           <button class="calm-badge" id="header-coin-badge" aria-label="Solde de pièces — ouvrir la boutique" data-view-button="shop">
             <span id="header-coin-balance">🪙 0</span>
@@ -300,7 +299,7 @@
 
           <article class="card">
             <h2>Ajouter une récompense</h2>
-            <p class="small-muted">Ex.: café spécial, vidéos 30 min, petit projet personnel.</p>
+            <p class="small-muted">Ex.: pause détente, vidéos 30 min, activité créative.</p>
             <label class="idea-label">
               <span>Récompense personnelle</span>
               <input id="shop-reward-input" type="text" maxlength="80" placeholder="Ex.: café spécial">
@@ -434,7 +433,7 @@
           <button data-motivation="Jeux vidéo">🎮 Jeux vidéo</button>
           <button data-motivation="Films / séries">🎬 Films / séries</button>
           <button data-motivation="Temps relax">😌 Temps relax</button>
-          <button data-motivation="Petit projet">🛠️ Petit projet</button>
+          <button data-motivation="Temps libre">🧩 Temps libre</button>
           <button data-motivation="Streak">🔥 Streak</button>
           <button data-motivation="Énergie">⚡ Énergie</button>
           <button data-motivation="Moins procrastiner">🧠 Moins procrastiner</button>
@@ -447,9 +446,9 @@
           <button data-reward="Séries">Séries</button>
           <button data-reward="Pause relax">Pause relax</button>
           <button data-reward="Musique relax">Musique relax</button>
-          <button data-reward="Café spécial">Café spécial</button>
+          <button data-reward="Moment calme">Moment calme</button>
           <button data-reward="30 min de vidéos">30 min de vidéos</button>
-          <button data-reward="Petit projet personnel">Petit projet personnel</button>
+          <button data-reward="Activité créative">Activité créative</button>
         </div>
         <button id="finish-onboarding" class="primary wide">Commencer ÉLAN</button>
       </article>

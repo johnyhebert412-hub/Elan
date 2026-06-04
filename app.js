@@ -18,7 +18,7 @@
     productivity: { total: 3, reward: "Pause relax" },
     outside: { total: 3, reward: "Air frais" },
     mental: { total: 10, reward: "Temps calme" },
-    couple: { total: 3, reward: "Café spécial" }
+    couple: { total: 3, reward: "Moment calme" }
   };
 
   const COINS_PER_TASK = 5;
@@ -36,20 +36,19 @@
   ];
   const defaultShopRewards = [
     { name: "Pause sans culpabilité", type: "Détente", cost: 20, duration: "10 min" },
-    { name: "Bain chaud", type: "Détente", cost: 35, duration: "25 min" },
+    { name: "Pause détente", type: "Détente", cost: 25, duration: "15 min" },
+    { name: "Moment calme", type: "Détente", cost: 25, duration: "20 min" },
+    { name: "Temps libre", type: "Détente", cost: 30, duration: "30 min" },
     { name: "Musique relax", type: "Détente", cost: 15, duration: "15 min" },
     { name: "30 min de jeu vidéo", type: "Jeux", cost: 45, duration: "30 min" },
     { name: "Soirée jeux vidéo", type: "Jeux", cost: 90, duration: "60 min" },
     { name: "30 min de vidéos", type: "Petit plaisir", cost: 30, duration: "30 min" },
-    { name: "Épisode de série", type: "Petit plaisir", cost: 45, duration: "1 épisode" },
-    { name: "Film tranquille", type: "Petit plaisir", cost: 70, duration: "1 film" },
-    { name: "Café spécial", type: "Petit plaisir", cost: 25, duration: "1 café" },
+    { name: "Film ou série", type: "Petit plaisir", cost: 55, duration: "45 min" },
     { name: "Collation plaisir", type: "Petit plaisir", cost: 20, duration: "1 collation" },
-    { name: "Sortie simple planifiée", type: "Sortie", cost: 75, duration: "45 min" },
-    { name: "Temps chasse", type: "Sortie", cost: 80, duration: "60 min" },
-    { name: "Petit projet personnel", type: "Achat planifié", cost: 60, duration: "30 min" },
-    { name: "Équipement chasse prévu", type: "Achat planifié", cost: 120, duration: "achat prévu" },
-    { name: "Achat loisir prévu", type: "Achat planifié", cost: 100, duration: "achat prévu" }
+    { name: "Sortie simple", type: "Sortie", cost: 75, duration: "45 min" },
+    { name: "Activité créative", type: "Petit plaisir", cost: 45, duration: "30 min" },
+    { name: "Activité loisir", type: "Petit plaisir", cost: 50, duration: "30 min" },
+    { name: "Petit achat prévu", type: "Achat planifié", cost: 100, duration: "achat prévu" }
   ];
   const blockedRewardTerms = [
     "temps couple",
@@ -62,7 +61,11 @@
     "faire une tâche ménagère",
     "promener les chiens",
     "prendre soin des animaux",
-    "animaux"
+    "animaux",
+    "temps chasse",
+    "chasse",
+    "équipement chasse",
+    "petit projet personnel"
   ];
 
   const agendaTypeColors = {
