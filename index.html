@@ -335,6 +335,31 @@
               <span>Récompense personnelle</span>
               <input id="shop-reward-input" type="text" maxlength="80" placeholder="Ex.: café spécial">
             </label>
+            <label class="idea-label">
+              <span>Catégorie</span>
+              <select id="shop-reward-category">
+                <option value="Detente">Détente</option>
+                <option value="Loisirs">Loisirs</option>
+                <option value="Divertissement">Divertissement</option>
+                <option value="Calme">Calme</option>
+                <option value="Bonus">Bonus</option>
+              </select>
+            </label>
+            <label class="idea-label">
+              <span>Type</span>
+              <select id="shop-reward-type">
+                <option value="timer">Avec timer</option>
+                <option value="free">Libre</option>
+              </select>
+            </label>
+            <label class="idea-label">
+              <span>Durée</span>
+              <input id="shop-reward-minutes" type="number" min="1" max="180" value="20">
+            </label>
+            <label class="idea-label">
+              <span>Coût</span>
+              <input id="shop-reward-cost" type="number" min="1" max="500" value="20">
+            </label>
             <button id="save-shop-reward" class="secondary wide" type="button">Ajouter à la boutique</button>
           </article>
         </section>

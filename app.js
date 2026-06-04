@@ -2039,7 +2039,7 @@
     list.replaceChildren(...rewards.map((reward) => {
       const item = document.createElement("p");
       item.className = "idea-item";
-      item.textContent = reward;
+      item.textContent = rewardTitle(reward);
       return item;
     }));
     list.classList.remove("hidden");
@@ -2138,7 +2138,7 @@
   }
 
   function isCoherentReward(label) {
-    const normalized = String(label || "").trim().toLowerCase();
+    const normalized = rewardTitle(label).toLowerCase();
     return normalized && !blockedRewardTerms.some((term) => normalized.includes(term));
   }
 
@@ -2438,21 +2438,44 @@
   function shopRewards() {
     const personal = state.rewards
       .filter(isCoherentReward)
-      .filter((reward) => !defaultShopRewards.some((item) => item.title === reward))
-      .map((reward) => ({ id: "custom-" + reward.toLowerCase().replace(/\s+/g, "-"), title: reward, category: "Bonus", cost: 30, minutes: 20, rewardType: "timer" }));
+      .filter((reward) => !defaultShopRewards.some((item) => item.title === rewardTitle(reward)))
+      .map((reward) => normalizeShopReward(reward));
     return [...defaultShopRewards, ...personal];
   }
 
+  function normalizeShopReward(reward) {
+    const title = rewardTitle(reward);
+    const type = rewardType(reward);
+    const category = shopCategories.some((item) => item.id === rewardCategory(reward)) ? rewardCategory(reward) : "Bonus";
+    const minutes = type === "free" ? 0 : Math.max(1, Math.round(Number(reward?.minutes) || 20));
+    const cost = Math.max(1, Math.round(Number(reward?.cost) || (type === "free" ? 50 : 20)));
+    const id = reward?.id || "custom-" + title.toLowerCase().replace(/\s+/g, "-");
+    return {
+      id,
+      title,
+      name: title,
+      category,
+      cost,
+      type,
+      rewardType: type,
+      minutes,
+      uses: type === "free" ? Math.max(1, Math.round(Number(reward?.uses) || 1)) : 0,
+      duration: minutes ? minutes + " min" : "Recompense libre",
+      durationMs: minutes * 60000
+    };
+  }
+
   function rewardTitle(reward) {
+    if (typeof reward === "string") return reward.trim();
     return String(reward?.title || reward?.name || "").trim();
   }
 
   function rewardType(reward) {
-    return reward?.rewardType || reward?.typeKey || (Number.isFinite(reward?.uses) ? "free" : "timer");
+    return reward?.rewardType || reward?.typeKey || (["timer", "free"].includes(reward?.type) ? reward.type : "") || (Number.isFinite(reward?.uses) ? "free" : "timer");
   }
 
   function rewardCategory(reward) {
-    return reward?.category || reward?.type || (rewardType(reward) === "free" ? "Libre" : "Temps libre");
+    return reward?.category || (rewardType(reward) === "free" ? "Divertissement" : "Bonus");
   }
 
   function rewardMinutes(reward) {
@@ -2855,6 +2878,10 @@
   function saveShopReward() {
     const input = $("shop-reward-input");
     const reward = input?.value.trim();
+    const category = $("shop-reward-category")?.value || "Bonus";
+    const type = $("shop-reward-type")?.value === "free" ? "free" : "timer";
+    const minutes = Math.max(1, Math.round(Number($("shop-reward-minutes")?.value) || 20));
+    const cost = Math.max(1, Math.round(Number($("shop-reward-cost")?.value) || (type === "free" ? 50 : 20)));
     if (!reward) {
       showToast("Écris une récompense.");
       return;
@@ -2863,9 +2890,23 @@
       showToast("Choisis plutôt un petit plaisir personnel.");
       return;
     }
-    state.rewards = [...new Set([...state.rewards, reward])].slice(-12);
+    const customReward = {
+      id: "custom-" + reward.toLowerCase().replace(/\s+/g, "-"),
+      title: reward,
+      category,
+      cost,
+      type,
+      rewardType: type,
+      minutes: type === "free" ? 0 : minutes,
+      uses: type === "free" ? 1 : 0
+    };
+    state.rewards = state.rewards
+      .filter((item) => rewardTitle(item) !== reward)
+      .concat([customReward])
+      .slice(-12);
     saveState();
     input.value = "";
+    shopFlow = { step: "variants", category, title: "", rewardType: "", rewardId: "" };
     renderRewards();
     renderShop();
     renderOnboarding();

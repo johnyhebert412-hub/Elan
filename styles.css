@@ -672,6 +672,17 @@ p { line-height: 1.4; }
   margin: 4px 0 6px;
 }
 
+.training-complete-reward {
+  color: var(--brand);
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 8px 0 0;
+}
+
+.training-complete-actions {
+  margin-top: 12px;
+}
+
 .quick-add-panel {
   margin-bottom: 82px;
 }
@@ -1053,7 +1064,8 @@ textarea {
   resize: vertical;
 }
 
-.idea-label input {
+.idea-label input,
+.idea-label select {
   background: white;
   border: 1px solid var(--border);
   border-radius: 12px;
