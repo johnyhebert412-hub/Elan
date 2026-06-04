@@ -38,9 +38,9 @@
     { name: "Pause sans culpabilité", type: "Détente", cost: 20, duration: "10 min" },
     { name: "Bain chaud", type: "Détente", cost: 35, duration: "25 min" },
     { name: "Musique relax", type: "Détente", cost: 15, duration: "15 min" },
-    { name: "30 min de Xbox", type: "Gaming", cost: 45, duration: "30 min" },
-    { name: "Soirée gaming", type: "Gaming", cost: 90, duration: "60 min" },
-    { name: "30 min YouTube", type: "Petit plaisir", cost: 30, duration: "30 min" },
+    { name: "30 min de jeu vidéo", type: "Jeux", cost: 45, duration: "30 min" },
+    { name: "Soirée jeux vidéo", type: "Jeux", cost: 90, duration: "60 min" },
+    { name: "30 min de vidéos", type: "Petit plaisir", cost: 30, duration: "30 min" },
     { name: "Épisode de série", type: "Petit plaisir", cost: 45, duration: "1 épisode" },
     { name: "Film tranquille", type: "Petit plaisir", cost: 70, duration: "1 film" },
     { name: "Café spécial", type: "Petit plaisir", cost: 25, duration: "1 café" },
@@ -1655,7 +1655,7 @@
       groups[type].push(reward);
       return groups;
     }, {});
-    const typeOrder = ["Détente", "Gaming", "Petit plaisir", "Sortie", "Achat planifié"];
+    const typeOrder = ["Détente", "Jeux", "Petit plaisir", "Sortie", "Achat planifié"];
     const sections = [];
     typeOrder.forEach(function(type) {
       const rewards = rewardsByType[type];
