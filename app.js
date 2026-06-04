@@ -116,29 +116,29 @@
         intensity: "Douce",
         note: "Commence simplement et garde un rythme confortable.",
         steps: [
-          { label: "Marche rapide", amount: "60 sec", description: "Marche vite sur place." },
-          { label: "Montées de genoux", amount: "45 sec", description: "Monte les genoux un à la fois." },
-          { label: "Jumping Jacks", amount: "30 sec", description: "Ouvre et ferme les bras et les jambes." }
+          { label: "Marche rapide", amount: "60 secondes" },
+          { label: "Genoux hauts", amount: "45 secondes" },
+          { label: "Jumping Jacks", amount: "30 secondes" }
         ]
       },
       intermediate: {
         duration: "3 min",
-        intensity: "Modérée",
-        note: "Garde un rythme simple et régulier.",
+        intensity: "Mod?r?e",
+        note: "Garde un rythme simple et r?gulier.",
         steps: [
-          { label: "Jumping Jacks", amount: "60 sec", description: "Ouvre et ferme les bras et les jambes." },
-          { label: "Montées de genoux", amount: "60 sec", description: "Monte les genoux un à la fois." },
-          { label: "Mountain Climbers", amount: "45 sec", description: "Ramène les genoux vers la poitrine." }
+          { label: "Jumping Jacks", amount: "60 secondes" },
+          { label: "Genoux hauts", amount: "60 secondes" },
+          { label: "Mountain Climbers", amount: "45 secondes" }
         ]
       },
       advanced: {
         duration: "3 min",
-        intensity: "Élevée",
-        note: "Reste attentif à tes sensations et ralentis si nécessaire.",
+        intensity: "?lev?e",
+        note: "Reste attentif ? tes sensations et ralentis si n?cessaire.",
         steps: [
-          { label: "Burpees", amount: "45 sec", description: "Descends au sol puis relève-toi." },
-          { label: "Mountain Climbers", amount: "60 sec", description: "Ramène les genoux vers la poitrine." },
-          { label: "Sprint sur place", amount: "60 sec", description: "Cours vite sur place." }
+          { label: "Burpees", amount: "45 secondes" },
+          { label: "Mountain Climbers", amount: "60 secondes" },
+          { label: "Sprint sur place", amount: "60 secondes" }
         ]
       }
     },
@@ -148,29 +148,29 @@
         intensity: "Douce",
         note: "Prends ton temps et garde des mouvements simples.",
         steps: [
-          { label: "Squats", amount: "8 répétitions", description: "Plie les jambes puis remonte." },
-          { label: "Pompes", amount: "5 répétitions", description: "Descends puis remonte le corps." },
-          { label: "Planche", amount: "20 sec", description: "Garde le corps droit." }
+          { label: "Squats", amount: "8 r?p?titions" },
+          { label: "Pompes", amount: "5 r?p?titions" },
+          { label: "Planche", amount: "20 secondes" }
         ]
       },
       intermediate: {
         duration: "3 min",
-        intensity: "Modérée",
-        note: "Avance étape par étape, avec des pauses si nécessaire.",
+        intensity: "Mod?r?e",
+        note: "Avance ?tape par ?tape, avec des pauses si n?cessaire.",
         steps: [
-          { label: "Squats", amount: "12 répétitions", description: "Plie les jambes puis remonte." },
-          { label: "Pompes", amount: "10 répétitions", description: "Descends puis remonte le corps." },
-          { label: "Planche", amount: "30 sec", description: "Garde le corps droit." }
+          { label: "Squats", amount: "12 r?p?titions" },
+          { label: "Pompes", amount: "10 r?p?titions" },
+          { label: "Planche", amount: "30 secondes" }
         ]
       },
       advanced: {
         duration: "4 min",
-        intensity: "Élevée",
-        note: "Garde le contrôle et réduis le rythme si nécessaire.",
+        intensity: "?lev?e",
+        note: "Garde le contr?le et r?duis le rythme si n?cessaire.",
         steps: [
-          { label: "Squats", amount: "20 répétitions", description: "Plie les jambes puis remonte." },
-          { label: "Pompes", amount: "15 répétitions", description: "Descends puis remonte le corps." },
-          { label: "Planche", amount: "60 sec", description: "Garde le corps droit." }
+          { label: "Squats", amount: "20 r?p?titions" },
+          { label: "Pompes", amount: "15 r?p?titions" },
+          { label: "Planche", amount: "60 secondes" }
         ]
       }
     },
@@ -180,29 +180,29 @@
         intensity: "Douce",
         note: "Un rythme tranquille est suffisant pour commencer.",
         steps: [
-          { label: "Marche rapide", amount: "2 min", description: "Marche vite sur place." },
-          { label: "Chaise", amount: "20 sec", description: "Dos au mur, jambes pliées." },
-          { label: "Planche", amount: "20 sec", description: "Garde le corps droit." }
+          { label: "Marche rapide", amount: "2 minutes" },
+          { label: "Chaise", amount: "20 secondes" },
+          { label: "Planche", amount: "20 secondes" }
         ]
       },
       intermediate: {
         duration: "3 min",
-        intensity: "Modérée",
+        intensity: "Mod?r?e",
         note: "Garde un rythme stable et fais une pause au besoin.",
         steps: [
-          { label: "Fentes", amount: "10 répétitions", description: "Avance une jambe, descends, puis remonte." },
-          { label: "Chaise", amount: "40 sec", description: "Dos au mur, jambes pliées." },
-          { label: "Planche", amount: "40 sec", description: "Garde le corps droit." }
+          { label: "Fentes", amount: "10 r?p?titions" },
+          { label: "Chaise", amount: "40 secondes" },
+          { label: "Planche", amount: "40 secondes" }
         ]
       },
       advanced: {
         duration: "4 min",
-        intensity: "Élevée",
-        note: "Garde les mouvements simples et réduis l'intensité si nécessaire.",
+        intensity: "?lev?e",
+        note: "Garde les mouvements simples et r?duis l'intensit? si n?cessaire.",
         steps: [
-          { label: "Fentes", amount: "12 répétitions", description: "Avance une jambe, descends, puis remonte." },
-          { label: "Chaise", amount: "60 sec", description: "Dos au mur, jambes pliées." },
-          { label: "Planche", amount: "60 sec", description: "Garde le corps droit." }
+          { label: "Fentes", amount: "12 r?p?titions" },
+          { label: "Chaise", amount: "60 secondes" },
+          { label: "Planche", amount: "60 secondes" }
         ]
       }
     }
@@ -262,6 +262,8 @@
   let trainingTimerStepKey = "";
   let trainingTimerRemaining = 0;
   let trainingTimerElapsed = false;
+  let trainingTimerPhase = "idle";
+  let trainingCountdownValue = 3;
   let shopFlow = { step: "categories", category: "", title: "", rewardType: "", rewardId: "" };
 
   function cloneState(value) {
@@ -564,12 +566,6 @@
         const amount = document.createElement("span");
         amount.textContent = step.amount;
         item.append(label, amount);
-        if (step.description) {
-          const description = document.createElement("p");
-          description.className = "training-step-description";
-          description.textContent = step.description;
-          item.append(description);
-        }
         item.classList.toggle("active", isStarted && index === currentStepIndex);
         item.classList.toggle("done", isStarted && index < currentStepIndex);
         return item;
@@ -593,15 +589,10 @@
       const step = program.steps[currentStepIndex];
       if (stepCount) stepCount.textContent = `Exercice ${currentStepIndex + 1}/${totalSteps}`;
       if (currentStep) currentStep.textContent = step.label;
-      const currentDescription = $("training-current-description");
-      if (currentDescription) {
-        currentDescription.textContent = step.description || "";
-        currentDescription.classList.toggle("hidden", !step.description);
-      }
       const hasTimer = parseTrainingDurationSeconds(step.amount) > 0;
       if (currentAmount) {
         currentAmount.textContent = step.amount;
-        currentAmount.classList.toggle("hidden", hasTimer);
+        currentAmount.classList.remove("hidden");
       }
       if (progressFill) progressFill.style.width = `${Math.round((currentStepIndex / totalSteps) * 100)}%`;
       renderTrainingTimer(step, currentStepIndex);
@@ -664,6 +655,8 @@
       trainingTimerStepKey = stepKey;
       trainingTimerRemaining = Math.max(1, seconds);
       trainingTimerElapsed = false;
+      trainingTimerPhase = "countdown";
+      trainingCountdownValue = 3;
       trainingTimerId = window.setInterval(tickTrainingTimer, 1000);
     }
     timer.classList.remove("hidden");
@@ -671,6 +664,16 @@
   }
 
   function tickTrainingTimer() {
+    if (trainingTimerPhase === "countdown") {
+      if (trainingCountdownValue > 0) {
+        trainingCountdownValue -= 1;
+        updateTrainingTimerDisplay();
+        return;
+      }
+      trainingTimerPhase = "timer";
+      updateTrainingTimerDisplay();
+      return;
+    }
     if (trainingTimerRemaining > 0) {
       trainingTimerRemaining -= 1;
     }
@@ -688,10 +691,22 @@
     const display = $("training-timer-display");
     const status = $("training-timer-status");
     const completeButton = $("complete-training-step");
+    if (trainingTimerPhase === "countdown") {
+      if (display) {
+        display.textContent = trainingCountdownValue > 0 ? String(trainingCountdownValue) : "GO !";
+        display.classList.add("training-countdown-display");
+      }
+      if (status) status.textContent = trainingCountdownValue > 0 ? "Prépare-toi." : "C'est parti.";
+      if (completeButton) completeButton.textContent = "Terminé";
+      return;
+    }
     const remaining = Math.max(0, trainingTimerRemaining);
     const minutes = Math.floor(remaining / 60);
     const seconds = remaining % 60;
-    if (display) display.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    if (display) {
+      display.classList.remove("training-countdown-display");
+      display.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
     if (status) status.textContent = trainingTimerElapsed ? "Temps écoulé. Tu peux passer à l'étape suivante." : "Compte à rebours en cours.";
     if (completeButton) completeButton.textContent = trainingTimerElapsed ? "Étape suivante" : "Terminé";
   }
@@ -702,6 +717,9 @@
     trainingTimerStepKey = "";
     trainingTimerRemaining = 0;
     trainingTimerElapsed = false;
+    trainingTimerPhase = "idle";
+    trainingCountdownValue = 3;
+    $("training-timer-display")?.classList.remove("training-countdown-display");
     const completeButton = $("complete-training-step");
     if (completeButton) completeButton.textContent = "Terminé";
   }
