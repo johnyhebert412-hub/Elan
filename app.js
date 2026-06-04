@@ -45,9 +45,16 @@
     { id: "relaxation-15", title: "Relaxation", category: "Calme", cost: 25, minutes: 15, rewardType: "timer" },
     { id: "relaxation-20", title: "Relaxation", category: "Calme", cost: 30, minutes: 20, rewardType: "timer" },
     { id: "relaxation-30", title: "Relaxation", category: "Calme", cost: 40, minutes: 30, rewardType: "timer" },
-    { id: "film", title: "Film", category: "Libre", cost: 60, uses: 1, rewardType: "free" },
-    { id: "soiree-detente", title: "Soiree detente", category: "Libre", cost: 80, uses: 1, rewardType: "free" },
-    { id: "moment-special", title: "Moment special", category: "Libre", cost: 70, uses: 1, rewardType: "free" }
+    { id: "film", title: "Film", category: "Divertissement", cost: 60, uses: 1, rewardType: "free" },
+    { id: "soiree-detente", title: "Soiree detente", category: "Bonus", cost: 80, uses: 1, rewardType: "free" },
+    { id: "moment-special", title: "Moment special", category: "Bonus", cost: 70, uses: 1, rewardType: "free" }
+  ];
+  const shopCategories = [
+    { id: "Detente", label: "Détente", icon: "☕" },
+    { id: "Loisirs", label: "Loisirs", icon: "🎮" },
+    { id: "Divertissement", label: "Divertissement", icon: "🎬" },
+    { id: "Calme", label: "Calme", icon: "📚" },
+    { id: "Bonus", label: "Bonus", icon: "🎁" }
   ];
   const blockedRewardTerms = [
     "temps couple",
@@ -258,6 +265,7 @@
   let trainingTimerStepKey = "";
   let trainingTimerRemaining = 0;
   let trainingTimerElapsed = false;
+  let shopFlow = { step: "categories", category: "", title: "", rewardType: "", rewardId: "" };
 
   function cloneState(value) {
     if (typeof structuredClone === "function") return structuredClone(value);
@@ -2434,7 +2442,7 @@
     const personal = state.rewards
       .filter(isCoherentReward)
       .filter((reward) => !defaultShopRewards.some((item) => item.title === reward))
-      .map((reward) => ({ id: "custom-" + reward.toLowerCase().replace(/\s+/g, "-"), title: reward, category: "Temps libre", cost: 30, minutes: 20, rewardType: "timer" }));
+      .map((reward) => ({ id: "custom-" + reward.toLowerCase().replace(/\s+/g, "-"), title: reward, category: "Bonus", cost: 30, minutes: 20, rewardType: "timer" }));
     return [...defaultShopRewards, ...personal];
   }
 
@@ -2483,6 +2491,171 @@
       groups.set(key, current);
     });
     return Array.from(groups.values());
+  }
+
+  function shopCategoryMeta(categoryId) {
+    return shopCategories.find((category) => category.id === categoryId) || { id: categoryId, label: categoryId, icon: "" };
+  }
+
+  function shopBack() {
+    if (shopFlow.step === "confirm") {
+      shopFlow = { ...shopFlow, step: "variants", rewardId: "" };
+    } else if (shopFlow.step === "variants") {
+      shopFlow = { ...shopFlow, step: "rewards", title: "", rewardType: "", rewardId: "" };
+    } else if (shopFlow.step === "rewards") {
+      shopFlow = { step: "categories", category: "", title: "", rewardType: "", rewardId: "" };
+    }
+    renderShop();
+  }
+
+  function resetShopFlow() {
+    shopFlow = { step: "categories", category: "", title: "", rewardType: "", rewardId: "" };
+  }
+
+  function shopRewardChoices(categoryId) {
+    const choices = new Map();
+    shopRewards()
+      .filter((reward) => rewardCategory(reward) === categoryId)
+      .forEach((reward) => {
+        const title = rewardTitle(reward);
+        if (!title) return;
+        const type = rewardType(reward);
+        const key = type + ":" + title;
+        if (!choices.has(key)) choices.set(key, { title, rewardType: type, category: categoryId });
+      });
+    return Array.from(choices.values());
+  }
+
+  function shopRewardVariants() {
+    return shopRewards().filter((reward) =>
+      rewardCategory(reward) === shopFlow.category &&
+      rewardTitle(reward) === shopFlow.title &&
+      rewardType(reward) === shopFlow.rewardType
+    );
+  }
+
+  function selectedShopReward() {
+    return shopRewards().find((reward) => reward.id === shopFlow.rewardId) || null;
+  }
+
+  function shopChoiceCard(titleText, detailText, actionText, onClick, disabled) {
+    const item = document.createElement("article");
+    item.className = "shop-item";
+    const copy = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = titleText;
+    copy.append(title);
+    if (detailText) {
+      const detail = document.createElement("p");
+      detail.className = "small-muted";
+      detail.textContent = detailText;
+      copy.append(detail);
+    }
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = disabled ? "secondary" : "primary";
+    button.textContent = actionText;
+    button.disabled = Boolean(disabled);
+    button.addEventListener("click", onClick);
+    item.append(copy, button);
+    return item;
+  }
+
+  function shopBackButton() {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "secondary wide";
+    button.textContent = "Retour";
+    button.addEventListener("click", shopBack);
+    return button;
+  }
+
+  function renderShopFlow(list) {
+    const nodes = [];
+
+    if (shopFlow.step === "categories") {
+      nodes.push(...shopCategories.map((category) =>
+        shopChoiceCard(category.icon + " " + category.label, "Choisir cette catégorie", "Choisir", function() {
+          shopFlow = { step: "rewards", category: category.id, title: "", rewardType: "", rewardId: "" };
+          renderShop();
+        })
+      ));
+      list.replaceChildren(...nodes);
+      return;
+    }
+
+    const category = shopCategoryMeta(shopFlow.category);
+    const heading = document.createElement("section");
+    heading.className = "shop-category";
+    const title = document.createElement("h3");
+    title.textContent = category.icon + " " + category.label;
+    heading.append(title);
+    nodes.push(heading);
+
+    if (shopFlow.step === "rewards") {
+      shopRewardChoices(shopFlow.category).forEach((choice) => {
+        nodes.push(shopChoiceCard(choice.title, choice.rewardType === "free" ? "Récompense libre" : "Récompense avec timer", "Choisir", function() {
+          shopFlow = { ...shopFlow, step: "variants", title: choice.title, rewardType: choice.rewardType, rewardId: "" };
+          renderShop();
+        }));
+      });
+      nodes.push(shopBackButton());
+      list.replaceChildren(...nodes);
+      return;
+    }
+
+    if (shopFlow.step === "variants") {
+      const rewardHeading = document.createElement("section");
+      rewardHeading.className = "shop-category";
+      const rewardTitleEl = document.createElement("h3");
+      rewardTitleEl.textContent = shopFlow.title;
+      rewardHeading.append(rewardTitleEl);
+      nodes.push(rewardHeading);
+      shopRewardVariants().forEach((reward) => {
+        const detail = rewardType(reward) === "free"
+          ? reward.cost + " pièces - Récompense libre"
+          : rewardMinutes(reward) + " min - " + reward.cost + " pièces";
+        nodes.push(shopChoiceCard(rewardType(reward) === "free" ? "1 utilisation" : rewardMinutes(reward) + " min", detail, "Choisir", function() {
+          shopFlow = { ...shopFlow, step: "confirm", rewardId: reward.id };
+          renderShop();
+        }));
+      });
+      nodes.push(shopBackButton());
+      list.replaceChildren(...nodes);
+      return;
+    }
+
+    const reward = selectedShopReward();
+    if (!reward) {
+      resetShopFlow();
+      renderShop();
+      return;
+    }
+    const canAfford = state.coins >= reward.cost;
+    const confirmCard = document.createElement("article");
+    confirmCard.className = "shop-item shop-confirm-card";
+    const copy = document.createElement("div");
+    const confirmTitle = document.createElement("strong");
+    confirmTitle.textContent = rewardTitle(reward);
+    const duration = document.createElement("p");
+    duration.className = "small-muted";
+    duration.textContent = rewardType(reward) === "free" ? "1 utilisation" : rewardMinutes(reward) + " minutes";
+    const cost = document.createElement("p");
+    cost.className = "small-muted";
+    cost.textContent = "Coût : " + reward.cost + " pièces";
+    copy.append(confirmTitle, duration, cost);
+    const buyButton = document.createElement("button");
+    buyButton.type = "button";
+    buyButton.className = canAfford ? "primary" : "secondary";
+    buyButton.textContent = canAfford ? "Acheter" : "Pas assez";
+    buyButton.disabled = !canAfford;
+    buyButton.addEventListener("click", function() {
+      resetShopFlow();
+      unlockReward(reward, buyButton);
+    });
+    confirmCard.append(copy, buyButton);
+    nodes.push(confirmCard, shopBackButton());
+    list.replaceChildren(...nodes);
   }
 
   function renderShop() {
@@ -2553,49 +2726,7 @@
       }
     }
 
-    const rewardsByType = shopRewards().reduce(function(groups, reward) {
-      const type = rewardCategory(reward);
-      if (!groups[type]) groups[type] = [];
-      groups[type].push(reward);
-      return groups;
-    }, {});
-    const typeOrder = ["Detente", "Loisirs", "Calme", "Libre", "Temps libre"];
-    const sections = [];
-    typeOrder.forEach(function(type) {
-      const rewards = rewardsByType[type];
-      if (!rewards || !rewards.length) return;
-      const group = document.createElement("section");
-      group.className = "shop-category";
-      const heading = document.createElement("h3");
-      heading.textContent = type;
-      const items = document.createElement("div");
-      items.className = "shop-list";
-      items.replaceChildren(...rewards.map(function(reward) {
-        var item = document.createElement("article");
-        item.className = "shop-item";
-        var copy = document.createElement("div");
-        var title = document.createElement("strong");
-        title.textContent = rewardTitle(reward);
-        var detail = document.createElement("p");
-        detail.className = "small-muted";
-        detail.textContent = rewardType(reward) === "free" ? reward.cost + " pieces - Recompense libre" : reward.cost + " pieces - " + rewardMinutes(reward) + " min";
-        copy.append(title, detail);
-        var canAfford = state.coins >= reward.cost;
-        var button = document.createElement("button");
-        button.type = "button";
-        button.className = canAfford ? "primary" : "secondary";
-        button.textContent = canAfford ? "Acheter" : "Pas assez";
-        button.disabled = !canAfford;
-        (function(r, btn) {
-          btn.addEventListener("click", function() { unlockReward(r, btn); });
-        }(reward, button));
-        item.append(copy, button);
-        return item;
-      }));
-      group.append(heading, items);
-      sections.push(group);
-    });
-    list.replaceChildren(...sections);
+    renderShopFlow(list);
   }
 
   function parseDurationMs(durationStr) {
