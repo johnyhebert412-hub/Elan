@@ -1867,9 +1867,9 @@ body.goal-series-active.challenge-open .app-shell {
 
 .selected-missions-list button {
   align-items: center;
-  background: var(--brand);
-  border-color: var(--brand);
-  color: white;
+  background: var(--soft);
+  border-color: var(--border);
+  color: var(--ink);
   display: flex;
   font-weight: 700;
   gap: 8px;
@@ -1879,9 +1879,10 @@ body.goal-series-active.challenge-open .app-shell {
 
 .selected-missions-list button::after {
   content: "✕";
+  color: var(--brand);
   flex-shrink: 0;
   font-size: 0.78rem;
-  opacity: 0.7;
+  opacity: 0.72;
 }
 
 .suggestions-list {
