@@ -13,15 +13,14 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        
+        <nav class="top-actions" aria-label="Barre supérieure">
+          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
+          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
+        </nav>
         <div class="topbar-main">
           <div>
             <p class="eyebrow">Coach du quotidien</p>
             <h1>Élan</h1>
-<nav class="top-actions" aria-label="Barre supérieure">
-          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
-          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
-        </nav>
           </div>
           <button class="calm-badge" id="header-coin-badge" aria-label="Solde de pièces — ouvrir la boutique" data-view-button="shop">
             <span id="header-coin-balance">🪙 0</span>
@@ -32,10 +31,10 @@
       <main>
         <section id="view-home" class="view active" aria-labelledby="home-title">
           <article id="home-hero" class="hero action-hero">
-            <p class="step">Par où commencer ?</p>
+            <p class="step">Accès rapide</p>
             <h2 id="home-title">Urgence mentale</h2>
             <button id="next-action" class="primary action-button">Urgence mentale</button>
-            <button id="choose-domain-button" class="hero-link">Personnaliser doucement →</button>
+            <button id="choose-domain-button" class="hero-link">Personnaliser doucement</button>
           </article>
 
           <article id="emergency-card" class="emergency-card hidden" aria-live="polite">
@@ -48,12 +47,9 @@
           <article id="domain-choice-card" class="domain-choice-card" aria-labelledby="domain-choice-title">
             <p class="step">Choix simple</p>
             <h2 id="domain-choice-title">Que veux-tu faire ?</h2>
-            <p class="muted domain-choice-hint">Une seule chose à la fois. C'est assez.</p>
+            <p class="muted">Choisis un domaine</p>
             <div class="domain-choice-grid">
               <button data-select-domain="house">🧹 Maison</button>
-              <button data-select-domain="health">💧 Santé</button>
-              <button data-select-domain="productivity">🎯 Productivité</button>
-              <button data-select-domain="outside">🌲 Extérieur</button>
             </div>
           </article>
 
@@ -109,13 +105,9 @@
           <div class="section-heading">
             <p class="step">Domaines</p>
             <h2 id="domains-title">Choisis ton besoin</h2>
-            <p class="section-hint">Chaque domaine est une façon de commencer.</p>
           </div>
           <div class="domain-grid">
-            <button type="button" class="domain-tile domain-house" data-open-domain="house" aria-controls="domain-house"><strong>🧹 Maison</strong><span>Espace &amp; soulagement</span><em id="count-house">À commencer</em><span class="domain-meter"><i id="progress-house"></i></span></button>
-            <button type="button" class="domain-tile domain-health" data-open-domain="health" aria-controls="domain-health"><strong>💧 Santé</strong><span>Énergie &amp; bien-être</span><em id="count-health">À commencer</em><span class="domain-meter"><i id="progress-health"></i></span></button>
-            <button type="button" class="domain-tile domain-productivity" data-open-domain="productivity" aria-controls="domain-productivity"><strong>🎯 Productivité</strong><span>Démarrage doux</span><em id="count-productivity">À commencer</em><span class="domain-meter"><i id="progress-productivity"></i></span></button>
-            <button type="button" class="domain-tile domain-outside" data-open-domain="outside" aria-controls="domain-outside"><strong>🌲 Extérieur</strong><span>Mouvement &amp; air frais</span><em id="count-outside">À commencer</em><span class="domain-meter"><i id="progress-outside"></i></span></button>
+            <button type="button" class="domain-tile domain-house" data-open-domain="house" aria-controls="domain-house"><strong>Maison</strong><span>Soulagement</span><em id="count-house">À commencer</em><span class="domain-meter"><i id="progress-house"></i></span></button>
           </div>
 
           <article id="domain-house" class="card domain-panel hidden">
@@ -128,71 +120,12 @@
             </div>
           </article>
 
-          <article id="domain-health" class="card domain-panel hidden">
-            <div class="card-header"><h2>Santé</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">Énergie réelle : eau, sommeil, médication, mouvement léger.</p>
-            <div class="task-list">
-              <button data-complete="Boire de l'eau">Boire de l'eau</button>
-              <button data-complete="Préparer mon sommeil">Préparer mon sommeil</button>
-              <button data-complete="Vérifier ma médication">Vérifier ma médication</button>
-              <button data-complete="Bouger 2 minutes">Bouger 2 minutes</button>
-            </div>
-          </article>
-
-          <article id="domain-mental" class="card domain-panel hidden mental-emergency">
-            <div class="card-header"><h2>Urgence mentale</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">OK. Tu reprends le contrôle. Une action physique, maintenant.</p>
-            <div class="task-list">
-              <button data-complete="Toucher 3 objets différents">Touche 3 objets différents</button>
-              <button data-complete="Prendre 3 grandes respirations">Prends 3 grandes respirations</button>
-              <button data-complete="Boire un verre d'eau">Bois un verre d'eau</button>
-              <button data-complete="Nommer 3 choses autour">Regarde autour et nomme 3 choses</button>
-              <button data-complete="Relâcher les épaules">Relâche tes épaules</button>
-              <button data-complete="Mettre les deux pieds au sol">Mets les deux pieds au sol</button>
-              <button data-complete="Fermer les yeux 10 secondes">Ferme les yeux 10 secondes</button>
-              <button data-complete="Marcher 30 secondes">Marche 30 secondes</button>
-              <button data-complete="Écouter un son autour">Écoute un son autour de toi</button>
-              <button data-complete="Pause écran 1 minute">Prends une pause écran 1 minute</button>
-            </div>
-          </article>
-
-          <article id="domain-productivity" class="card domain-panel hidden">
-            <div class="card-header"><h2>Productivité</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">Démarrer petit, sans te noyer.</p>
-            <div class="task-list">
-              <button data-complete="Ouvrir la tâche">Ouvrir la tâche</button>
-              <button data-complete="Écrire une phrase">Écrire une phrase</button>
-              <button data-complete="Timer 2 minutes">Timer 2 minutes</button>
-            </div>
-          </article>
-
-          <article id="domain-outside" class="card domain-panel hidden">
-            <div class="card-header"><h2>Activité / extérieur</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">Bouger doucement, sans pression.</p>
-            <div class="task-list">
-              <button data-complete="Mettre tes souliers">Mettre tes souliers</button>
-              <button data-complete="Sortir 2 minutes">Sortir 2 minutes</button>
-              <button data-complete="Prendre l'air dehors">Prendre l'air dehors</button>
-            </div>
-          </article>
-
-          <article id="domain-couple" class="card domain-panel hidden">
-            <div class="card-header"><h2>Couple</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">Connexion simple. Petites attentions.</p>
-            <div class="task-list">
-              <button data-complete="Envoyer un message gentil">Envoyer un message gentil</button>
-              <button data-complete="Offrir une attention">Offrir une attention</button>
-              <button data-complete="Demander comment ça va">Demander comment ça va</button>
-            </div>
-          </article>
-
         </section>
 
         <section id="view-agenda" class="view" aria-labelledby="agenda-title">
           <div class="section-heading">
             <p class="step">Calendrier doux</p>
             <h2 id="agenda-title">Agenda</h2>
-            <p class="section-hint">Prévoir sans te surcharger.</p>
           </div>
 
           <article class="card agenda-month-card">
@@ -274,12 +207,11 @@
           <div class="section-heading">
             <p class="step">Récompenses</p>
             <h2 id="shop-title">Boutique</h2>
-            <p class="section-hint">Tes pièces, tes pauses méritées.</p>
           </div>
           <article class="card shop-balance-card">
             <p class="step">Monnaie virtuelle</p>
             <h2 id="coin-balance">0 pièces</h2>
-            <p class="small-muted">Chaque action complétée te rapporte des pièces 🪙 — sans dépense réelle.</p>
+            <p class="small-muted">Aucune dépense réelle. Tes pièces servent seulement à débloquer des pauses.</p>
           </article>
 
           <article id="active-reward-panel" class="card active-reward-card hidden">
@@ -297,7 +229,7 @@
 
           <article class="card">
             <h2>Boutique</h2>
-            <p class="small-muted">Une pause méritée vaut mieux qu'une récompense forcée. Choisis ce qui te fait du bien.</p>
+            <p class="small-muted">Choisis une récompense qui te motive vraiment, sans nuire à ton budget.</p>
             <div id="shop-rewards" class="shop-list"></div>
           </article>
 
@@ -316,7 +248,6 @@
           <div class="section-heading">
             <p class="step">Paramètres</p>
             <h2 id="settings-title">Réglages simples</h2>
-            <p class="section-hint">ÉLAN s'adapte à toi.</p>
           </div>
           <article class="card">
             <h2>Notifications</h2>
@@ -399,7 +330,6 @@
           </div>
           <button id="close-checkin" class="text-button" type="button">Fermer</button>
         </div>
-        <p class="history-intro small-muted">Chaque action compte. Même les petites.</p>
         <div id="history-list" class="history-list"></div>
       </article>
     </section>

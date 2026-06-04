@@ -5,20 +5,12 @@
   const suggestedActions = {
     off: { title: "Choisir un petit départ", text: "Garde la journée légère avec une action simple.", action: "complete" },
     house: { title: "Faire la vaisselle", text: "Un geste simple pour remettre l'espace en ordre.", action: "complete" },
-    health: { title: "Boire de l'eau", text: "Prends quelques gorgées maintenant.", action: "complete" },
-    productivity: { title: "Ouvrir la tâche", text: "Commence par rendre la tâche visible.", action: "complete" },
-    outside: { title: "Mettre tes souliers", text: "Prépare juste le départ.", action: "complete" },
-    mental: { title: "Urgence mentale", text: "OK. Reviens au présent avec une action simple.", action: "complete" },
-    couple: { title: "Envoyer un message gentil", text: "Un petit signe de connexion suffit.", action: "complete" }
+    mental: { title: "Urgence mentale", text: "OK. Reviens au présent avec une action simple.", action: "complete" }
   };
   const domainInfo = {
     off: { total: 3, reward: "Temps relax" },
     house: { total: 3, reward: "Musique" },
-    health: { total: 4, reward: "Repos doux" },
-    productivity: { total: 3, reward: "Pause relax" },
-    outside: { total: 3, reward: "Air frais" },
-    mental: { total: 10, reward: "Temps calme" },
-    couple: { total: 3, reward: "Moment calme" }
+    mental: { total: 10, reward: "Temps calme" }
   };
 
   const COINS_PER_TASK = 5;
@@ -80,10 +72,6 @@
   const homeDomains = {
     off: { title: "Congé", subtitle: "Journée plus légère, sans pression.", missions: [{ label: "Choisir une petite chose" }, { label: "Préparer un coin calme" }, { label: "Faire 5 minutes utiles" }, { label: "Sortir prendre l'air" }, { label: "Ranger un petit espace" }, { label: "Planifier un moment relax" }] },
     house: { title: "Maison", subtitle: "Petits gestes pour avancer à la maison.", missions: [{ label: "Faire la vaisselle" }, { label: "Ranger une surface" }, { label: "Lancer une brassée" }, { label: "Ranger une pièce" }, { label: "Vider une poubelle" }, { label: "Essuyer un comptoir" }, { label: "Plier quelques vêtements" }, { label: "Nettoyer un coin rapide" }] },
-    productivity: { title: "Productivité", subtitle: "Démarrer sans te noyer.", missions: [{ label: "Ouvrir la tâche" }, { label: "Écrire une phrase" }, { label: "Timer 2 minutes" }, { label: "Nommer la prochaine étape" }, { label: "Fermer une distraction" }, { label: "Préparer le matériel" }] },
-    couple: { title: "Temps couple/famille", subtitle: "Connexion simple.", missions: [{ label: "Envoyer un message gentil" }, { label: "Faire une attention" }, { label: "Demander comment ça va" }, { label: "Faire un câlin" }, { label: "Proposer 10 minutes ensemble" }, { label: "Écouter sans interrompre" }] },
-    outside: { title: "Activité / extérieur", subtitle: "Bouger doucement.", missions: [{ label: "Mettre tes souliers" }, { label: "Sortir 2 minutes" }, { label: "Marcher 30 secondes" }, { label: "Ouvrir la porte" }, { label: "Prendre l'air dehors" }, { label: "Faire un mini tour" }] },
-    health: { title: "Santé", subtitle: "Énergie, sommeil, eau, médication.", missions: [{ label: "Boire de l'eau" }, { label: "Vérifier la médication" }, { label: "Bouger 2 minutes" }, { label: "Préparer le sommeil" }, { label: "Manger quelque chose simple" }, { label: "Étirer les épaules" }] },
     mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }] }
   };
 

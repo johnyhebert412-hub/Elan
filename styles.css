@@ -322,11 +322,6 @@ p { line-height: 1.4; }
 }
 
 .domain-house { --domain: #548069; --domain-soft: #e6f1eb; }
-.domain-health { --domain: #258195; --domain-soft: #e2f2f5; }
-.domain-mental { --domain: #4f6f8f; --domain-soft: #e8f0f5; }
-.domain-productivity { --domain: #6d6a2f; --domain-soft: #f1efd9; }
-.domain-outside { --domain: #3f7c48; --domain-soft: #e3f2e6; }
-.domain-couple { --domain: #b35c68; --domain-soft: #f9e8eb; }
 .domain-meter {
   background: var(--domain-soft);
   border-radius: 999px;
@@ -800,22 +795,6 @@ textarea {
 
 .task-list button {
   text-align: left;
-}
-
-.mental-emergency {
-  background: linear-gradient(180deg, #fbfefe 0%, var(--surface) 100%);
-  border-color: #cddde5;
-}
-
-.mental-emergency .task-list {
-  gap: 8px;
-}
-
-.mental-emergency .task-list button {
-  background: #e8f0f5;
-  border-color: transparent;
-  color: #253f52;
-  font-weight: 650;
 }
 
 .button-row {
