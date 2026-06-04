@@ -303,6 +303,29 @@
       if (nextState.selectedDomain && !suggestedActions[nextState.selectedDomain]) {
         nextState.selectedDomain = "";
       }
+      let cleanedAtLoad = false;
+      nextState.goalQueue = normalizeGoalQueue(nextState.goalQueue);
+      if (nextState.goalQueue.active && !isActiveChallengeValid(nextState.activeChallenge)) {
+        nextState.goalQueue = { items: [], active: false, currentIndex: 0 };
+        nextState.activeChallenge = null;
+        cleanedAtLoad = true;
+      }
+      if (nextState.activeChallenge && !isActiveChallengeValid(nextState.activeChallenge)) {
+        nextState.activeChallenge = null;
+        cleanedAtLoad = true;
+      }
+      if (nextState.activeChallenge?.rewardedAt || nextState.activeChallenge?.status === "completed") {
+        nextState.activeChallenge = null;
+        cleanedAtLoad = true;
+      }
+      if (nextState.training?.started) {
+        nextState.training = { ...nextState.training, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+        cleanedAtLoad = true;
+      }
+      if (cleanedAtLoad) {
+        console.debug("[ELAN activity]", "nettoyage état persistant", { reason: "loadState" });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
+      }
       return nextState;
     } catch (error) {
       return cloneState(defaultState);
@@ -311,6 +334,85 @@
 
   function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function debugActivityLog(action, detail = {}) {
+    console.debug("[ELAN activity]", action, detail);
+  }
+
+  function isActiveChallengeValid(challenge) {
+    if (!challenge || typeof challenge !== "object") return false;
+    if (!challenge.label || !challenge.domain) return false;
+    return ["setup", "countdown", "running", "done"].includes(challenge.status);
+  }
+
+  function normalizeGoalQueue(queue = state.goalQueue) {
+    const items = Array.isArray(queue?.items)
+      ? queue.items.filter((item) => item && typeof item.label === "string" && item.label.trim())
+      : [];
+    const currentIndex = Number.isFinite(queue?.currentIndex) ? queue.currentIndex : 0;
+    return {
+      items,
+      active: Boolean(queue?.active),
+      currentIndex: Math.min(Math.max(0, currentIndex), Math.max(items.length - 1, 0))
+    };
+  }
+
+  function clearTrainingRuntimeState(reason) {
+    stopTrainingTimer();
+    if (!state.training?.started) return false;
+    state.training = { ...state.training, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    debugActivityLog("nettoyage entraînement", { reason });
+    return true;
+  }
+
+  function clearMaisonRuntimeState(reason, { clearQueue = true } = {}) {
+    window.clearInterval(challengeCountdownId);
+    window.clearInterval(challengeTimerId);
+    challengeCountdownId = null;
+    challengeTimerId = null;
+    isCompletingChallenge = false;
+    const changed = Boolean(state.activeChallenge || state.goalQueue?.active || (clearQueue && queuedItems().length));
+    state.activeChallenge = null;
+    if (clearQueue) state.goalQueue = { items: [], active: false, currentIndex: 0 };
+    debugActivityLog("nettoyage maison", { reason, clearQueue, changed });
+    return changed;
+  }
+
+  function sanitizePersistedActivityState(reason = "chargement") {
+    let changed = false;
+    state.goalQueue = normalizeGoalQueue();
+    if (!state.goalQueue.items.length && state.goalQueue.active) {
+      state.goalQueue.active = false;
+      state.goalQueue.currentIndex = 0;
+      changed = true;
+    }
+    if (state.goalQueue.active && !isActiveChallengeValid(state.activeChallenge)) {
+      state.goalQueue = { items: [], active: false, currentIndex: 0 };
+      state.activeChallenge = null;
+      changed = true;
+    }
+    if (state.activeChallenge && !isActiveChallengeValid(state.activeChallenge)) {
+      state.activeChallenge = null;
+      changed = true;
+    }
+    if (state.activeChallenge?.rewardedAt || state.activeChallenge?.status === "completed") {
+      state.activeChallenge = null;
+      changed = true;
+    }
+    if (state.training?.started && state.activeChallenge) {
+      state.training = { ...state.training, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+      changed = true;
+    }
+    if (state.training?.started) {
+      state.training = { ...state.training, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+      changed = true;
+    }
+    if (changed) {
+      debugActivityLog("nettoyage état persistant", { reason });
+      saveState();
+    }
+    return changed;
   }
 
   function $(id) {
@@ -660,9 +762,13 @@
       showToast("Ajoute au moins un exercice.");
       return;
     }
+    clearMaisonRuntimeState("démarrage entraînement");
+    debugActivityLog("démarrage activité", { type: "training", mode: state.training?.mode, level: state.training?.level });
     state.training = { ...(state.training || defaultState.training), started: true, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
+    renderGoalQueue();
+    renderChallengeTimer();
     scrollToTrainingActiveStep();
     showToast("Séance commencée. Une étape à la fois.");
   }
@@ -677,8 +783,8 @@
 
   function stopTrainingSession() {
     if (!state.training?.started) return;
-    stopTrainingTimer();
-    state.training = { ...state.training, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    debugActivityLog("arrêt activité", { type: "training" });
+    clearTrainingRuntimeState("arrêt entraînement");
     saveState();
     renderTrainingProgram();
     showToast("Séance arrêtée.");
@@ -716,6 +822,7 @@
     const { program, label: programLabel } = currentTrainingProgram();
     stopTrainingTimer();
     const reward = trainingRewardForCurrentSession();
+    debugActivityLog("fin activité", { type: "training", reward });
     state.training = { ...state.training, started: false, currentStep: program.steps.length - 1, completed: true, lastReward: reward };
     state.wins += 1;
     state.coins += reward;
@@ -957,8 +1064,8 @@
     const domain = state.currentHomeDomain;
     if (!domain) return;
     // Réinitialiser la progression du domaine et la file
+    clearMaisonRuntimeState("réinitialisation domaine");
     state.progress[domain] = 0;
-    state.goalQueue = { items: [], active: false, currentIndex: 0 };
     saveState();
     renderSelectedDomain();
     renderDomainProgress();
@@ -1016,8 +1123,11 @@
   }
 
   function startGoalQueue() {
+    sanitizePersistedActivityState("avant démarrage série");
     const items = queuedItems();
     if (!items.length || state.activeChallenge) return;
+    clearTrainingRuntimeState("démarrage série maison");
+    debugActivityLog("démarrage activité", { type: "maison", count: items.length });
     state.goalQueue = { items, active: true, currentIndex: 0 };
     saveState();
     renderGoalQueue();
@@ -1041,6 +1151,8 @@
     if (nextIndex >= items.length) {
       // Vider l'état domaine AVANT le render pour éviter que renderSelectedDomain
       // réaffiche la carte missions par-dessus le retour à l'accueil
+      debugActivityLog("fin activité", { type: "maison", count: items.length });
+      clearMaisonRuntimeState("fin série maison");
       state.goalQueue = { items: [], active: false, currentIndex: 0 };
       state.currentHomeDomain = "";
       state.selectedDomain = "";
@@ -1082,10 +1194,8 @@
   }
 
   function stopGoalQueue(message = "Correct. Tu peux reprendre plus tard.") {
-    window.clearInterval(challengeCountdownId);
-    window.clearInterval(challengeTimerId);
-    state.activeChallenge = null;
-    state.goalQueue = { items: [], active: false, currentIndex: 0 };
+    debugActivityLog("arrêt activité", { type: "maison" });
+    clearMaisonRuntimeState("arrêt série maison");
     saveState();
     renderGoalQueue();
     renderChallengeTimer();
@@ -1309,9 +1419,17 @@
 
   function cancelChallenge() {
     if (!state.activeChallenge) return;
-    window.clearInterval(challengeCountdownId);
-    window.clearInterval(challengeTimerId);
-    state.activeChallenge = null;
+    const challenge = state.activeChallenge;
+    debugActivityLog("arrêt activité", { type: "mission", status: challenge.status, fromQueue: challenge.fromQueue });
+    if (challenge.fromQueue) {
+      clearMaisonRuntimeState("annulation mission maison");
+    } else {
+      window.clearInterval(challengeCountdownId);
+      window.clearInterval(challengeTimerId);
+      challengeCountdownId = null;
+      challengeTimerId = null;
+      state.activeChallenge = null;
+    }
     saveState();
     renderChallengeTimer();
     renderGoalQueue();
@@ -1358,10 +1476,13 @@
     const challenge = state.activeChallenge;
     if (!challenge || !["running", "done"].includes(challenge.status) || challenge.rewardedAt || isCompletingChallenge) return;
     isCompletingChallenge = true;
+    debugActivityLog("fin activité", { type: "mission", label: challenge.label, fromQueue: challenge.fromQueue });
     const button = $("finish-challenge");
     if (button) button.disabled = true;
     window.clearInterval(challengeCountdownId);
     window.clearInterval(challengeTimerId);
+    challengeCountdownId = null;
+    challengeTimerId = null;
     const remainingMs = Math.max(0, (challenge.endsAt || Date.now()) - Date.now());
     const successMessage = remainingMs > 0
       ? `Bravo ! Tu as terminé avec encore ${formatRemainingText(remainingMs)}.`
@@ -2760,6 +2881,8 @@
     bindById("finish-onboarding", "click", finishOnboarding);
 
     bindById("reset-data", "click", () => {
+      clearMaisonRuntimeState("réinitialisation données");
+      clearTrainingRuntimeState("réinitialisation données");
       localStorage.removeItem(STORAGE_KEY);
       state = cloneState(defaultState);
       render();
@@ -2802,10 +2925,21 @@
     scheduleAgendaReminders();
   }
 
+  function finalizeActivityStateAfterBoot() {
+    sanitizePersistedActivityState("chargement différé");
+    saveState();
+    renderGoalQueue();
+    renderTrainingProgram();
+    renderChallengeTimer();
+  }
+
   bindInstallEvents();
   bindEvents();
   window.addEventListener("resize", updateFixedBarMetrics);
+  sanitizePersistedActivityState("chargement initial");
+  saveState();
   render();
+  window.setTimeout(finalizeActivityStateAfterBoot, 150);
   updateFixedBarMetrics();
   registerServiceWorker();
 }());
