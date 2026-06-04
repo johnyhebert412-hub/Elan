@@ -1002,8 +1002,8 @@
     if (!state.history || !state.history.length) {
       list.replaceChildren();
       const empty = document.createElement("p");
-      empty.className = "small-muted";
-      empty.textContent = "Aucune victoire encore. Complète une action pour commencer !";
+      empty.className = "history-empty-state";
+      empty.innerHTML = `<span class="history-empty-icon">🌱</span><span>Aucune victoire encore.<br>Complète une première action pour commencer !</span>`;
       list.append(empty);
       return;
     }
@@ -1375,9 +1375,9 @@
     const count = $("agenda-count");
     if (count) count.textContent = `${items.length} item${items.length > 1 ? "s" : ""}`;
     if (!items.length) {
-      const empty = document.createElement("p");
-      empty.className = "small-muted";
-      empty.textContent = "Rien de prévu. Ajoute une petite chose si tu veux.";
+      const empty = document.createElement("div");
+      empty.className = "agenda-empty-state";
+      empty.innerHTML = `<span class="agenda-empty-icon">📅</span><p>Rien de prévu ici.</p><p class="agenda-empty-hint">Ajoute une petite chose avec le bouton + si tu veux te souvenir de quelque chose.</p>`;
       list.replaceChildren(empty);
       return;
     }
