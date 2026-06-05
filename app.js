@@ -2345,12 +2345,12 @@
     const upcoming = budgetUpcomingEntries();
     const upcomingIncome = upcoming.filter((item) => item.kind === "income").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
     const upcomingPayments = upcoming.filter((item) => item.kind === "payment").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const availableNow = nowIncome - nowPayments;
-    const afterPayments = availableNow + upcomingIncome - upcomingPayments;
+    const plannedAmount = nowIncome - nowPayments;
+    const estimatedRemainder = plannedAmount + upcomingIncome - upcomingPayments;
 
-    if ($("budget-now")) $("budget-now").textContent = money(availableNow);
+    if ($("budget-now")) $("budget-now").textContent = money(plannedAmount);
     if ($("budget-upcoming-payments")) $("budget-upcoming-payments").textContent = money(upcomingPayments);
-    if ($("budget-after-payments")) $("budget-after-payments").textContent = money(afterPayments);
+    if ($("budget-after-payments")) $("budget-after-payments").textContent = money(estimatedRemainder);
 
     renderBudgetList("budget-income-list", incomes, "income");
     renderBudgetList("budget-payment-list", payments, "payment");
