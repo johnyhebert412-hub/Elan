@@ -262,16 +262,20 @@
 
           <article id="domain-budget" class="card domain-panel budget-panel hidden">
             <div class="card-header"><h2>Budget</h2><button class="text-button" data-close-domain type="button">Changer</button></div>
-            <p class="muted">Planifie ton argent selon ton agenda.</p>
+            <p class="muted">Planificateur financier relié à ton agenda.</p>
 
             <section class="budget-summary-grid" aria-label="Résumé du budget">
               <div class="budget-summary-card">
-                <span>Paiements à venir</span>
-                <strong id="budget-upcoming-payments">0 $</strong>
+                <span>Entrées prévues ce mois-ci</span>
+                <strong id="budget-month-income">0 $</strong>
               </div>
               <div class="budget-summary-card">
-                <span>Reste estimé</span>
-                <strong id="budget-after-payments">0 $</strong>
+                <span>Sorties prévues ce mois-ci</span>
+                <strong id="budget-month-payments">0 $</strong>
+              </div>
+              <div class="budget-summary-card">
+                <span>Événements à venir</span>
+                <strong id="budget-upcoming-count">0</strong>
               </div>
             </section>
 
@@ -284,10 +288,10 @@
                 <input id="budget-income-amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant">
                 <input id="budget-income-date" type="date">
                 <select id="budget-income-repeat" aria-label="Récurrence du revenu">
-                  <option value="">Une fois</option>
-                  <option value="weekly">Chaque semaine</option>
+                  <option value="">Unique</option>
+                  <option value="weekly">Hebdomadaire</option>
                   <option value="biweekly">Aux 2 semaines</option>
-                  <option value="monthly">Chaque mois</option>
+                  <option value="monthly">Mensuel</option>
                 </select>
                 <button id="budget-add-income" class="primary" type="button">Ajouter revenu</button>
               </div>
@@ -302,18 +306,11 @@
                 <input id="budget-payment-name" type="text" maxlength="60" placeholder="Nom du paiement">
                 <input id="budget-payment-amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant">
                 <input id="budget-payment-date" type="date">
-                <select id="budget-payment-category" aria-label="Catégorie du paiement">
-                  <option value="loyer">Loyer</option>
-                  <option value="auto">Auto</option>
-                  <option value="telephone">Téléphone</option>
-                  <option value="assurance">Assurance</option>
-                  <option value="autre">Autre</option>
-                </select>
                 <select id="budget-payment-repeat" aria-label="Récurrence du paiement">
-                  <option value="">Une fois</option>
-                  <option value="weekly">Chaque semaine</option>
+                  <option value="">Unique</option>
+                  <option value="weekly">Hebdomadaire</option>
                   <option value="biweekly">Aux 2 semaines</option>
-                  <option value="monthly">Chaque mois</option>
+                  <option value="monthly">Mensuel</option>
                 </select>
                 <button id="budget-add-payment" class="primary" type="button">Ajouter paiement</button>
               </div>

@@ -2542,23 +2542,6 @@
     return { incomes, payments };
   }
 
-  function budgetUpcomingEntries() {
-    const today = new Date(`${todayKey()}T12:00:00`);
-    const end = new Date(today);
-    end.setDate(end.getDate() + 30);
-    const { incomes, payments } = budgetEntries();
-    return [
-      ...incomes.map((item) => ({ ...item, kind: "income" })),
-      ...payments.map((item) => ({ ...item, kind: "payment" }))
-    ]
-      .filter((item) => item.date)
-      .filter((item) => {
-        const date = new Date(`${item.date}T12:00:00`);
-        return date >= today && date <= end;
-      })
-      .sort((a, b) => a.date.localeCompare(b.date));
-  }
-
   function addDays(dateValue, days) {
     const date = new Date(`${dateValue}T12:00:00`);
     date.setDate(date.getDate() + days);
@@ -2571,16 +2554,14 @@
     return dateKey(date);
   }
 
-  function budgetOccurrenceDates(entry) {
+  function budgetOccurrenceDatesBetween(entry, start, end) {
     if (!entry.date) return [];
-    const today = todayKey();
-    const end = addDays(today, 30);
     const dates = [];
     let current = entry.date;
     const repeat = entry.repeat || "";
     let guard = 0;
 
-    while (current < today && repeat && guard < 80) {
+    while (current < start && repeat && guard < 120) {
       if (repeat === "weekly") current = addDays(current, 7);
       else if (repeat === "biweekly") current = addDays(current, 14);
       else if (repeat === "monthly") current = addMonths(current, 1);
@@ -2588,7 +2569,7 @@
       guard += 1;
     }
 
-    while (current >= today && current <= end && guard < 120) {
+    while (current >= start && current <= end && guard < 160) {
       dates.push(current);
       if (repeat === "weekly") current = addDays(current, 7);
       else if (repeat === "biweekly") current = addDays(current, 14);
@@ -2597,6 +2578,10 @@
       guard += 1;
     }
     return dates;
+  }
+
+  function budgetOccurrenceDates(entry) {
+    return budgetOccurrenceDatesBetween(entry, todayKey(), addDays(todayKey(), 30));
   }
 
   function budgetFinanceOccurrences30Days() {
@@ -2615,11 +2600,11 @@
 
   function budgetRepeatText(value) {
     const labels = {
-      weekly: "Chaque semaine",
+      weekly: "Hebdomadaire",
       biweekly: "Aux 2 semaines",
-      monthly: "Chaque mois"
+      monthly: "Mensuel"
     };
-    return labels[value] || "Une fois";
+    return labels[value] || "Unique";
   }
 
   function budgetCategoryText(value) {
@@ -2631,6 +2616,53 @@
       autre: "Autre"
     };
     return labels[value] || "Autre";
+  }
+
+  function budgetPaymentIcon(item) {
+    const text = String(`${item.name || ""} ${item.category || ""}`)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    if (text.includes("telephone") || text.includes("phone") || text.includes("cell")) return "📱";
+    if (text.includes("vehicule") || text.includes("auto") || text.includes("voiture")) return "🚗";
+    if (text.includes("loyer")) return "🏠";
+    if (text.includes("assurance")) return "🛡️";
+    return "📌";
+  }
+
+  function inferBudgetPaymentCategory(name) {
+    const text = String(name || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    if (text.includes("loyer")) return "loyer";
+    if (text.includes("vehicule") || text.includes("auto") || text.includes("voiture")) return "auto";
+    if (text.includes("telephone") || text.includes("phone") || text.includes("cell")) return "telephone";
+    if (text.includes("assurance")) return "assurance";
+    return "autre";
+  }
+
+  function budgetEntryIcon(item) {
+    return item.kind === "income" ? "💰" : budgetPaymentIcon(item);
+  }
+
+  function budgetWeekdayText(dateValue) {
+    return new Intl.DateTimeFormat("fr-CA", { weekday: "long" }).format(new Date(`${dateValue}T12:00:00`));
+  }
+
+  function budgetMonthRange() {
+    const now = new Date(`${todayKey()}T12:00:00`);
+    const start = new Date(now.getFullYear(), now.getMonth(), 1, 12);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 12);
+    return { start: dateKey(start), end: dateKey(end) };
+  }
+
+  function budgetFinanceOccurrencesForRange(start, end) {
+    const { incomes, payments } = budgetEntries();
+    return [
+      ...incomes.flatMap((entry) => budgetOccurrenceDatesBetween(entry, start, end).map((date) => ({ ...entry, date, kind: "income" }))),
+      ...payments.flatMap((entry) => budgetOccurrenceDatesBetween(entry, start, end).map((date) => ({ ...entry, date, kind: "payment" })))
+    ].sort((a, b) => a.date.localeCompare(b.date));
   }
 
   function syncBudgetAgendaEntry(entry, kind) {
@@ -2648,6 +2680,9 @@
       text,
       time: "",
       reminder: "none",
+      repeat: entry.repeat || "",
+      amount,
+      financeKind: kind,
       notified: false,
       done: false
     };
@@ -2679,9 +2714,7 @@
       title.textContent = item.name;
       const meta = document.createElement("p");
       meta.className = "small-muted";
-      meta.textContent = kind === "income"
-        ? `${budgetDateText(item.date)} · ${budgetRepeatText(item.repeat)}`
-        : `${budgetDateText(item.date)} · ${budgetCategoryText(item.category)} · ${budgetRepeatText(item.repeat)}`;
+      meta.textContent = `${budgetDateText(item.date)} · ${budgetRepeatText(item.repeat)}`;
       copy.append(title, meta);
       const side = document.createElement("div");
       const amount = document.createElement("div");
@@ -2702,17 +2735,15 @@
     const panel = $("domain-budget");
     if (!panel) return;
     const { incomes, payments } = budgetEntries();
-    const today = todayKey();
-    const nowIncome = incomes.filter((item) => item.date <= today).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const nowPayments = payments.filter((item) => item.date <= today).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const upcoming = budgetUpcomingEntries();
-    const upcomingIncome = upcoming.filter((item) => item.kind === "income").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const upcomingPayments = upcoming.filter((item) => item.kind === "payment").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const plannedAmount = nowIncome - nowPayments;
-    const estimatedRemainder = plannedAmount + upcomingIncome - upcomingPayments;
+    const upcoming = budgetFinanceOccurrences30Days();
+    const monthRange = budgetMonthRange();
+    const monthEvents = budgetFinanceOccurrencesForRange(monthRange.start, monthRange.end);
+    const monthIncome = monthEvents.filter((item) => item.kind === "income").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const monthPayments = monthEvents.filter((item) => item.kind === "payment").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
-    if ($("budget-upcoming-payments")) $("budget-upcoming-payments").textContent = money(upcomingPayments);
-    if ($("budget-after-payments")) $("budget-after-payments").textContent = money(estimatedRemainder);
+    if ($("budget-month-income")) $("budget-month-income").textContent = money(monthIncome);
+    if ($("budget-month-payments")) $("budget-month-payments").textContent = money(monthPayments);
+    if ($("budget-upcoming-count")) $("budget-upcoming-count").textContent = `${upcoming.length}`;
 
     renderBudgetList("budget-income-list", incomes, "income");
     renderBudgetList("budget-payment-list", payments, "payment");
@@ -2728,17 +2759,20 @@
     }
     upcomingList.replaceChildren(...upcoming.map((item) => {
       const row = document.createElement("article");
-      row.className = "budget-item";
+      row.className = "budget-item budget-event-item";
       const copy = document.createElement("div");
+      const day = document.createElement("p");
+      day.className = "budget-event-day";
+      day.textContent = budgetWeekdayText(item.date);
       const title = document.createElement("strong");
-      title.textContent = item.kind === "income" ? `Paie · ${item.name}` : `${budgetCategoryText(item.category)} · ${item.name}`;
+      title.textContent = `${budgetEntryIcon(item)} ${item.name}`;
       const meta = document.createElement("p");
       meta.className = "small-muted";
       meta.textContent = budgetDateText(item.date);
-      copy.append(title, meta);
+      copy.append(day, title, meta);
       const amount = document.createElement("div");
       amount.className = "budget-amount";
-      amount.textContent = `${item.kind === "income" ? "+" : "-"}${money(item.amount)}`;
+      amount.textContent = money(item.amount);
       row.append(copy, amount);
       return row;
     }));
@@ -2757,17 +2791,20 @@
     }
     target.replaceChildren(...items.map((item) => {
       const row = document.createElement("article");
-      row.className = "budget-item";
+      row.className = "budget-item budget-event-item";
       const copy = document.createElement("div");
+      const day = document.createElement("p");
+      day.className = "budget-event-day";
+      day.textContent = budgetWeekdayText(item.date);
       const title = document.createElement("strong");
-      title.textContent = item.kind === "income" ? `Paie · ${item.name}` : `${budgetCategoryText(item.category)} · ${item.name}`;
+      title.textContent = `${budgetEntryIcon(item)} ${item.name}`;
       const meta = document.createElement("p");
       meta.className = "small-muted";
       meta.textContent = budgetDateText(item.date);
-      copy.append(title, meta);
+      copy.append(day, title, meta);
       const amount = document.createElement("div");
       amount.className = "budget-amount";
-      amount.textContent = `${item.kind === "income" ? "+" : "-"}${money(item.amount)}`;
+      amount.textContent = money(item.amount);
       row.append(copy, amount);
       return row;
     }));
@@ -2798,7 +2835,7 @@
     const name = $("budget-payment-name")?.value.trim();
     const amount = Number.parseFloat($("budget-payment-amount")?.value);
     const date = $("budget-payment-date")?.value;
-    const category = $("budget-payment-category")?.value || "autre";
+    const category = inferBudgetPaymentCategory(name);
     const repeat = $("budget-payment-repeat")?.value || "";
     if (!name || !Number.isFinite(amount) || amount <= 0 || !date) {
       showToast("Ajoute un nom, un montant et une date.");
