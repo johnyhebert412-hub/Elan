@@ -560,7 +560,6 @@
     const currentAmount = $("training-current-amount");
     const progressFill = $("training-progress-fill");
     const completePanel = $("training-complete-panel");
-    const completeSummary = $("training-complete-summary");
     const completeReward = $("training-complete-reward");
     const startButton = $("start-training-session");
     const quickBuilder = $("training-quick-builder");
@@ -624,7 +623,6 @@
 
     if (isCompleted) {
       const reward = Number.isFinite(state.training?.lastReward) ? state.training.lastReward : trainingRewardForCurrentSession();
-      if (completeSummary) completeSummary.textContent = "Activité terminée.";
       if (completeReward) {
         completeReward.textContent = reward > 0 ? `+${reward} jetons gagnés` : "";
         completeReward.classList.toggle("hidden", reward <= 0);
@@ -951,6 +949,7 @@
     renderTrainingProgram();
     renderShop();
     renderHistoryList();
+    window.requestAnimationFrame(() => $("training-complete-panel")?.focus({ preventScroll: true }));
     showSuccessToast(`Séance terminée. +${reward} jetons gagnés`);
   }
 
@@ -3661,7 +3660,6 @@
     bindById("reset-training-session", "click", resetTrainingSession);
     bindById("training-complete-continue", "click", continueAfterTrainingComplete);
     bindById("training-complete-shop", "click", openShopAfterTrainingComplete);
-    bindById("training-complete-finish", "click", finishAfterTrainingComplete);
     bindById("add-training-exercise", "click", addTrainingExercise);
     bindById("training-custom-name", "keydown", (event) => {
       if (event.key === "Enter") addTrainingExercise();

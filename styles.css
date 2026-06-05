@@ -947,29 +947,95 @@ p { line-height: 1.4; }
 }
 
 .training-complete-panel {
-  background: #eef7f2;
-  border: 1px solid var(--brand-light);
-  border-radius: 14px;
-  margin-top: 12px;
-  padding: 14px;
+  align-items: center;
+  animation: training-modal-fade 180ms ease both;
+  background: rgba(23, 39, 33, 0.46);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
   text-align: center;
+  z-index: 80;
+}
+
+.training-complete-card {
+  animation: training-modal-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  background: var(--surface);
+  border: 1px solid rgba(76, 125, 94, 0.16);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(23, 39, 33, 0.26);
+  max-width: 360px;
+  padding: 26px 20px 20px;
+  width: min(100%, 360px);
 }
 
 .training-complete-panel h4 {
   color: var(--brand);
-  font-size: 1.1rem;
-  margin: 4px 0 6px;
+  font-size: 1.35rem;
+  margin: 8px 0 10px;
 }
 
 .training-complete-reward {
-  color: var(--brand);
-  font-size: 1rem;
+  background: linear-gradient(135deg, #f5ead2, #fffaf0);
+  border: 1px solid #f0d9a8;
+  border-radius: 16px;
+  color: #6f4a17;
+  display: inline-flex;
+  font-size: 1.05rem;
   font-weight: 800;
-  margin: 8px 0 0;
+  margin: 4px 0 0;
+  padding: 10px 14px;
+}
+
+.training-complete-icon {
+  animation: training-check-pop 360ms 80ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  background: var(--brand);
+  color: white;
+  font-size: 2rem;
+  height: 70px;
+  margin: 0 auto 10px;
+  width: 70px;
 }
 
 .training-complete-actions {
-  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+@keyframes training-modal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes training-modal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes training-check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-10deg);
+  }
+  70% {
+    transform: scale(1.08) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
 }
 
 .quick-add-panel {

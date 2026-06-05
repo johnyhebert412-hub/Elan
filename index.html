@@ -213,15 +213,15 @@
                 <p><span>Intensité</span><strong id="training-intensity-text">Douce</strong></p>
               </div>
               <p id="training-note" class="small-muted">Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.</p>
-              <section id="training-complete-panel" class="training-complete-panel hidden" aria-live="polite">
-                <p class="domain-completed-icon" aria-hidden="true">✓</p>
-                <h4>Bravo !</h4>
-                <p id="training-complete-summary" class="small-muted">Activité terminée.</p>
-                <div id="training-complete-reward" class="training-complete-reward" aria-label="Jetons gagnés"></div>
-                <div class="button-row training-complete-actions">
-                  <button id="training-complete-continue" class="primary" type="button">Continuer</button>
-                  <button id="training-complete-shop" class="secondary" type="button">Aller à la boutique</button>
-                  <button id="training-complete-finish" class="secondary" type="button">Terminer</button>
+              <section id="training-complete-panel" class="training-complete-panel hidden" aria-live="polite" aria-modal="true" role="dialog" tabindex="-1">
+                <div class="training-complete-card">
+                  <p class="domain-completed-icon training-complete-icon" aria-hidden="true">✓</p>
+                  <h4>Programme terminé</h4>
+                  <div id="training-complete-reward" class="training-complete-reward" aria-label="Jetons gagnés"></div>
+                  <div class="button-row training-complete-actions">
+                    <button id="training-complete-continue" class="primary" type="button">Continuer</button>
+                    <button id="training-complete-shop" class="secondary" type="button">Aller à la boutique</button>
+                  </div>
                 </div>
               </section>
               <div class="button-row">
