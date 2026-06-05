@@ -200,6 +200,11 @@
       advanced: "Avancé"
     }
   };
+  const trainingTypeMeta = {
+    cardio: { icon: "🏃", description: "Améliore ton souffle et ton endurance." },
+    force: { icon: "🏋️", description: "Développe ta force et ta puissance." },
+    endurance: { icon: "🔥", description: "Travaille ta résistance et ta constance." }
+  };
   const trainingRewardByLevel = {
     beginner: 5,
     intermediate: 10,
@@ -344,7 +349,7 @@
     notifications: { important: false, summary: false },
     budget: { incomes: [], payments: [] },
     houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, quickMission: null },
-    training: { mode: "quick", type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
+    training: { mode: "quick", type: "cardio", level: "beginner", paneOpen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
   let state = loadState();
@@ -422,6 +427,7 @@
               mode: saved.training.mode === "custom" ? "custom" : "quick",
               type: trainingPrograms[saved.training.type] ? saved.training.type : defaultState.training.type,
               level: trainingPrograms[saved.training.type]?.[saved.training.level] ? saved.training.level : defaultState.training.level,
+              paneOpen: Boolean(saved.training.paneOpen),
               started: Boolean(saved.training.started),
               currentStep: Number.isFinite(saved.training.currentStep) ? saved.training.currentStep : 0,
               completed: Boolean(saved.training.completed),
@@ -1040,14 +1046,48 @@
     }
     const type = trainingPrograms[state.training?.type] ? state.training.type : defaultState.training.type;
     const level = trainingPrograms[type]?.[state.training?.level] ? state.training.level : defaultState.training.level;
+    const typeIcon = trainingTypeMeta[type]?.icon || "💪";
     return {
       mode,
       type,
       level,
-      title: `${trainingLabels.type[type]} ${trainingLabels.level[level].toLowerCase()}`,
+      title: `${typeIcon} ${trainingLabels.type[type]} ${trainingLabels.level[level].toLowerCase()}`,
       label: `${trainingLabels.type[type]} ${trainingLabels.level[level].toLowerCase()}`,
       program: trainingPrograms[type][level]
     };
+  }
+
+  function trainingCompletedCount(type) {
+    const label = trainingLabels.type[type] || "";
+    return (state.history || []).filter((entry) => (
+      entry?.domain === "training" && String(entry.label || "").toLowerCase().includes(label.toLowerCase())
+    )).length;
+  }
+
+  function trainingProgressPercent(type) {
+    return Math.min(100, trainingCompletedCount(type) * 10);
+  }
+
+  function renderTrainingTypeCards() {
+    const target = $("training-type-cards");
+    if (!target) return;
+    target.replaceChildren(...Object.keys(trainingPrograms).map((type) => {
+      const meta = trainingTypeMeta[type] || { icon: "💪", description: "" };
+      const count = trainingCompletedCount(type);
+      const percent = trainingProgressPercent(type);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "training-type-card";
+      button.dataset.trainingTypeCard = type;
+      button.innerHTML = `
+        <span class="training-type-icon" aria-hidden="true">${meta.icon}</span>
+        <strong>${trainingLabels.type[type]}</strong>
+        <span>${meta.description}</span>
+        <i class="training-type-meter" aria-hidden="true"><b style="width:${percent}%"></b></i>
+        <em>${count} séance${count > 1 ? "s" : ""} complétée${count > 1 ? "s" : ""}</em>
+      `;
+      return button;
+    }));
   }
 
   function renderTrainingProgram() {
@@ -1058,6 +1098,7 @@
     const currentStepIndex = Math.min(Math.max(state.training?.currentStep || 0, 0), Math.max(totalSteps - 1, 0));
     const isStarted = Boolean(state.training?.started && !state.training?.completed);
     const isCompleted = Boolean(state.training?.completed);
+    const paneOpen = Boolean(state.training?.paneOpen || isStarted || isCompleted || mode === "custom");
     panel.classList.toggle("training-active-domain", isStarted);
     document.querySelectorAll("[data-training-mode]").forEach((button) => {
       const active = button.dataset.trainingMode === mode;
@@ -1091,19 +1132,26 @@
     const progressFill = $("training-progress-fill");
     const completePanel = $("training-complete-panel");
     const completeReward = $("training-complete-reward");
+    const completeProgram = $("training-complete-program");
     const startButton = $("start-training-session");
     const quickBuilder = $("training-quick-builder");
+    const overview = $("training-overview");
     const customBuilder = $("training-custom-builder");
     const customList = $("training-custom-list");
+    const selectedTypeTitle = $("training-selected-type-title");
 
-    if (quickBuilder) quickBuilder.classList.toggle("hidden", mode !== "quick" || isStarted);
+    renderTrainingTypeCards();
+    if (overview) overview.classList.toggle("hidden", mode !== "quick" || isStarted || isCompleted);
+    if (quickBuilder) quickBuilder.classList.toggle("hidden", mode !== "quick" || !paneOpen || isStarted || isCompleted);
     if (customBuilder) customBuilder.classList.toggle("hidden", mode !== "custom" || isStarted);
     if (programCard) {
+      programCard.classList.toggle("hidden", !paneOpen);
       programCard.classList.toggle("training-session-focused", isStarted);
       programCard.classList.toggle("training-countdown-active", isStarted && trainingTimerPhase === "countdown");
     }
 
     if (title) title.textContent = programTitle;
+    if (selectedTypeTitle) selectedTypeTitle.textContent = `${trainingTypeMeta[type]?.icon || "💪"} ${trainingLabels.type[type]}`;
     if (steps) {
       steps.replaceChildren(...program.steps.map((step, index) => {
         const item = document.createElement("li");
@@ -1153,6 +1201,7 @@
 
     if (isCompleted) {
       const reward = Number.isFinite(state.training?.lastReward) ? state.training.lastReward : trainingRewardForCurrentSession();
+      if (completeProgram) completeProgram.textContent = programTitle;
       if (completeReward) {
         completeReward.textContent = reward > 0 ? `+${reward} jetons gagnés` : "";
         completeReward.classList.toggle("hidden", reward <= 0);
@@ -1379,7 +1428,7 @@
   function setTrainingMode(mode) {
     if (!["quick", "custom"].includes(mode)) return;
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), mode, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), mode, paneOpen: mode === "custom" ? true : Boolean(state.training?.paneOpen), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
@@ -1387,16 +1436,22 @@
   function setTrainingType(type) {
     if (!trainingPrograms[type]) return;
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), type, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), type, paneOpen: true, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
+  }
+
+  function chooseTrainingType(type) {
+    setTrainingMode("quick");
+    setTrainingType(type);
+    $("training-quick-builder")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function setTrainingLevel(level) {
     const type = trainingPrograms[state.training?.type] ? state.training.type : defaultState.training.type;
     if (!trainingPrograms[type]?.[level]) return;
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), level, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), level, paneOpen: true, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
@@ -1409,7 +1464,7 @@
     }
     clearMaisonRuntimeState("démarrage entraînement");
     debugActivityLog("démarrage activité", { type: "training", mode: state.training?.mode, level: state.training?.level });
-    state.training = { ...(state.training || defaultState.training), started: true, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), paneOpen: true, started: true, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     renderGoalQueue();
@@ -1418,9 +1473,24 @@
     showToast("Séance commencée. Une étape à la fois.");
   }
 
+  function startQuickTrainingSession() {
+    setTrainingMode("quick");
+    setTrainingType("cardio");
+    setTrainingLevel("beginner");
+    startTrainingSession();
+  }
+
+  function backToTrainingOverview() {
+    stopTrainingTimer();
+    state.training = { ...(state.training || defaultState.training), mode: "quick", paneOpen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    saveState();
+    renderTrainingProgram();
+    $("training-overview")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   function resetTrainingSession() {
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), paneOpen: Boolean(state.training?.paneOpen), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1932,6 +2002,7 @@
     $("training-complete-panel")?.classList.add("hidden");
     state.training = {
       ...(state.training || defaultState.training),
+      paneOpen: false,
       started: false,
       completed: false,
       currentStep: 0,
@@ -1951,6 +2022,8 @@
     $("training-complete-panel")?.classList.add("hidden");
     state.training = {
       ...(state.training || defaultState.training),
+      mode: "quick",
+      paneOpen: false,
       started: false,
       completed: false,
       currentStep: 0,
@@ -1959,13 +2032,15 @@
     };
     saveState();
     renderTrainingProgram();
-    showView("shop");
+    showView("domains");
+    $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function finishAfterTrainingComplete() {
     $("training-complete-panel")?.classList.add("hidden");
     state.training = {
       ...(state.training || defaultState.training),
+      paneOpen: false,
       started: false,
       completed: false,
       currentStep: 0,
@@ -4357,9 +4432,15 @@
     document.querySelectorAll("[data-training-type]").forEach((button) => {
       button.addEventListener("click", () => setTrainingType(button.dataset.trainingType));
     });
+    $("training-type-cards")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-training-type-card]");
+      if (button) chooseTrainingType(button.dataset.trainingTypeCard);
+    });
     document.querySelectorAll("[data-training-level]").forEach((button) => {
       button.addEventListener("click", () => setTrainingLevel(button.dataset.trainingLevel));
     });
+    bindById("training-start-fast", "click", startQuickTrainingSession);
+    bindById("training-back-overview", "click", backToTrainingOverview);
     bindById("start-training-session", "click", startTrainingSession);
     bindById("complete-training-step", "click", completeTrainingStep);
     bindById("skip-training-step", "click", skipTrainingStep);

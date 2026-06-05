@@ -186,35 +186,44 @@
           </article>
 
           <article id="domain-training" class="card domain-panel training-panel hidden">
-            <div class="card-header"><h2>Entraînement</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">Choisis un rythme simple. L'objectif est de bouger sans pression.</p>
+            <div class="card-header"><h2>💪 Entraînement</h2><button class="text-button" data-close-domain>Changer</button></div>
+            <section class="training-hero" aria-labelledby="training-hero-title">
+              <p class="step">Coach sportif</p>
+              <h3 id="training-hero-title">Que veux-tu améliorer aujourd'hui ?</h3>
+            </section>
 
-            <div class="training-control">
-              <p class="domain-section-label">Mode</p>
-              <div class="training-mode-row" role="group" aria-label="Mode d'entraînement">
-                <button type="button" data-training-mode="quick">Programme rapide</button>
-                <button type="button" data-training-mode="custom">Créer ton programme</button>
+            <section class="training-fast-session" aria-labelledby="training-fast-title">
+              <div class="card-header compact-header">
+                <div>
+                  <p class="step">Raccourci</p>
+                  <h3 id="training-fast-title">⚡ Séance rapide</h3>
+                </div>
+                <strong>+5</strong>
               </div>
-            </div>
+              <p><span>10 minutes</span><strong>+5 jetons</strong></p>
+              <button id="training-start-fast" class="primary wide" type="button">Commencer</button>
+            </section>
 
-            <div id="training-quick-builder" class="training-builder">
-            <div class="training-control">
-              <p class="domain-section-label">Type d'entraînement</p>
-              <div class="training-choice-row" role="group" aria-label="Type d'entraînement">
-                <button type="button" data-training-type="cardio">Cardio</button>
-                <button type="button" data-training-type="force">Force</button>
-                <button type="button" data-training-type="endurance">Endurance</button>
-              </div>
-            </div>
+            <section id="training-overview" class="training-overview" aria-labelledby="training-overview-title">
+              <p id="training-overview-title" class="domain-section-label">Choix principal</p>
+              <div id="training-type-cards" class="training-type-cards"></div>
+            </section>
 
-            <div class="training-control">
-              <p class="domain-section-label">Niveau</p>
-              <div class="training-choice-row" role="group" aria-label="Niveau d'entraînement">
-                <button type="button" data-training-level="beginner">Débutant</button>
-                <button type="button" data-training-level="intermediate">Intermédiaire</button>
-                <button type="button" data-training-level="advanced">Avancé</button>
+            <div id="training-quick-builder" class="training-builder hidden">
+              <div class="training-control">
+                <div class="card-header compact-header">
+                  <div>
+                    <p class="domain-section-label">Niveau</p>
+                    <h3 id="training-selected-type-title">Cardio</h3>
+                  </div>
+                  <button id="training-back-overview" class="text-button" type="button">Retour</button>
+                </div>
+                <div class="training-choice-row training-level-cards" role="group" aria-label="Niveau d'entraînement">
+                  <button type="button" data-training-level="beginner">🟢 Débutant</button>
+                  <button type="button" data-training-level="intermediate">🟡 Intermédiaire</button>
+                  <button type="button" data-training-level="advanced">🔴 Avancé</button>
+                </div>
               </div>
-            </div>
             </div>
 
             <section id="training-custom-builder" class="training-custom-builder hidden" aria-labelledby="training-custom-title">
@@ -231,7 +240,7 @@
             <section id="training-program-card" class="training-program-card" aria-labelledby="training-program-title">
               <div class="card-header">
                 <div>
-                  <p class="step">Programme proposé</p>
+                  <p class="step">Programme</p>
                   <h3 id="training-program-title">Cardio débutant</h3>
                 </div>
                 <span id="training-intensity" class="training-badge">Douce</span>
@@ -271,12 +280,13 @@
               <p id="training-note" class="small-muted">Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.</p>
               <section id="training-complete-panel" class="training-complete-panel hidden" aria-live="polite" aria-modal="true" role="dialog" tabindex="-1">
                 <div class="training-complete-card">
-                  <p class="domain-completed-icon training-complete-icon" aria-hidden="true">✓</p>
-                  <h4>Programme terminé</h4>
+                  <p class="domain-completed-icon training-complete-icon" aria-hidden="true">🎉</p>
+                  <h4>Séance terminée</h4>
+                  <p id="training-complete-program" class="small-muted">Programme</p>
                   <div id="training-complete-reward" class="training-complete-reward" aria-label="Jetons gagnés"></div>
                   <div class="button-row training-complete-actions">
                     <button id="training-complete-continue" class="primary" type="button">Continuer</button>
-                    <button id="training-complete-shop" class="secondary" type="button">Aller à la boutique</button>
+                    <button id="training-complete-shop" class="secondary" type="button">Retour à Entraînement</button>
                   </div>
                 </div>
               </section>
