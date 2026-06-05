@@ -91,6 +91,102 @@
     mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }] }
   };
 
+  const houseRooms = [
+    {
+      id: "salon",
+      icon: "🛋️",
+      label: "Salon",
+      tasks: [
+        { id: "salon-aspirateur", label: "Passer l'aspirateur", reward: 10 },
+        { id: "salon-depoussierer", label: "Dépoussiérer", reward: 5 },
+        { id: "salon-ranger-objets", label: "Ranger les objets", reward: 5 },
+        { id: "salon-nettoyer-table", label: "Nettoyer la table", reward: 5 },
+        { id: "salon-nettoyer-vitres", label: "Nettoyer les vitres", reward: 10 },
+        { id: "salon-dechets", label: "Ramasser les déchets", reward: 5 }
+      ]
+    },
+    {
+      id: "cuisine",
+      icon: "🍳",
+      label: "Cuisine",
+      tasks: [
+        { id: "cuisine-vaisselle", label: "Faire la vaisselle", reward: 5 },
+        { id: "cuisine-comptoir", label: "Nettoyer le comptoir", reward: 5 },
+        { id: "cuisine-balayer", label: "Balayer le plancher", reward: 10 },
+        { id: "cuisine-poubelles", label: "Sortir les poubelles", reward: 5 },
+        { id: "cuisine-micro-ondes", label: "Nettoyer le micro-ondes", reward: 10 },
+        { id: "cuisine-epicerie", label: "Ranger l'épicerie", reward: 5 },
+        { id: "cuisine-evier", label: "Nettoyer l'évier", reward: 5 }
+      ]
+    },
+    {
+      id: "chambre",
+      icon: "🛏️",
+      label: "Chambre",
+      tasks: [
+        { id: "chambre-lit", label: "Faire le lit", reward: 5 },
+        { id: "chambre-vetements", label: "Ranger les vêtements", reward: 5 },
+        { id: "chambre-aspirateur", label: "Aspirateur", reward: 10 },
+        { id: "chambre-depoussierer", label: "Dépoussiérer", reward: 5 },
+        { id: "chambre-poubelle", label: "Vider la poubelle", reward: 5 }
+      ]
+    },
+    {
+      id: "salle-bain",
+      icon: "🚿",
+      label: "Salle de bain",
+      tasks: [
+        { id: "bain-toilette", label: "Nettoyer la toilette", reward: 10 },
+        { id: "bain-lavabo", label: "Nettoyer le lavabo", reward: 5 },
+        { id: "bain-miroir", label: "Nettoyer le miroir", reward: 5 },
+        { id: "bain-douche", label: "Nettoyer la douche", reward: 10 },
+        { id: "bain-serviettes", label: "Changer les serviettes", reward: 5 },
+        { id: "bain-balayer", label: "Balayer", reward: 5 },
+        { id: "bain-plancher", label: "Laver le plancher", reward: 10 }
+      ]
+    },
+    {
+      id: "buanderie",
+      icon: "🧺",
+      label: "Buanderie",
+      tasks: [
+        { id: "buanderie-brassee", label: "Faire une brassée", reward: 5 },
+        { id: "buanderie-plier", label: "Plier les vêtements", reward: 5 },
+        { id: "buanderie-ranger", label: "Ranger les vêtements", reward: 5 },
+        { id: "buanderie-secheuse", label: "Nettoyer la sécheuse", reward: 5 },
+        { id: "buanderie-plancher", label: "Nettoyer le plancher", reward: 5 }
+      ]
+    },
+    {
+      id: "entree",
+      icon: "🚪",
+      label: "Entrée",
+      tasks: [
+        { id: "entree-chaussures", label: "Ranger les chaussures", reward: 5 },
+        { id: "entree-manteaux", label: "Ranger les manteaux", reward: 5 },
+        { id: "entree-balayer", label: "Balayer", reward: 5 },
+        { id: "entree-porte", label: "Nettoyer la porte", reward: 5 },
+        { id: "entree-tapis", label: "Nettoyer le tapis", reward: 5 }
+      ]
+    },
+    {
+      id: "exterieur",
+      icon: "🌳",
+      label: "Extérieur",
+      tasks: [
+        { id: "exterieur-pelouse", label: "Tondre la pelouse", reward: 15, season: "Été" },
+        { id: "exterieur-desherber", label: "Désherber", reward: 10, season: "Été" },
+        { id: "exterieur-arroser", label: "Arroser les plantes", reward: 5, season: "Été" },
+        { id: "exterieur-branches", label: "Ramasser les branches", reward: 10, season: "Été" },
+        { id: "exterieur-patio", label: "Nettoyer le patio", reward: 10, season: "Été" },
+        { id: "exterieur-deneiger", label: "Déneiger l'entrée", reward: 15, season: "Hiver" },
+        { id: "exterieur-deglacer", label: "Déglacer les marches", reward: 10, season: "Hiver" },
+        { id: "exterieur-sabler", label: "Sabler", reward: 5, season: "Hiver" },
+        { id: "exterieur-voiture", label: "Dégager la voiture", reward: 10, season: "Hiver" }
+      ]
+    }
+  ];
+
   const trainingLabels = {
     type: {
       cardio: "Cardio",
@@ -245,6 +341,7 @@
     history: [],
     notifications: { important: false, summary: false },
     budget: { incomes: [], payments: [] },
+    houseCoach: { selectedRoom: "", activeTask: null, completed: {} },
     training: { mode: "quick", type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
@@ -307,6 +404,13 @@
               payments: Array.isArray(saved.budget.payments) ? saved.budget.payments : []
             }
           : cloneState(defaultState.budget),
+        houseCoach: saved.houseCoach && typeof saved.houseCoach === "object"
+          ? {
+              selectedRoom: typeof saved.houseCoach.selectedRoom === "string" ? saved.houseCoach.selectedRoom : "",
+              activeTask: saved.houseCoach.activeTask && typeof saved.houseCoach.activeTask === "object" ? saved.houseCoach.activeTask : null,
+              completed: saved.houseCoach.completed && typeof saved.houseCoach.completed === "object" ? saved.houseCoach.completed : {}
+            }
+          : cloneState(defaultState.houseCoach),
         training: saved.training && typeof saved.training === "object"
           ? {
               mode: saved.training.mode === "custom" ? "custom" : "quick",
@@ -475,6 +579,7 @@
     document.querySelectorAll(".domain-panel").forEach((panel) => panel.classList.add("hidden"));
     panel.classList.remove("hidden");
     renderHomeSuggestion();
+    if (domain === "house") renderHouseCoach();
     if (domain === "training") renderTrainingProgram();
     if (domain === "budget") renderBudget();
     showView("domains");
@@ -488,6 +593,203 @@
 
   function closeDomain() {
     document.querySelectorAll(".domain-panel").forEach((panel) => panel.classList.add("hidden"));
+  }
+
+  function todayKey() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function allHouseTasks() {
+    return houseRooms.flatMap((room) => room.tasks.map((task) => ({ ...task, roomId: room.id, roomLabel: room.label, roomIcon: room.icon })));
+  }
+
+  function houseTaskById(taskId) {
+    return allHouseTasks().find((task) => task.id === taskId) || null;
+  }
+
+  function houseRoomById(roomId) {
+    return houseRooms.find((room) => room.id === roomId) || null;
+  }
+
+  function completedHouseTaskIds(date = todayKey()) {
+    const completed = state.houseCoach?.completed?.[date];
+    return Array.isArray(completed) ? completed : [];
+  }
+
+  function isHouseTaskCompleted(taskId) {
+    return completedHouseTaskIds().includes(taskId);
+  }
+
+  function houseStats() {
+    const completedIds = completedHouseTaskIds();
+    const tasks = allHouseTasks();
+    const totalTokens = tasks.reduce((sum, task) => sum + task.reward, 0);
+    const earnedTokens = tasks
+      .filter((task) => completedIds.includes(task.id))
+      .reduce((sum, task) => sum + task.reward, 0);
+    const percent = tasks.length ? Math.round((completedIds.length / tasks.length) * 100) : 0;
+    return {
+      completedCount: completedIds.length,
+      totalCount: tasks.length,
+      percent,
+      earnedTokens,
+      remainingTokens: Math.max(0, totalTokens - earnedTokens)
+    };
+  }
+
+  function renderHouseCoach() {
+    const stats = houseStats();
+    const percent = $("house-dashboard-percent");
+    const progress = $("house-dashboard-progress");
+    const doneCount = $("house-done-count");
+    const earned = $("house-earned-tokens");
+    const remaining = $("house-remaining-tokens");
+    const roomGrid = $("house-room-grid");
+    const detail = $("house-room-detail");
+    const detailTitle = $("house-room-title");
+    const taskList = $("house-task-list");
+    const activePanel = $("house-active-mission");
+    const activeTask = state.houseCoach?.activeTask ? houseTaskById(state.houseCoach.activeTask.id) : null;
+    const selectedRoom = houseRoomById(state.houseCoach?.selectedRoom);
+
+    if (percent) percent.textContent = `${stats.percent} %`;
+    if (progress) progress.style.width = `${stats.percent}%`;
+    if (doneCount) doneCount.textContent = `${stats.completedCount}`;
+    if (earned) earned.textContent = `${stats.earnedTokens}`;
+    if (remaining) remaining.textContent = `${stats.remainingTokens}`;
+
+    if (roomGrid) {
+      roomGrid.replaceChildren(...houseRooms.map((room) => {
+        const completedInRoom = room.tasks.filter((task) => isHouseTaskCompleted(task.id)).length;
+        const available = room.tasks.length - completedInRoom;
+        const roomPercent = room.tasks.length ? Math.round((completedInRoom / room.tasks.length) * 100) : 0;
+        const roomTokens = room.tasks
+          .filter((task) => !isHouseTaskCompleted(task.id))
+          .reduce((sum, task) => sum + task.reward, 0);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "house-room-card";
+        button.dataset.houseRoom = room.id;
+        button.innerHTML = `
+          <span class="house-room-icon" aria-hidden="true">${room.icon}</span>
+          <strong>${room.label}</strong>
+          <span>${available} tâche${available > 1 ? "s" : ""} disponible${available > 1 ? "s" : ""}</span>
+          <span>Progression : ${roomPercent} %</span>
+          <span>${roomTokens} jetons restants</span>
+          <i class="house-room-meter" aria-hidden="true"><b style="width:${roomPercent}%"></b></i>
+        `;
+        return button;
+      }));
+    }
+
+    if (detail) detail.classList.toggle("hidden", !selectedRoom);
+    if (detailTitle && selectedRoom) detailTitle.textContent = `${selectedRoom.icon} ${selectedRoom.label}`;
+    if (taskList && selectedRoom) {
+      taskList.replaceChildren(...selectedRoom.tasks.map((task) => {
+        const completed = isHouseTaskCompleted(task.id);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "house-task-button";
+        button.dataset.houseTask = task.id;
+        button.disabled = completed;
+        button.innerHTML = `
+          <span>
+            <strong>${task.label}</strong>
+            ${task.season ? `<em>${task.season}</em>` : ""}
+          </span>
+          <b>${completed ? "Terminé" : `+${task.reward}`}</b>
+        `;
+        return button;
+      }));
+    } else if (taskList) {
+      taskList.replaceChildren();
+    }
+
+    if (activePanel) activePanel.classList.toggle("hidden", !activeTask);
+    if (activeTask) {
+      $("house-active-task-name").textContent = activeTask.label;
+      $("house-active-task-room").textContent = `${activeTask.roomIcon} ${activeTask.roomLabel}`;
+      $("house-active-task-reward").textContent = `+${activeTask.reward} jetons`;
+    }
+  }
+
+  function selectHouseRoom(roomId) {
+    if (!houseRoomById(roomId)) return;
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: roomId };
+    state.selectedDomain = "house";
+    saveState();
+    renderHouseCoach();
+    $("house-room-detail")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function backToHouseRooms() {
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: "" };
+    saveState();
+    renderHouseCoach();
+  }
+
+  function selectHouseTask(taskId) {
+    const task = houseTaskById(taskId);
+    if (!task || isHouseTaskCompleted(task.id)) return;
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: task.roomId, activeTask: { id: task.id } };
+    state.selectedDomain = "house";
+    saveState();
+    renderHouseCoach();
+    $("house-active-mission")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function cancelHouseTask() {
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), activeTask: null };
+    saveState();
+    renderHouseCoach();
+  }
+
+  function showHouseCompleteModal(task) {
+    const modal = $("house-complete-modal");
+    if (!modal) return;
+    $("house-complete-task-name").textContent = task.label;
+    $("house-complete-reward").textContent = `+${task.reward} jetons gagnés`;
+    modal.classList.remove("hidden");
+    window.requestAnimationFrame(() => modal.focus({ preventScroll: true }));
+  }
+
+  function closeHouseCompleteModal() {
+    $("house-complete-modal")?.classList.add("hidden");
+  }
+
+  function completeHouseTask() {
+    const task = state.houseCoach?.activeTask ? houseTaskById(state.houseCoach.activeTask.id) : null;
+    if (!task || isHouseTaskCompleted(task.id)) {
+      cancelHouseTask();
+      return;
+    }
+    const date = todayKey();
+    const completed = completedHouseTaskIds(date);
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      activeTask: null,
+      selectedRoom: task.roomId,
+      completed: {
+        ...(state.houseCoach?.completed || {}),
+        [date]: [...completed, task.id]
+      }
+    };
+    state.selectedDomain = "house";
+    state.wins += 1;
+    state.coins += task.reward;
+    state.progress.house = (state.progress.house || 0) + 1;
+    state.history = [{
+      label: `Maison - ${task.roomLabel} : ${task.label}`,
+      coins: task.reward,
+      at: Date.now(),
+      domain: "house"
+    }, ...state.history].slice(0, 50);
+    saveState();
+    renderHouseCoach();
+    renderDomainProgress();
+    renderShop();
+    renderHistoryList();
+    showHouseCompleteModal(task);
   }
 
   function currentTrainingProgram() {
@@ -1899,6 +2201,20 @@
     Object.entries(domainInfo).forEach(([domain, info]) => {
       const meter = $(`progress-${domain}`);
       if (!meter) return;
+      if (domain === "house") {
+        const stats = houseStats();
+        const count = $(`count-${domain}`);
+        if (count) {
+          count.textContent = stats.completedCount === 0
+            ? "À commencer"
+            : stats.completedCount >= stats.totalCount
+              ? "Complété"
+              : `${stats.percent} %`;
+        }
+        meter.style.width = `${stats.percent}%`;
+        meter.parentElement.setAttribute("aria-label", `${stats.completedCount} sur ${stats.totalCount} missions maison faites`);
+        return;
+      }
       const completed = Math.min(state.progress[domain] || 0, info.total);
       $(`count-${domain}`).textContent = completed === 0
         ? "À commencer"
@@ -3546,6 +3862,18 @@
     document.querySelectorAll("[data-select-domain]").forEach((button) => {
       button.addEventListener("click", () => selectHomeDomain(button.dataset.selectDomain));
     });
+    $("house-room-grid")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-house-room]");
+      if (button) selectHouseRoom(button.dataset.houseRoom);
+    });
+    $("house-task-list")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-house-task]");
+      if (button) selectHouseTask(button.dataset.houseTask);
+    });
+    bindById("house-back-rooms", "click", backToHouseRooms);
+    bindById("house-complete-task", "click", completeHouseTask);
+    bindById("house-cancel-task", "click", cancelHouseTask);
+    bindById("house-complete-continue", "click", closeHouseCompleteModal);
     bindById("close-selected-domain", "click", closeSelectedDomain);
     bindById("add-selected-goal", "click", () => addCustomGoal($("add-selected-goal").dataset.addGoal));
     document.querySelectorAll("[data-toggle-missions]").forEach((button) => {
@@ -3702,6 +4030,7 @@
     renderIdeas();
     renderRewards();
     renderShop();
+    renderHouseCoach();
     renderTrainingProgram();
     renderSelectedDomain();
     renderDomainProgress();

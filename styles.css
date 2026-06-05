@@ -269,6 +269,240 @@ p { line-height: 1.4; }
   color: white;
 }
 
+.house-dashboard {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  margin: 16px 0;
+  padding: 14px;
+}
+
+.house-dashboard h3,
+.house-room-detail h3,
+.house-active-mission h3 {
+  color: var(--ink);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+#house-dashboard-percent {
+  color: var(--brand);
+  font-size: 1.25rem;
+}
+
+.house-progress-track,
+.house-room-meter {
+  background: rgba(22, 84, 70, 0.14);
+  border-radius: 999px;
+  display: block;
+  height: 8px;
+  overflow: hidden;
+}
+
+.house-progress-track {
+  margin: 12px 0;
+}
+
+.house-progress-track i,
+.house-room-meter b {
+  background: var(--brand);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  transition: width 220ms ease;
+}
+
+.house-stats {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.house-stats p {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 0;
+  padding: 10px 8px;
+}
+
+.house-stats span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+
+.house-stats strong {
+  color: var(--brand);
+  display: block;
+  font-size: 1.1rem;
+  margin-top: 4px;
+}
+
+.house-room-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  margin-top: 10px;
+}
+
+.house-room-card {
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--ink);
+  display: grid;
+  gap: 5px;
+  min-height: 148px;
+  padding: 13px;
+  text-align: left;
+}
+
+.house-room-card:active {
+  transform: scale(0.99);
+}
+
+.house-room-icon {
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.house-room-card strong {
+  font-size: 1.02rem;
+}
+
+.house-room-card span:not(.house-room-icon) {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.house-room-meter {
+  margin-top: 4px;
+  width: 100%;
+}
+
+.house-room-detail,
+.house-active-mission {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  margin-top: 16px;
+  padding: 14px;
+}
+
+.house-task-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.house-task-button {
+  align-items: center;
+  background: var(--soft);
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--ink);
+  display: flex;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 12px;
+  text-align: left;
+}
+
+.house-task-button:disabled {
+  opacity: 0.58;
+}
+
+.house-task-button span {
+  display: grid;
+  gap: 3px;
+}
+
+.house-task-button strong {
+  font-size: 0.98rem;
+}
+
+.house-task-button em {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: normal;
+}
+
+.house-task-button b,
+.house-active-reward {
+  color: var(--brand);
+  font-weight: 800;
+}
+
+.house-active-mission {
+  background: #eef7f2;
+  border-color: var(--brand-light);
+}
+
+.house-active-mission .button-row {
+  margin-top: 12px;
+}
+
+.house-complete-modal {
+  align-items: center;
+  animation: training-modal-fade 180ms ease both;
+  background: rgba(23, 39, 33, 0.46);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  text-align: center;
+  z-index: 82;
+}
+
+.house-complete-card {
+  animation: training-modal-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  background: var(--surface);
+  border: 1px solid rgba(76, 125, 94, 0.16);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(23, 39, 33, 0.26);
+  max-width: 350px;
+  padding: 26px 20px 20px;
+  width: min(100%, 350px);
+}
+
+.house-complete-icon {
+  animation: training-check-pop 360ms 80ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.house-complete-card h2 {
+  color: var(--brand);
+  font-size: 1.35rem;
+  margin: 0 0 8px;
+}
+
+.house-complete-task-name {
+  color: var(--ink);
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.house-complete-reward {
+  background: linear-gradient(135deg, #f5ead2, #fffaf0);
+  border: 1px solid #f0d9a8;
+  border-radius: 16px;
+  color: #6f4a17;
+  display: inline-flex;
+  font-weight: 800;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+}
+
+.house-complete-card button {
+  width: 100%;
+}
+
 .add-small {
   background: transparent;
   border: 0;

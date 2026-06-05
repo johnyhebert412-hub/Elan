@@ -49,7 +49,7 @@
             <h2 id="domain-choice-title">Que veux-tu faire ?</h2>
             <p class="muted">Choisis un domaine</p>
             <div class="domain-choice-grid">
-              <button data-select-domain="house">🧹 Maison</button>
+              <button data-open-domain="house">🏠 Maison</button>
               <button data-open-domain="training">🏃 Entraînement</button>
               <button data-open-domain="budget">💵 Budget</button>
             </div>
@@ -116,12 +116,46 @@
 
           <article id="domain-house" class="card domain-panel hidden">
             <div class="card-header"><h2>Maison</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">Petits gestes pour avancer à la maison.</p>
-            <div class="task-list">
-              <button data-complete="Faire la vaisselle">Faire la vaisselle</button>
-              <button data-complete="Ranger une surface">Ranger une surface</button>
-              <button data-complete="Lancer une brassée">Lancer une brassée</button>
-            </div>
+            <p class="muted">Coach d'entretien simple pour garder la maison en ordre.</p>
+            <section class="house-dashboard" aria-labelledby="house-dashboard-title">
+              <div class="card-header">
+                <div>
+                  <p class="step">Aujourd'hui</p>
+                  <h3 id="house-dashboard-title">Progression Maison</h3>
+                </div>
+                <strong id="house-dashboard-percent">0 %</strong>
+              </div>
+              <div class="house-progress-track" aria-hidden="true"><i id="house-dashboard-progress"></i></div>
+              <div class="house-stats">
+                <p><span>Missions terminées</span><strong id="house-done-count">0</strong></p>
+                <p><span>Jetons gagnés</span><strong id="house-earned-tokens">0</strong></p>
+                <p><span>Jetons restants</span><strong id="house-remaining-tokens">0</strong></p>
+              </div>
+            </section>
+            <section id="house-room-overview">
+              <p class="domain-section-label">Pièces</p>
+              <div id="house-room-grid" class="house-room-grid"></div>
+            </section>
+            <section id="house-room-detail" class="house-room-detail hidden" aria-live="polite">
+              <div class="card-header">
+                <div>
+                  <p class="step">Pièce sélectionnée</p>
+                  <h3 id="house-room-title">Cuisine</h3>
+                </div>
+                <button id="house-back-rooms" class="text-button" type="button">Retour</button>
+              </div>
+              <div id="house-task-list" class="house-task-list"></div>
+            </section>
+            <section id="house-active-mission" class="house-active-mission hidden" aria-live="polite">
+              <p class="step">Mission active</p>
+              <h3 id="house-active-task-name">Faire la vaisselle</h3>
+              <p id="house-active-task-room" class="small-muted">Cuisine</p>
+              <p id="house-active-task-reward" class="house-active-reward">+5 jetons</p>
+              <div class="button-row">
+                <button id="house-complete-task" class="primary" type="button">Terminé</button>
+                <button id="house-cancel-task" class="secondary" type="button">Retour</button>
+              </div>
+            </section>
           </article>
 
           <article id="domain-training" class="card domain-panel training-panel hidden">
@@ -642,6 +676,15 @@
           <button id="series-complete-shop" class="secondary" type="button">Aller à la boutique</button>
           <button id="series-complete-finish" class="secondary" type="button">Terminer</button>
         </div>
+      </article>
+    </section>
+    <section id="house-complete-modal" class="house-complete-modal hidden" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="house-complete-title" tabindex="-1">
+      <article class="house-complete-card">
+        <div class="house-complete-icon" aria-hidden="true">🎉</div>
+        <h2 id="house-complete-title">Mission terminée</h2>
+        <p id="house-complete-task-name" class="house-complete-task-name">Mission</p>
+        <div id="house-complete-reward" class="house-complete-reward">+5 jetons gagnés</div>
+        <button id="house-complete-continue" class="primary" type="button">Continuer</button>
       </article>
     </section>
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
