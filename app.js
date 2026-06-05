@@ -266,6 +266,7 @@
   let trainingTimerElapsed = false;
   let trainingTimerPhase = "idle";
   let trainingCountdownValue = 3;
+  let trainingAutoAdvanceId = null;
   let shopFlow = { step: "categories", category: "", title: "", rewardType: "", rewardId: "" };
 
   function cloneState(value) {
@@ -612,6 +613,7 @@
         currentAmount.classList.toggle("hidden", hasTimer);
       }
       if (progressFill) progressFill.style.width = `${Math.round((currentStepIndex / totalSteps) * 100)}%`;
+      updateTrainingCountdownDetails(step, currentStepIndex, totalSteps);
       renderTrainingTimer(step, currentStepIndex);
       if (programCard) programCard.classList.toggle("training-countdown-active", trainingTimerPhase === "countdown");
     } else if (progressFill) {
@@ -658,26 +660,34 @@
     return Math.round(value * (unit.startsWith("min") ? 60 : 1));
   }
 
+  function updateTrainingCountdownDetails(step, stepIndex, totalSteps) {
+    const stepLabel = $("training-countdown-step");
+    const name = $("training-countdown-name");
+    const amount = $("training-countdown-amount");
+    if (stepLabel) {
+      stepLabel.textContent = stepIndex === 0
+        ? `Exercice ${stepIndex + 1}/${totalSteps}`
+        : `Exercice suivant · ${stepIndex + 1}/${totalSteps}`;
+    }
+    if (name) name.textContent = step.label;
+    if (amount) amount.textContent = step.amount;
+  }
+
   function renderTrainingTimer(step, stepIndex) {
     const timer = $("training-step-timer");
     if (!timer) return;
     const seconds = parseTrainingDurationSeconds(step.amount);
-    if (!seconds) {
-      stopTrainingTimer();
-      timer.classList.add("hidden");
-      return;
-    }
     const stepKey = `${state.training?.mode || "quick"}:${stepIndex}:${step.label}:${step.amount}`;
     if (trainingTimerStepKey !== stepKey) {
       stopTrainingTimer();
       trainingTimerStepKey = stepKey;
-      trainingTimerRemaining = Math.max(1, seconds);
+      trainingTimerRemaining = Math.max(0, seconds);
       trainingTimerElapsed = false;
       trainingTimerPhase = "countdown";
       trainingCountdownValue = 3;
       trainingTimerId = window.setInterval(tickTrainingTimer, 1000);
     }
-    timer.classList.remove("hidden");
+    timer.classList.toggle("hidden", !seconds || trainingTimerPhase === "countdown" || trainingTimerPhase === "idle");
     updateTrainingTimerDisplay();
   }
 
@@ -689,7 +699,11 @@
         renderTrainingProgram();
         return;
       }
-      trainingTimerPhase = "timer";
+      trainingTimerPhase = trainingTimerRemaining > 0 ? "timer" : "idle";
+      if (trainingTimerPhase === "idle") {
+        window.clearInterval(trainingTimerId);
+        trainingTimerId = null;
+      }
       updateTrainingTimerDisplay();
       renderTrainingProgram();
       return;
@@ -702,8 +716,15 @@
       window.clearInterval(trainingTimerId);
       trainingTimerId = null;
       trainingTimerElapsed = true;
+      trainingTimerPhase = "complete";
       updateTrainingTimerDisplay();
       if ("vibrate" in navigator) navigator.vibrate([15, 35, 15]);
+      window.clearTimeout(trainingAutoAdvanceId);
+      trainingAutoAdvanceId = window.setTimeout(() => {
+        if (state.training?.started && !state.training?.completed && trainingTimerElapsed) {
+          advanceTrainingStep(false);
+        }
+      }, 1100);
     }
   }
 
@@ -726,6 +747,12 @@
       return;
     }
     if (countdownScreen) countdownScreen.classList.add("hidden");
+    if (trainingTimerPhase === "idle") {
+      if (display) display.classList.remove("training-countdown-display");
+      if (status) status.textContent = "";
+      if (completeButton) completeButton.textContent = "Terminé";
+      return;
+    }
     const remaining = Math.max(0, trainingTimerRemaining);
     const minutes = Math.floor(remaining / 60);
     const seconds = remaining % 60;
@@ -733,13 +760,15 @@
       display.classList.remove("training-countdown-display");
       display.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     }
-    if (status) status.textContent = trainingTimerElapsed ? "Temps écoulé. Tu peux passer à l'étape suivante." : "";
+    if (status) status.textContent = trainingTimerElapsed ? "✓ Exercice terminé" : "Temps restant :";
     if (completeButton) completeButton.textContent = trainingTimerElapsed ? "Étape suivante" : "Terminé";
   }
 
   function stopTrainingTimer() {
     window.clearInterval(trainingTimerId);
+    window.clearTimeout(trainingAutoAdvanceId);
     trainingTimerId = null;
+    trainingAutoAdvanceId = null;
     trainingTimerStepKey = "";
     trainingTimerRemaining = 0;
     trainingTimerElapsed = false;
