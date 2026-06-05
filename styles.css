@@ -1036,6 +1036,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
 
 .budget-summary-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 16px 0;
 }
