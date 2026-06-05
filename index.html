@@ -223,13 +223,8 @@
           <article id="domain-budget" class="card domain-panel budget-panel hidden">
             <div class="card-header"><h2>Budget</h2><button class="text-button" data-close-domain type="button">Changer</button></div>
             <p class="muted">Planifie ton argent selon ton agenda.</p>
-            <p class="budget-reassurance">Aucune connexion bancaire. Tu inscris seulement ce que tu veux planifier.</p>
 
             <section class="budget-summary-grid" aria-label="Résumé du budget">
-              <div class="budget-summary-card">
-                <span>Montant à planifier</span>
-                <strong id="budget-now">0 $</strong>
-              </div>
               <div class="budget-summary-card">
                 <span>Paiements à venir</span>
                 <strong id="budget-upcoming-payments">0 $</strong>
@@ -283,6 +278,13 @@
                 <button id="budget-add-payment" class="primary" type="button">Ajouter paiement</button>
               </div>
               <div id="budget-payment-list" class="budget-list"></div>
+            </section>
+
+            <section class="budget-section">
+              <div class="card-header compact-header">
+                <h3>Objectifs financiers</h3>
+                <span class="small-muted">Future évolution</span>
+              </div>
             </section>
 
             <section class="budget-section">

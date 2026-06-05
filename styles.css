@@ -1018,16 +1018,6 @@ input[type="date"], input[type="time"], input[type="text"], select {
   border-left: 5px solid #6f7440;
 }
 
-.budget-reassurance {
-  background: #f8f4e8;
-  border: 1px solid #e7dcc3;
-  border-radius: 14px;
-  color: #5f6041;
-  font-size: 0.92rem;
-  margin: 10px 0 14px;
-  padding: 11px 12px;
-}
-
 .budget-summary-grid {
   display: grid;
   gap: 10px;

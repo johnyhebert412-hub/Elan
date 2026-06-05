@@ -2348,7 +2348,6 @@
     const plannedAmount = nowIncome - nowPayments;
     const estimatedRemainder = plannedAmount + upcomingIncome - upcomingPayments;
 
-    if ($("budget-now")) $("budget-now").textContent = money(plannedAmount);
     if ($("budget-upcoming-payments")) $("budget-upcoming-payments").textContent = money(upcomingPayments);
     if ($("budget-after-payments")) $("budget-after-payments").textContent = money(estimatedRemainder);
 
