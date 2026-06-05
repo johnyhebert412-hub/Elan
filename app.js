@@ -81,7 +81,8 @@
     Pause: "#e7f0f3",
     "Rendez-vous": "#f3e4e7",
     Habitude: "#e8eddc",
-    "Bloc de temps": "#ebe6f3"
+    "Bloc de temps": "#ebe6f3",
+    Finance: "#f6f0dc"
   };
 
   const homeDomains = {
@@ -243,6 +244,7 @@
     activeReward: null,
     history: [],
     notifications: { important: false, summary: false },
+    budget: { incomes: [], payments: [] },
     training: { mode: "quick", type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
@@ -298,6 +300,12 @@
         activeReward: (saved.activeReward && typeof saved.activeReward === "object") ? saved.activeReward : null,
         history: Array.isArray(saved.history) ? saved.history : [],
         notifications: { ...defaultState.notifications, ...saved.notifications },
+        budget: saved.budget && typeof saved.budget === "object"
+          ? {
+              incomes: Array.isArray(saved.budget.incomes) ? saved.budget.incomes : [],
+              payments: Array.isArray(saved.budget.payments) ? saved.budget.payments : []
+            }
+          : cloneState(defaultState.budget),
         training: saved.training && typeof saved.training === "object"
           ? {
               mode: saved.training.mode === "custom" ? "custom" : "quick",
@@ -318,7 +326,7 @@
             }
           : { ...defaultState.training }
       };
-      if (nextState.selectedDomain && !suggestedActions[nextState.selectedDomain]) {
+      if (nextState.selectedDomain && !suggestedActions[nextState.selectedDomain] && !["training", "budget"].includes(nextState.selectedDomain)) {
         nextState.selectedDomain = "";
       }
       let cleanedAtLoad = false;
@@ -467,6 +475,7 @@
     panel.classList.remove("hidden");
     renderHomeSuggestion();
     if (domain === "training") renderTrainingProgram();
+    if (domain === "budget") renderBudget();
     showView("domains");
     panel.setAttribute("tabindex", "-1");
     window.requestAnimationFrame(() => {
@@ -2158,6 +2167,228 @@
     return `${year}-${month}-${day}`;
   }
 
+  function money(value) {
+    const amount = Number(value) || 0;
+    return `${amount.toLocaleString("fr-CA", { maximumFractionDigits: 2 })} $`;
+  }
+
+  function budgetEntries() {
+    const budget = state.budget || defaultState.budget;
+    const incomes = Array.isArray(budget.incomes) ? budget.incomes : [];
+    const payments = Array.isArray(budget.payments) ? budget.payments : [];
+    return { incomes, payments };
+  }
+
+  function budgetUpcomingEntries() {
+    const today = new Date(`${todayKey()}T12:00:00`);
+    const end = new Date(today);
+    end.setDate(end.getDate() + 30);
+    const { incomes, payments } = budgetEntries();
+    return [
+      ...incomes.map((item) => ({ ...item, kind: "income" })),
+      ...payments.map((item) => ({ ...item, kind: "payment" }))
+    ]
+      .filter((item) => item.date)
+      .filter((item) => {
+        const date = new Date(`${item.date}T12:00:00`);
+        return date >= today && date <= end;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  function budgetDateText(dateValue) {
+    if (!dateValue) return "Sans date";
+    if (dateValue === todayKey()) return "Aujourd'hui";
+    return new Intl.DateTimeFormat("fr-CA", { day: "numeric", month: "long" }).format(new Date(`${dateValue}T12:00:00`));
+  }
+
+  function budgetRepeatText(value) {
+    const labels = {
+      weekly: "Chaque semaine",
+      biweekly: "Aux 2 semaines",
+      monthly: "Chaque mois"
+    };
+    return labels[value] || "Une fois";
+  }
+
+  function budgetCategoryText(value) {
+    const labels = {
+      loyer: "Loyer",
+      auto: "Auto",
+      telephone: "Téléphone",
+      assurance: "Assurance",
+      autre: "Autre"
+    };
+    return labels[value] || "Autre";
+  }
+
+  function syncBudgetAgendaEntry(entry, kind) {
+    const amount = Number(entry.amount) || 0;
+    const sourceId = `budget-${kind}-${entry.id}`;
+    const prefix = kind === "income" ? "Revenu" : "Paiement";
+    const sign = kind === "income" ? "+" : "-";
+    const text = `${prefix} : ${entry.name} ${sign}${money(amount)}`;
+    const existing = state.agenda.find((item) => item.sourceId === sourceId);
+    const agendaItem = {
+      id: existing?.id || sourceId,
+      sourceId,
+      date: entry.date,
+      type: "Finance",
+      text,
+      time: "",
+      reminder: "none",
+      notified: false,
+      done: false
+    };
+    state.agenda = existing
+      ? state.agenda.map((item) => item.sourceId === sourceId ? { ...item, ...agendaItem, done: item.done } : item)
+      : [...state.agenda, agendaItem].slice(-100);
+  }
+
+  function removeBudgetAgendaEntry(id, kind) {
+    const sourceId = `budget-${kind}-${id}`;
+    state.agenda = state.agenda.filter((item) => item.sourceId !== sourceId);
+  }
+
+  function renderBudgetList(targetId, items, kind) {
+    const target = $(targetId);
+    if (!target) return;
+    if (!items.length) {
+      const empty = document.createElement("p");
+      empty.className = "budget-empty";
+      empty.textContent = kind === "income" ? "Aucun revenu prévu." : "Aucun paiement prévu.";
+      target.replaceChildren(empty);
+      return;
+    }
+    target.replaceChildren(...items.slice().sort((a, b) => (a.date || "").localeCompare(b.date || "")).map((item) => {
+      const row = document.createElement("article");
+      row.className = "budget-item";
+      const copy = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.name;
+      const meta = document.createElement("p");
+      meta.className = "small-muted";
+      meta.textContent = kind === "income"
+        ? `${budgetDateText(item.date)} · ${budgetRepeatText(item.repeat)}`
+        : `${budgetDateText(item.date)} · ${budgetCategoryText(item.category)}`;
+      copy.append(title, meta);
+      const side = document.createElement("div");
+      const amount = document.createElement("div");
+      amount.className = "budget-amount";
+      amount.textContent = money(item.amount);
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "budget-delete";
+      remove.textContent = "Supprimer";
+      remove.addEventListener("click", () => removeBudgetEntry(kind, item.id));
+      side.append(amount, remove);
+      row.append(copy, side);
+      return row;
+    }));
+  }
+
+  function renderBudget() {
+    const panel = $("domain-budget");
+    if (!panel) return;
+    const { incomes, payments } = budgetEntries();
+    const today = todayKey();
+    const nowIncome = incomes.filter((item) => item.date <= today).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const nowPayments = payments.filter((item) => item.date <= today).reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const upcoming = budgetUpcomingEntries();
+    const upcomingIncome = upcoming.filter((item) => item.kind === "income").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const upcomingPayments = upcoming.filter((item) => item.kind === "payment").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const availableNow = nowIncome - nowPayments;
+    const afterPayments = availableNow + upcomingIncome - upcomingPayments;
+
+    if ($("budget-now")) $("budget-now").textContent = money(availableNow);
+    if ($("budget-upcoming-payments")) $("budget-upcoming-payments").textContent = money(upcomingPayments);
+    if ($("budget-after-payments")) $("budget-after-payments").textContent = money(afterPayments);
+
+    renderBudgetList("budget-income-list", incomes, "income");
+    renderBudgetList("budget-payment-list", payments, "payment");
+
+    const upcomingList = $("budget-upcoming-list");
+    if (!upcomingList) return;
+    if (!upcoming.length) {
+      const empty = document.createElement("p");
+      empty.className = "budget-empty";
+      empty.textContent = "Rien dans les 30 prochains jours.";
+      upcomingList.replaceChildren(empty);
+      return;
+    }
+    upcomingList.replaceChildren(...upcoming.map((item) => {
+      const row = document.createElement("article");
+      row.className = "budget-item";
+      const copy = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.kind === "income" ? `Paie · ${item.name}` : `${budgetCategoryText(item.category)} · ${item.name}`;
+      const meta = document.createElement("p");
+      meta.className = "small-muted";
+      meta.textContent = budgetDateText(item.date);
+      copy.append(title, meta);
+      const amount = document.createElement("div");
+      amount.className = "budget-amount";
+      amount.textContent = `${item.kind === "income" ? "+" : "-"}${money(item.amount)}`;
+      row.append(copy, amount);
+      return row;
+    }));
+  }
+
+  function addBudgetIncome() {
+    const name = $("budget-income-name")?.value.trim();
+    const amount = Number.parseFloat($("budget-income-amount")?.value);
+    const date = $("budget-income-date")?.value;
+    const repeat = $("budget-income-repeat")?.value || "";
+    if (!name || !Number.isFinite(amount) || amount <= 0 || !date) {
+      showToast("Ajoute un nom, un montant et une date.");
+      return;
+    }
+    const entry = { id: `income-${Date.now()}`, name, amount, date, repeat };
+    state.budget = state.budget || cloneState(defaultState.budget);
+    state.budget.incomes = [...(state.budget.incomes || []), entry];
+    syncBudgetAgendaEntry(entry, "income");
+    saveState();
+    ["budget-income-name", "budget-income-amount", "budget-income-date"].forEach((id) => { const field = $(id); if (field) field.value = ""; });
+    renderBudget();
+    renderAgenda();
+    showToast("Revenu ajouté au Budget et à l'Agenda.");
+  }
+
+  function addBudgetPayment() {
+    const name = $("budget-payment-name")?.value.trim();
+    const amount = Number.parseFloat($("budget-payment-amount")?.value);
+    const date = $("budget-payment-date")?.value;
+    const category = $("budget-payment-category")?.value || "autre";
+    if (!name || !Number.isFinite(amount) || amount <= 0 || !date) {
+      showToast("Ajoute un nom, un montant et une date.");
+      return;
+    }
+    const entry = { id: `payment-${Date.now()}`, name, amount, date, category };
+    state.budget = state.budget || cloneState(defaultState.budget);
+    state.budget.payments = [...(state.budget.payments || []), entry];
+    syncBudgetAgendaEntry(entry, "payment");
+    saveState();
+    ["budget-payment-name", "budget-payment-amount", "budget-payment-date"].forEach((id) => { const field = $(id); if (field) field.value = ""; });
+    renderBudget();
+    renderAgenda();
+    showToast("Paiement ajouté au Budget et à l'Agenda.");
+  }
+
+  function removeBudgetEntry(kind, id) {
+    if (!state.budget) return;
+    if (kind === "income") {
+      state.budget.incomes = (state.budget.incomes || []).filter((item) => item.id !== id);
+      removeBudgetAgendaEntry(id, "income");
+    } else {
+      state.budget.payments = (state.budget.payments || []).filter((item) => item.id !== id);
+      removeBudgetAgendaEntry(id, "payment");
+    }
+    saveState();
+    renderBudget();
+    renderAgenda();
+    showToast("Élément supprimé.");
+  }
+
   function selectedAgendaDate() {
     return state.agendaDate || todayKey();
   }
@@ -3331,6 +3562,8 @@
     bindById("series-complete-finish", "click", finishAfterSeriesComplete);
     bindById("domain-restart", "click", restartDomain);
     bindById("domain-change", "click", closeSelectedDomain);
+    bindById("budget-add-income", "click", addBudgetIncome);
+    bindById("budget-add-payment", "click", addBudgetPayment);
   }
 
   function render() {
@@ -3339,6 +3572,7 @@
     renderCheckInHistory();
     renderQuickItems();
     renderAgenda();
+    renderBudget();
     renderIdeas();
     renderRewards();
     renderShop();
