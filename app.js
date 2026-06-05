@@ -82,7 +82,11 @@
     "Rendez-vous": "#f3e4e7",
     Habitude: "#e8eddc",
     "Bloc de temps": "#ebe6f3",
-    Finance: "#f6f0dc"
+    Finance: "#f6f0dc",
+    Budget: "#f6f0dc",
+    Maison: "#e7f2ec",
+    "Entraînement": "#e7eef7",
+    Objectif: "#eee8f4"
   };
 
   const homeDomains = {
@@ -335,13 +339,14 @@
     goalQueue: { items: [], active: false, currentIndex: 0 },
     agenda: [],
     agendaDate: "",
+    agendaView: "today",
     activeChallenge: null,
     purchasedRewards: [],
     activeReward: null,
     history: [],
     notifications: { important: false, summary: false },
     budget: { incomes: [], payments: [] },
-    houseCoach: { selectedRoom: "", activeTask: null, completed: {} },
+    houseCoach: { selectedRoom: "", activeTask: null, completed: {}, quickMission: null },
     training: { mode: "quick", type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
@@ -358,6 +363,7 @@
   let isCompletingChallenge = false;
   let activeRewardTimerId = null;
   let trainingTimerId = null;
+  let houseTimerId = null;
   let trainingTimerStepKey = "";
   let trainingTimerRemaining = 0;
   let trainingTimerElapsed = false;
@@ -392,6 +398,7 @@
           : cloneState(defaultState.goalQueue),
         agenda: Array.isArray(saved.agenda) ? saved.agenda : [],
         agendaDate: typeof saved.agendaDate === "string" ? saved.agendaDate : "",
+        agendaView: ["today", "week", "next30"].includes(saved.agendaView) ? saved.agendaView : "today",
         activeChallenge: saved.activeChallenge && typeof saved.activeChallenge === "object" ? saved.activeChallenge : null,
         coins: Number.isFinite(saved.coins) ? saved.coins : (Number.isFinite(saved.wins) ? saved.wins * COINS_PER_TASK : 0),
         purchasedRewards: Array.isArray(saved.purchasedRewards) ? saved.purchasedRewards : [],
@@ -408,7 +415,8 @@
           ? {
               selectedRoom: typeof saved.houseCoach.selectedRoom === "string" ? saved.houseCoach.selectedRoom : "",
               activeTask: saved.houseCoach.activeTask && typeof saved.houseCoach.activeTask === "object" ? saved.houseCoach.activeTask : null,
-              completed: saved.houseCoach.completed && typeof saved.houseCoach.completed === "object" ? saved.houseCoach.completed : {}
+              completed: saved.houseCoach.completed && typeof saved.houseCoach.completed === "object" ? saved.houseCoach.completed : {},
+              quickMission: saved.houseCoach.quickMission && typeof saved.houseCoach.quickMission === "object" ? saved.houseCoach.quickMission : null
             }
           : cloneState(defaultState.houseCoach),
         training: saved.training && typeof saved.training === "object"
@@ -637,6 +645,87 @@
     };
   }
 
+  function houseTaskDurationMs(task) {
+    if (!task) return 2 * 60000;
+    if (task.reward >= 15) return 8 * 60000;
+    if (task.reward >= 10) return 5 * 60000;
+    return 2 * 60000;
+  }
+
+  function houseQuickTasks() {
+    const tasks = allHouseTasks().filter((task) => !isHouseTaskCompleted(task.id));
+    const preferred = ["cuisine-vaisselle", "cuisine-comptoir", "salon-ranger-objets"];
+    const ordered = [
+      ...preferred.map((id) => tasks.find((task) => task.id === id)).filter(Boolean),
+      ...tasks.filter((task) => !preferred.includes(task.id))
+    ];
+    return ordered.slice(0, 3);
+  }
+
+  function activeHouseTaskRemaining() {
+    const active = state.houseCoach?.activeTask;
+    if (!active?.endsAt) return active?.durationMs || 0;
+    return Math.max(0, active.endsAt - Date.now());
+  }
+
+  function updateHouseTaskTime() {
+    const active = state.houseCoach?.activeTask;
+    if (!active) {
+      window.clearInterval(houseTimerId);
+      houseTimerId = null;
+      return;
+    }
+    const remaining = activeHouseTaskRemaining();
+    if (remaining <= 0 && active.status !== "done") {
+      state.houseCoach = {
+        ...(state.houseCoach || defaultState.houseCoach),
+        activeTask: { ...active, status: "done" }
+      };
+      saveState();
+      showToast("Temps écoulé. Tu peux valider la mission.");
+    }
+    renderHouseCoach();
+  }
+
+  function startHouseTaskTicker() {
+    window.clearInterval(houseTimerId);
+    const active = state.houseCoach?.activeTask;
+    if (!active) {
+      houseTimerId = null;
+      return;
+    }
+    if (active.status === "done") {
+      houseTimerId = null;
+      renderHouseCoach();
+      return;
+    }
+    houseTimerId = window.setInterval(updateHouseTaskTime, 1000);
+    updateHouseTaskTime();
+  }
+
+  function stopHouseTaskTicker() {
+    window.clearInterval(houseTimerId);
+    houseTimerId = null;
+  }
+
+  function resumeHouseTaskTimer() {
+    const active = state.houseCoach?.activeTask;
+    if (!active) return;
+    if (active.status === "running" && active.endsAt && Date.now() >= active.endsAt) {
+      state.houseCoach = {
+        ...(state.houseCoach || defaultState.houseCoach),
+        activeTask: { ...active, status: "done" }
+      };
+      saveState();
+      return;
+    }
+    if (active.status === "running") startHouseTaskTicker();
+  }
+
+  function houseCompletionMessage(task) {
+    return `✓ ${task.label} terminé · +${task.reward} jetons`;
+  }
+
   function renderHouseCoach() {
     const stats = houseStats();
     const percent = $("house-dashboard-percent");
@@ -648,15 +737,34 @@
     const detail = $("house-room-detail");
     const detailTitle = $("house-room-title");
     const taskList = $("house-task-list");
+    const completedSection = $("house-completed-section");
+    const completedList = $("house-completed-list");
     const activePanel = $("house-active-mission");
     const activeTask = state.houseCoach?.activeTask ? houseTaskById(state.houseCoach.activeTask.id) : null;
     const selectedRoom = houseRoomById(state.houseCoach?.selectedRoom);
+    const quickTasks = houseQuickTasks();
 
     if (percent) percent.textContent = `${stats.percent} %`;
     if (progress) progress.style.width = `${stats.percent}%`;
     if (doneCount) doneCount.textContent = `${stats.completedCount}`;
     if (earned) earned.textContent = `${stats.earnedTokens}`;
     if (remaining) remaining.textContent = `${stats.remainingTokens}`;
+
+    if ($("house-quick-list")) {
+      $("house-quick-list").replaceChildren(...quickTasks.map((task) => {
+        const item = document.createElement("p");
+        item.innerHTML = `<span>☑ ${task.label}</span><strong>+${task.reward}</strong>`;
+        return item;
+      }));
+    }
+    if ($("house-quick-reward")) {
+      const quickReward = quickTasks.reduce((sum, task) => sum + task.reward, 0);
+      $("house-quick-reward").textContent = `+${quickReward}`;
+    }
+    if ($("house-start-quick")) {
+      $("house-start-quick").disabled = !quickTasks.length || Boolean(state.houseCoach?.activeTask);
+      $("house-start-quick").textContent = quickTasks.length ? "Commencer" : "Tout est terminé";
+    }
 
     if (roomGrid) {
       roomGrid.replaceChildren(...houseRooms.map((room) => {
@@ -685,31 +793,65 @@
     if (detail) detail.classList.toggle("hidden", !selectedRoom);
     if (detailTitle && selectedRoom) detailTitle.textContent = `${selectedRoom.icon} ${selectedRoom.label}`;
     if (taskList && selectedRoom) {
-      taskList.replaceChildren(...selectedRoom.tasks.map((task) => {
-        const completed = isHouseTaskCompleted(task.id);
+      const availableTasks = selectedRoom.tasks.filter((task) => !isHouseTaskCompleted(task.id));
+      taskList.replaceChildren(...availableTasks.map((task) => {
+        const row = document.createElement("article");
+        row.className = "house-task-row";
         const button = document.createElement("button");
         button.type = "button";
         button.className = "house-task-button";
         button.dataset.houseTask = task.id;
-        button.disabled = completed;
         button.innerHTML = `
           <span>
             <strong>${task.label}</strong>
             ${task.season ? `<em>${task.season}</em>` : ""}
           </span>
-          <b>${completed ? "Terminé" : `+${task.reward}`}</b>
+          <b>+${task.reward}</b>
         `;
-        return button;
+        const plan = document.createElement("div");
+        plan.className = "house-plan-row";
+        plan.innerHTML = `
+          <input type="date" value="${todayKey()}" data-house-plan-date="${task.id}" aria-label="Date pour ${task.label}">
+          <button class="secondary" type="button" data-house-plan-task="${task.id}">Planifier</button>
+        `;
+        row.append(button, plan);
+        return row;
       }));
+      if (!availableTasks.length) {
+        const empty = document.createElement("p");
+        empty.className = "small-muted";
+        empty.textContent = "Toutes les tâches de cette pièce sont terminées aujourd'hui.";
+        taskList.replaceChildren(empty);
+      }
     } else if (taskList) {
       taskList.replaceChildren();
     }
 
+    if (completedSection && completedList && selectedRoom) {
+      const completedTasks = selectedRoom.tasks.filter((task) => isHouseTaskCompleted(task.id));
+      completedSection.classList.toggle("hidden", !completedTasks.length);
+      completedList.replaceChildren(...completedTasks.map((task) => {
+        const item = document.createElement("p");
+        item.innerHTML = `<span>✓ ${task.label}</span><strong>+${task.reward}</strong>`;
+        return item;
+      }));
+    } else {
+      completedSection?.classList.add("hidden");
+      completedList?.replaceChildren();
+    }
+
     if (activePanel) activePanel.classList.toggle("hidden", !activeTask);
     if (activeTask) {
+      const activeState = state.houseCoach.activeTask;
+      const remainingMs = activeHouseTaskRemaining();
+      const durationMs = activeState.durationMs || houseTaskDurationMs(activeTask);
+      const ratio = durationMs ? Math.max(0, Math.min(1, remainingMs / durationMs)) : 0;
       $("house-active-task-name").textContent = activeTask.label;
       $("house-active-task-room").textContent = `${activeTask.roomIcon} ${activeTask.roomLabel}`;
       $("house-active-task-reward").textContent = `+${activeTask.reward} jetons`;
+      $("house-timer-display").textContent = formatRemaining(remainingMs);
+      $("house-timer-status").textContent = activeState.status === "done" ? "Temps écoulé" : "Mission en cours";
+      $("house-timer-progress").style.width = `${ratio * 100}%`;
     }
   }
 
@@ -731,17 +873,71 @@
   function selectHouseTask(taskId) {
     const task = houseTaskById(taskId);
     if (!task || isHouseTaskCompleted(task.id)) return;
-    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: task.roomId, activeTask: { id: task.id } };
+    const now = Date.now();
+    const durationMs = houseTaskDurationMs(task);
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      selectedRoom: task.roomId,
+      activeTask: { id: task.id, startedAt: now, endsAt: now + durationMs, durationMs, status: "running" }
+    };
     state.selectedDomain = "house";
     saveState();
     renderHouseCoach();
+    startHouseTaskTicker();
     $("house-active-mission")?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function cancelHouseTask() {
     state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), activeTask: null };
+    stopHouseTaskTicker();
     saveState();
     renderHouseCoach();
+  }
+
+  function startHouseQuickMission() {
+    const tasks = houseQuickTasks();
+    if (!tasks.length) {
+      showToast("Tout est terminé pour aujourd'hui.");
+      return;
+    }
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0 }
+    };
+    selectHouseTask(tasks[0].id);
+  }
+
+  function planHouseTask(taskId) {
+    const task = houseTaskById(taskId);
+    if (!task) return;
+    const date = document.querySelector(`[data-house-plan-date="${taskId}"]`)?.value || todayKey();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      showToast("Choisis une date valide.");
+      return;
+    }
+    const sourceId = `house-plan-${task.id}-${date}`;
+    const existing = state.agenda.find((item) => item.sourceId === sourceId);
+    const agendaItem = {
+      id: existing?.id || sourceId,
+      sourceId,
+      date,
+      type: "Maison",
+      domain: "Maison",
+      text: task.label,
+      room: task.roomLabel,
+      tokens: task.reward,
+      time: "",
+      reminder: "none",
+      repeat: "",
+      notified: false,
+      done: false
+    };
+    state.agenda = existing
+      ? state.agenda.map((item) => item.sourceId === sourceId ? { ...item, ...agendaItem, done: item.done } : item)
+      : [...state.agenda, agendaItem].slice(-120);
+    saveState();
+    renderAgenda();
+    showToast("Tâche Maison planifiée dans l'Agenda.");
   }
 
   function showHouseCompleteModal(task) {
@@ -755,6 +951,11 @@
 
   function closeHouseCompleteModal() {
     $("house-complete-modal")?.classList.add("hidden");
+    const quick = state.houseCoach?.quickMission;
+    const nextTaskId = Array.isArray(quick?.taskIds) ? quick.taskIds[quick.currentIndex || 0] : "";
+    if (nextTaskId && !state.houseCoach?.activeTask && !isHouseTaskCompleted(nextTaskId)) {
+      selectHouseTask(nextTaskId);
+    }
   }
 
   function completeHouseTask() {
@@ -769,6 +970,7 @@
       ...(state.houseCoach || defaultState.houseCoach),
       activeTask: null,
       selectedRoom: task.roomId,
+      quickMission: state.houseCoach?.quickMission || null,
       completed: {
         ...(state.houseCoach?.completed || {}),
         [date]: [...completed, task.id]
@@ -785,11 +987,26 @@
       domain: "house"
     }, ...state.history].slice(0, 50);
     saveState();
+    stopHouseTaskTicker();
     renderHouseCoach();
     renderDomainProgress();
     renderShop();
     renderHistoryList();
+    renderAgenda();
     showHouseCompleteModal(task);
+    showToast(houseCompletionMessage(task));
+    const quick = state.houseCoach?.quickMission;
+    if (quick?.taskIds?.length) {
+      const nextIndex = (quick.currentIndex || 0) + 1;
+      const nextTaskId = quick.taskIds[nextIndex];
+      if (nextTaskId && !isHouseTaskCompleted(nextTaskId)) {
+        state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), quickMission: { ...quick, currentIndex: nextIndex } };
+        saveState();
+      } else {
+        state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), quickMission: null };
+        saveState();
+      }
+    }
   }
 
   function currentTrainingProgram() {
@@ -2779,35 +2996,7 @@
   }
 
   function renderAgendaFinanceUpcoming() {
-    const target = $("agenda-finance-upcoming");
-    if (!target) return;
-    const items = budgetFinanceOccurrences30Days();
-    if (!items.length) {
-      const empty = document.createElement("p");
-      empty.className = "budget-empty";
-      empty.textContent = "Aucun revenu ou paiement prévu dans les 30 prochains jours.";
-      target.replaceChildren(empty);
-      return;
-    }
-    target.replaceChildren(...items.map((item) => {
-      const row = document.createElement("article");
-      row.className = "budget-item budget-event-item";
-      const copy = document.createElement("div");
-      const day = document.createElement("p");
-      day.className = "budget-event-day";
-      day.textContent = budgetWeekdayText(item.date);
-      const title = document.createElement("strong");
-      title.textContent = `${budgetEntryIcon(item)} ${item.name}`;
-      const meta = document.createElement("p");
-      meta.className = "small-muted";
-      meta.textContent = budgetDateText(item.date);
-      copy.append(day, title, meta);
-      const amount = document.createElement("div");
-      amount.className = "budget-amount";
-      amount.textContent = money(item.amount);
-      row.append(copy, amount);
-      return row;
-    }));
+    renderAgendaPlanningList();
   }
 
   function addBudgetIncome() {
@@ -2881,7 +3070,7 @@
   }
 
   function agendaItemsForDate(dateValue) {
-    return state.agenda.filter((item) => item.date === dateValue);
+    return agendaEventsForRange(dateValue, dateValue);
   }
 
   function isCoherentReward(label) {
@@ -2906,6 +3095,137 @@
       "60": "Rappel 1 h avant"
     };
     return labels[`${reminder}`] || labels.none;
+  }
+
+  function agendaRepeatText(value) {
+    return budgetRepeatText(value);
+  }
+
+  function agendaViewRange() {
+    const start = todayKey();
+    const view = ["today", "week", "next30"].includes(state.agendaView) ? state.agendaView : "today";
+    if (view === "week") return { view, start, end: addDays(start, 6), title: "Cette semaine" };
+    if (view === "next30") return { view, start, end: addDays(start, 30), title: "30 prochains jours" };
+    return { view: "today", start, end: start, title: "Aujourd'hui" };
+  }
+
+  function agendaManualOccurrencesForRange(start, end) {
+    return (state.agenda || [])
+      .filter((item) => !(item.sourceId || "").startsWith("budget-"))
+      .flatMap((item) => budgetOccurrenceDatesBetween(item, start, end).map((date) => ({
+        id: `${item.id}-${date}`,
+        sourceId: item.sourceId || item.id,
+        date,
+        domain: item.domain || item.type || "Agenda",
+        type: item.type || "Agenda",
+        title: item.text || item.title || "Événement",
+        amount: Number(item.amount) || 0,
+        tokens: Number(item.tokens) || 0,
+        repeat: item.repeat || "",
+        time: item.time || "",
+        reminder: item.reminder || "none",
+        done: Boolean(item.done),
+        source: "agenda"
+      })));
+  }
+
+  function agendaBudgetOccurrencesForRange(start, end) {
+    return budgetFinanceOccurrencesForRange(start, end).map((item) => ({
+      id: `budget-${item.kind}-${item.id}-${item.date}`,
+      sourceId: `budget-${item.kind}-${item.id}`,
+      date: item.date,
+      domain: "Budget",
+      type: item.kind === "income" ? "Revenu prévu" : "Paiement prévu",
+      title: item.name,
+      amount: Number(item.amount) || 0,
+      tokens: 0,
+      repeat: item.repeat || "",
+      icon: budgetEntryIcon(item),
+      source: "budget",
+      financeKind: item.kind
+    }));
+  }
+
+  function agendaEventsForRange(start, end) {
+    return [
+      ...agendaBudgetOccurrencesForRange(start, end),
+      ...agendaManualOccurrencesForRange(start, end)
+    ].sort((a, b) => `${a.date} ${a.time || ""}`.localeCompare(`${b.date} ${b.time || ""}`));
+  }
+
+  function agendaEventDomainIcon(event) {
+    if (event.icon) return event.icon;
+    const icons = {
+      Budget: "💰",
+      Maison: "🏠",
+      "Entraînement": "💪",
+      Objectif: "🎯",
+      Agenda: "📅"
+    };
+    return icons[event.domain] || icons[event.type] || "📅";
+  }
+
+  function renderAgendaPlanningList() {
+    const target = $("agenda-planning-list");
+    if (!target) return;
+    const range = agendaViewRange();
+    const items = agendaEventsForRange(range.start, range.end);
+    const title = $("agenda-planning-title");
+    const count = $("agenda-planning-count");
+    if (title) title.textContent = range.title;
+    if (count) count.textContent = `${items.length} événement${items.length > 1 ? "s" : ""}`;
+    document.querySelectorAll("[data-agenda-view]").forEach((button) => {
+      const isActive = button.dataset.agendaView === range.view;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+    if (!items.length) {
+      const empty = document.createElement("p");
+      empty.className = "small-muted";
+      empty.textContent = "Rien de prévu dans cette vue.";
+      target.replaceChildren(empty);
+      return;
+    }
+    const nodes = [];
+    let currentDate = "";
+    items.forEach((event) => {
+      if (event.date !== currentDate) {
+        currentDate = event.date;
+        const day = document.createElement("h3");
+        day.className = "agenda-date-group";
+        day.textContent = agendaDateLabel(event.date);
+        nodes.push(day);
+      }
+      const row = document.createElement("article");
+      row.className = "agenda-plan-item";
+      row.style.borderLeftColor = agendaTypeColors[event.domain] || agendaTypeColors[event.type] || "#e8eddc";
+      const main = document.createElement("div");
+      const meta = document.createElement("p");
+      meta.className = "agenda-meta";
+      const details = [event.domain || event.type, event.type];
+      if (event.repeat) details.push(agendaRepeatText(event.repeat));
+      if (event.time) details.push(event.time);
+      meta.textContent = details.filter(Boolean).join(" · ");
+      const titleNode = document.createElement("strong");
+      titleNode.textContent = `${agendaEventDomainIcon(event)} ${event.title}`;
+      const chips = document.createElement("div");
+      chips.className = "agenda-plan-chips";
+      if (event.amount) {
+        const chip = document.createElement("span");
+        chip.textContent = money(event.amount);
+        chips.append(chip);
+      }
+      if (event.tokens) {
+        const chip = document.createElement("span");
+        chip.textContent = `+${event.tokens} jetons`;
+        chips.append(chip);
+      }
+      main.append(meta, titleNode);
+      if (chips.childElementCount) main.append(chips);
+      row.append(main);
+      nodes.push(row);
+    });
+    target.replaceChildren(...nodes);
   }
 
   function agendaMonthLabel(dateValue) {
@@ -2954,17 +3274,15 @@
 
   function renderAgenda() {
     const list = $("agenda-list");
-    if (!list) return;
     const selectedDate = selectedAgendaDate();
     state.agendaDate = selectedDate;
     const agendaDateInput = $("agenda-date");
-    const dayLabel = $("agenda-day-label");
     const monthLabel = $("agenda-month-label");
     if (agendaDateInput) agendaDateInput.value = selectedDate;
-    if (dayLabel) dayLabel.textContent = agendaDateLabel(selectedDate);
     if (monthLabel) monthLabel.textContent = agendaMonthLabel(selectedDate);
     renderAgendaCalendar(selectedDate);
     renderAgendaFinanceUpcoming();
+    if (!list) return;
     const items = agendaItemsForSelectedDate();
     const count = $("agenda-count");
     if (count) count.textContent = `${items.length} item${items.length > 1 ? "s" : ""}`;
@@ -3034,6 +3352,7 @@
       text,
       time: $("agenda-time").value,
       reminder,
+      repeat: $("agenda-repeat")?.value || "",
       notified: false,
       done: false
     };
@@ -3042,6 +3361,7 @@
     textInput.value = "";
     $("agenda-time").value = "";
     $("agenda-reminder").value = "none";
+    if ($("agenda-repeat")) $("agenda-repeat").value = "";
     closeAgendaForm();
     renderAgenda();
     scheduleAgendaReminders();
@@ -3906,6 +4226,11 @@
       if (button) selectHouseRoom(button.dataset.houseRoom);
     });
     $("house-task-list")?.addEventListener("click", (event) => {
+      const planButton = event.target.closest("[data-house-plan-task]");
+      if (planButton) {
+        planHouseTask(planButton.dataset.housePlanTask);
+        return;
+      }
       const button = event.target.closest("[data-house-task]");
       if (button) selectHouseTask(button.dataset.houseTask);
     });
@@ -3913,6 +4238,7 @@
     bindById("house-complete-task", "click", completeHouseTask);
     bindById("house-cancel-task", "click", cancelHouseTask);
     bindById("house-complete-continue", "click", closeHouseCompleteModal);
+    bindById("house-start-quick", "click", startHouseQuickMission);
     bindById("close-selected-domain", "click", closeSelectedDomain);
     bindById("add-selected-goal", "click", () => addCustomGoal($("add-selected-goal").dataset.addGoal));
     document.querySelectorAll("[data-toggle-missions]").forEach((button) => {
@@ -3977,6 +4303,13 @@
     $("agenda-today")?.addEventListener("click", () => setAgendaDate(todayKey()));
     $("agenda-prev-month")?.addEventListener("click", () => changeAgendaMonth(-1));
     $("agenda-next-month")?.addEventListener("click", () => changeAgendaMonth(1));
+    document.querySelectorAll("[data-agenda-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.agendaView = button.dataset.agendaView;
+        saveState();
+        renderAgenda();
+      });
+    });
     $("open-agenda-form")?.addEventListener("click", openAgendaForm);
     $("close-agenda-form")?.addEventListener("click", closeAgendaForm);
     $("save-shop-reward")?.addEventListener("click", saveShopReward);
@@ -4070,6 +4403,7 @@
     renderRewards();
     renderShop();
     renderHouseCoach();
+    resumeHouseTaskTimer();
     renderTrainingProgram();
     renderSelectedDomain();
     renderDomainProgress();
@@ -4090,6 +4424,7 @@
     renderGoalQueue();
     renderTrainingProgram();
     renderChallengeTimer();
+    resumeHouseTaskTimer();
   }
 
   bindInstallEvents();

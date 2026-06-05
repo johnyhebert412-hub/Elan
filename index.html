@@ -117,6 +117,17 @@
           <article id="domain-house" class="card domain-panel hidden">
             <div class="card-header"><h2>Maison</h2><button class="text-button" data-close-domain>Changer</button></div>
             <p class="muted">Coach d'entretien simple pour garder la maison en ordre.</p>
+            <section class="house-quick-mission" aria-labelledby="house-quick-title">
+              <div class="card-header compact-header">
+                <div>
+                  <p class="step">Raccourci</p>
+                  <h3 id="house-quick-title">⚡ Mission rapide</h3>
+                </div>
+                <strong id="house-quick-reward">+0</strong>
+              </div>
+              <div id="house-quick-list" class="house-quick-list"></div>
+              <button id="house-start-quick" class="primary wide" type="button">Commencer</button>
+            </section>
             <section class="house-dashboard" aria-labelledby="house-dashboard-title">
               <div class="card-header">
                 <div>
@@ -145,12 +156,21 @@
                 <button id="house-back-rooms" class="text-button" type="button">Retour</button>
               </div>
               <div id="house-task-list" class="house-task-list"></div>
+              <div id="house-completed-section" class="house-completed-section hidden">
+                <p class="domain-section-label">Terminés</p>
+                <div id="house-completed-list" class="house-completed-list"></div>
+              </div>
             </section>
             <section id="house-active-mission" class="house-active-mission hidden" aria-live="polite">
               <p class="step">Mission active</p>
               <h3 id="house-active-task-name">Faire la vaisselle</h3>
               <p id="house-active-task-room" class="small-muted">Cuisine</p>
               <p id="house-active-task-reward" class="house-active-reward">+5 jetons</p>
+              <div class="house-mission-timer" aria-label="Timer de mission">
+                <span id="house-timer-status">Mission en cours</span>
+                <strong id="house-timer-display">02:00</strong>
+                <i class="house-timer-track" aria-hidden="true"><b id="house-timer-progress"></b></i>
+              </div>
               <div class="button-row">
                 <button id="house-complete-task" class="primary" type="button">Terminé</button>
                 <button id="house-cancel-task" class="secondary" type="button">Retour</button>
@@ -363,22 +383,17 @@
           <article class="card">
             <div class="card-header">
               <div>
-                <p class="step">Jour choisi</p>
-                <h2 id="agenda-day-label">Aujourd'hui</h2>
+                <p class="step">Planification</p>
+                <h2 id="agenda-planning-title">Aujourd'hui</h2>
               </div>
-              <span id="agenda-count" class="small-muted">0 item</span>
+              <span id="agenda-planning-count" class="small-muted">0 événement</span>
             </div>
-            <div id="agenda-list" class="agenda-list"></div>
-          </article>
-
-          <article class="card">
-            <div class="card-header">
-              <div>
-                <p class="step">Budget</p>
-                <h2>À venir — 30 jours</h2>
-              </div>
+            <div class="agenda-view-tabs" role="tablist" aria-label="Vue agenda">
+              <button class="agenda-view-tab" type="button" data-agenda-view="today">Aujourd'hui</button>
+              <button class="agenda-view-tab" type="button" data-agenda-view="week">Semaine</button>
+              <button class="agenda-view-tab" type="button" data-agenda-view="next30">30 prochains jours</button>
             </div>
-            <div id="agenda-finance-upcoming" class="agenda-finance-upcoming"></div>
+            <div id="agenda-planning-list" class="agenda-planning-list"></div>
           </article>
 
           <article id="agenda-form-card" class="card agenda-card hidden">
@@ -398,6 +413,9 @@
                   <option value="Habitude">Habitude</option>
                   <option value="Bloc de temps">Bloc de temps</option>
                   <option value="Finance">Finance</option>
+                  <option value="Maison">Maison</option>
+                  <option value="Entraînement">Entraînement</option>
+                  <option value="Objectif">Objectif</option>
                 </select>
               </label>
               <label>
@@ -417,6 +435,15 @@
                   <option value="15">15 minutes avant</option>
                   <option value="30">30 minutes avant</option>
                   <option value="60">1 heure avant</option>
+                </select>
+              </label>
+              <label>
+                Récurrence
+                <select id="agenda-repeat">
+                  <option value="">Unique</option>
+                  <option value="weekly">Hebdomadaire</option>
+                  <option value="biweekly">Aux 2 semaines</option>
+                  <option value="monthly">Mensuel</option>
                 </select>
               </label>
               <button id="save-agenda-item" class="primary wide" type="button">Ajouter à l'agenda</button>

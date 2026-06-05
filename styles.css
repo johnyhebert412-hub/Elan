@@ -277,6 +277,49 @@ p { line-height: 1.4; }
   padding: 14px;
 }
 
+.house-quick-mission {
+  background: #fff9e8;
+  border: 1px solid #eadfb8;
+  border-radius: 18px;
+  margin-top: 16px;
+  padding: 14px;
+}
+
+.house-quick-mission h3 {
+  color: var(--ink);
+  font-size: 1.08rem;
+  margin: 0;
+}
+
+#house-quick-reward {
+  color: var(--brand);
+  font-size: 1rem;
+}
+
+.house-quick-list {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0;
+}
+
+.house-quick-list p,
+.house-completed-list p {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink);
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 9px 10px;
+}
+
+.house-quick-list strong,
+.house-completed-list strong {
+  color: var(--brand);
+}
+
 .house-dashboard h3,
 .house-room-detail h3,
 .house-active-mission h3 {
@@ -398,16 +441,25 @@ p { line-height: 1.4; }
   margin-top: 12px;
 }
 
+.house-task-row {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+}
+
 .house-task-button {
   align-items: center;
-  background: var(--soft);
+  background: transparent;
   border: 1px solid transparent;
-  border-radius: 14px;
+  border-radius: 10px;
   color: var(--ink);
   display: flex;
   justify-content: space-between;
   min-height: 58px;
-  padding: 12px;
+  padding: 8px;
   text-align: left;
 }
 
@@ -436,6 +488,21 @@ p { line-height: 1.4; }
   font-weight: 800;
 }
 
+.house-plan-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.house-plan-row input {
+  min-height: 42px;
+}
+
+.house-plan-row button {
+  min-height: 42px;
+  padding-inline: 12px;
+}
+
 .house-active-mission {
   background: #eef7f2;
   border-color: var(--brand-light);
@@ -443,6 +510,61 @@ p { line-height: 1.4; }
 
 .house-active-mission .button-row {
   margin-top: 12px;
+}
+
+.house-mission-timer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.house-mission-timer span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.house-mission-timer strong {
+  color: var(--brand);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.house-timer-track {
+  background: rgba(22, 84, 70, 0.14);
+  border-radius: 999px;
+  display: block;
+  height: 8px;
+  overflow: hidden;
+}
+
+.house-timer-track b {
+  background: var(--brand);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  transition: width 220ms ease;
+  width: 100%;
+}
+
+.house-completed-section {
+  margin-top: 14px;
+}
+
+.house-completed-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.house-completed-list p {
+  background: #eef7f2;
+  border-color: var(--brand-light);
 }
 
 .house-complete-modal {
@@ -1335,10 +1457,81 @@ input[type="date"], input[type="time"], input[type="text"], select {
   gap: 6px;
 }
 
+.agenda-view-tabs {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 12px 0;
+  padding: 5px;
+}
+
+.agenda-view-tab {
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  min-height: 42px;
+  padding: 8px 6px;
+}
+
+.agenda-view-tab.active {
+  background: var(--surface);
+  box-shadow: 0 6px 14px rgba(25, 38, 32, 0.08);
+  color: var(--brand);
+}
+
 .agenda-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.agenda-planning-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.agenda-date-group {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 8px 2px 0;
+  text-transform: capitalize;
+}
+
+.agenda-plan-item {
+  background: var(--soft);
+  border-left: 5px solid #e8eddc;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.agenda-plan-item strong {
+  color: var(--ink);
+  display: block;
+  font-size: 0.98rem;
+}
+
+.agenda-plan-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.agenda-plan-chips span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--brand);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 8px;
 }
 
 .agenda-item {
