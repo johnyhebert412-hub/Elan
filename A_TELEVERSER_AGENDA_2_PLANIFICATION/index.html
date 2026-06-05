@@ -1,0 +1,691 @@
+﻿<!doctype html>
+<html lang="fr-CA">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#165446">
+    <title>Élan - Coach du quotidien</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="topbar-main">
+          <div class="topbar-brand">
+            <p class="eyebrow">Coach du quotidien</p>
+            <h1>Élan</h1>
+          </div>
+          <button class="calm-badge" id="header-coin-badge" aria-label="Solde de pièces — ouvrir la boutique" data-view-button="shop">
+            <span id="header-coin-balance">🪙 0</span>
+          </button>
+        </div>
+        <nav class="top-actions" aria-label="Barre supérieure">
+          <button id="checkin-button" class="top-action-button" type="button" aria-controls="checkin-panel" aria-expanded="false" onclick="if (window.elanOpenHistory) { window.elanOpenHistory(event); } else { event.preventDefault(); document.getElementById('checkin-panel').classList.remove('hidden'); this.setAttribute('aria-expanded', 'true'); }">Historique</button>
+          <button class="top-action-button" data-view-button="settings" type="button">Paramètres</button>
+        </nav>
+      </header>
+
+      <main>
+        <section id="view-home" class="view active" aria-labelledby="home-title">
+          <article id="home-hero" class="hero action-hero">
+            <p class="step">Accès rapide</p>
+            <h2 id="home-title">Urgence mentale</h2>
+            <button id="next-action" class="primary action-button">Urgence mentale</button>
+            <button id="choose-domain-button" class="hero-link">Personnaliser doucement</button>
+          </article>
+
+          <article id="emergency-card" class="emergency-card hidden" aria-live="polite">
+            <p class="step">Mode secours</p>
+            <h2 id="emergency-action">Prends 3 grandes respirations</h2>
+            <button id="emergency-done" class="primary action-button">C'est fait</button>
+            <button id="emergency-other" class="text-button">Autre action</button>
+          </article>
+
+          <article id="domain-choice-card" class="domain-choice-card" aria-labelledby="domain-choice-title">
+            <p class="step">Choix simple</p>
+            <h2 id="domain-choice-title">Que veux-tu faire ?</h2>
+            <p class="muted">Choisis un domaine</p>
+            <div class="domain-choice-grid">
+              <button data-open-domain="house">🏠 Maison</button>
+              <button data-open-domain="training">🏃 Entraînement</button>
+              <button data-open-domain="budget">💵 Budget</button>
+            </div>
+          </article>
+
+          <article id="selected-domain-card" class="selected-domain-card hidden" aria-live="polite">
+            <div class="card-header">
+              <div>
+                <p class="step">Missions</p>
+                <h2 id="selected-domain-title">Domaine</h2>
+              </div>
+              <button id="close-selected-domain" class="domain-back-button" type="button">← Domaines</button>
+            </div>
+            <p id="selected-domain-subtitle" class="muted">Choisis une action.</p>
+
+            <div id="selected-section" class="hidden">
+              <p class="domain-section-label">✓ Objectifs sélectionnés</p>
+              <div id="selected-domain-missions" class="task-list selected-missions-list"></div>
+            </div>
+
+            <div id="suggestions-section">
+              <p class="domain-section-label" id="suggestions-label">💡 Suggestions</p>
+              <div id="domain-suggestions" class="suggestions-list"></div>
+              <p id="suggestions-empty-state" class="suggestions-empty hidden">Tous les objectifs sont sélectionnés !</p>
+            </div>
+
+            <button id="add-selected-goal" class="add-small hidden" type="button">+ Ajouter un objectif</button>
+            <div id="goal-selection-inline" class="goal-selection-inline hidden" aria-live="polite">
+              <p id="goal-selection-inline-summary" class="goal-selection-summary">0 objectif sélectionné</p>
+              <button id="start-goal-queue-inline" class="primary" type="button">Commencer la série</button>
+            </div>
+            <div id="domain-completed-panel" class="domain-completed-panel hidden" aria-live="polite">
+              <p class="domain-completed-icon" aria-hidden="true">✓</p>
+              <p class="domain-completed-msg" id="domain-completed-msg">Bravo, domaine complété pour maintenant.</p>
+              <div class="domain-completed-actions">
+                <button id="domain-restart" class="secondary" type="button">Recommencer ce domaine</button>
+                <button id="domain-change" class="primary" type="button">Choisir un autre domaine</button>
+              </div>
+            </div>
+          </article>
+
+          <article id="checkin-history-card" class="checkin-history-card hidden" aria-live="polite">
+            <div class="card-header">
+              <div>
+                <p class="step">Check-ins</p>
+                <h2>Petit fil de journée</h2>
+              </div>
+              <span id="checkin-stats" class="small-muted">0 aujourd'hui</span>
+            </div>
+            <div id="checkin-history" class="checkin-history"></div>
+          </article>
+        </section>
+
+        <section id="view-domains" class="view" aria-labelledby="domains-title">
+          <div class="section-heading">
+            <p class="step">Domaines</p>
+            <h2 id="domains-title">Choisis ton besoin</h2>
+          </div>
+          <div class="domain-grid">
+            <button type="button" class="domain-tile domain-house" data-open-domain="house" aria-controls="domain-house"><strong>Maison</strong><span>Soulagement</span><em id="count-house">À commencer</em><span class="domain-meter"><i id="progress-house"></i></span></button>
+            <button type="button" class="domain-tile domain-training" data-open-domain="training" aria-controls="domain-training"><strong>Entraînement</strong><span>Séance guidée</span><em>Type + niveau</em><span class="domain-meter"><i></i></span></button>
+            <button type="button" class="domain-tile domain-budget" data-open-domain="budget" aria-controls="domain-budget"><strong>Budget</strong><span>Prévision simple</span><em>Agenda financier</em><span class="domain-meter"><i></i></span></button>
+          </div>
+
+          <article id="domain-house" class="card domain-panel hidden">
+            <div class="card-header"><h2>Maison</h2><button class="text-button" data-close-domain>Changer</button></div>
+            <p class="muted">Coach d'entretien simple pour garder la maison en ordre.</p>
+            <section class="house-dashboard" aria-labelledby="house-dashboard-title">
+              <div class="card-header">
+                <div>
+                  <p class="step">Aujourd'hui</p>
+                  <h3 id="house-dashboard-title">Progression Maison</h3>
+                </div>
+                <strong id="house-dashboard-percent">0 %</strong>
+              </div>
+              <div class="house-progress-track" aria-hidden="true"><i id="house-dashboard-progress"></i></div>
+              <div class="house-stats">
+                <p><span>Missions terminées</span><strong id="house-done-count">0</strong></p>
+                <p><span>Jetons gagnés</span><strong id="house-earned-tokens">0</strong></p>
+                <p><span>Jetons restants</span><strong id="house-remaining-tokens">0</strong></p>
+              </div>
+            </section>
+            <section id="house-room-overview">
+              <p class="domain-section-label">Pièces</p>
+              <div id="house-room-grid" class="house-room-grid"></div>
+            </section>
+            <section id="house-room-detail" class="house-room-detail hidden" aria-live="polite">
+              <div class="card-header">
+                <div>
+                  <p class="step">Pièce sélectionnée</p>
+                  <h3 id="house-room-title">Cuisine</h3>
+                </div>
+                <button id="house-back-rooms" class="text-button" type="button">Retour</button>
+              </div>
+              <div id="house-task-list" class="house-task-list"></div>
+            </section>
+            <section id="house-active-mission" class="house-active-mission hidden" aria-live="polite">
+              <p class="step">Mission active</p>
+              <h3 id="house-active-task-name">Faire la vaisselle</h3>
+              <p id="house-active-task-room" class="small-muted">Cuisine</p>
+              <p id="house-active-task-reward" class="house-active-reward">+5 jetons</p>
+              <div class="button-row">
+                <button id="house-complete-task" class="primary" type="button">Terminé</button>
+                <button id="house-cancel-task" class="secondary" type="button">Retour</button>
+              </div>
+            </section>
+          </article>
+
+          <article id="domain-training" class="card domain-panel training-panel hidden">
+            <div class="card-header"><h2>Entraînement</h2><button class="text-button" data-close-domain>Changer</button></div>
+            <p class="muted">Choisis un rythme simple. L'objectif est de bouger sans pression.</p>
+
+            <div class="training-control">
+              <p class="domain-section-label">Mode</p>
+              <div class="training-mode-row" role="group" aria-label="Mode d'entraînement">
+                <button type="button" data-training-mode="quick">Programme rapide</button>
+                <button type="button" data-training-mode="custom">Créer ton programme</button>
+              </div>
+            </div>
+
+            <div id="training-quick-builder" class="training-builder">
+            <div class="training-control">
+              <p class="domain-section-label">Type d'entraînement</p>
+              <div class="training-choice-row" role="group" aria-label="Type d'entraînement">
+                <button type="button" data-training-type="cardio">Cardio</button>
+                <button type="button" data-training-type="force">Force</button>
+                <button type="button" data-training-type="endurance">Endurance</button>
+              </div>
+            </div>
+
+            <div class="training-control">
+              <p class="domain-section-label">Niveau</p>
+              <div class="training-choice-row" role="group" aria-label="Niveau d'entraînement">
+                <button type="button" data-training-level="beginner">Débutant</button>
+                <button type="button" data-training-level="intermediate">Intermédiaire</button>
+                <button type="button" data-training-level="advanced">Avancé</button>
+              </div>
+            </div>
+            </div>
+
+            <section id="training-custom-builder" class="training-custom-builder hidden" aria-labelledby="training-custom-title">
+              <p id="training-custom-title" class="domain-section-label">Ton programme</p>
+              <div class="training-custom-form">
+                <input id="training-custom-name" type="text" placeholder="Nom de l'exercice" autocomplete="off">
+                <input id="training-custom-amount" type="text" placeholder="Ex. 10 répétitions ou 45 s" autocomplete="off">
+                <button id="add-training-exercise" class="secondary" type="button">Ajouter</button>
+              </div>
+              <ol id="training-custom-list" class="training-custom-list"></ol>
+              <p class="small-muted">Ajoute au moins un exercice. L'ordre de la liste sera l'ordre de ta séance.</p>
+            </section>
+
+            <section id="training-program-card" class="training-program-card" aria-labelledby="training-program-title">
+              <div class="card-header">
+                <div>
+                  <p class="step">Programme proposé</p>
+                  <h3 id="training-program-title">Cardio débutant</h3>
+                </div>
+                <span id="training-intensity" class="training-badge">Douce</span>
+              </div>
+              <section id="training-active-step" class="training-active-step hidden" aria-live="polite" tabindex="-1">
+                <p id="training-step-count" class="goal-queue-active-step">Exercice 1/3</p>
+                <h4 id="training-current-step">Marche tranquille</h4>
+                <p id="training-remaining-steps" class="training-remaining-steps">Étapes restantes : 2</p>
+                <div id="training-step-timer" class="training-step-timer hidden" aria-live="polite">
+                  <span>Temps restant :</span>
+                  <strong id="training-timer-display">00:00</strong>
+                  <p id="training-timer-status" class="small-muted"></p>
+                </div>
+                <p id="training-current-amount" class="training-current-amount">5 min</p>
+                <div class="training-progress-track" aria-hidden="true"><i id="training-progress-fill"></i></div>
+                <div class="training-session-actions">
+                  <button id="complete-training-step" class="primary" type="button">Terminé</button>
+                  <button id="skip-training-step" class="secondary" type="button">Passer</button>
+                  <button id="stop-training-session" class="secondary" type="button">Arrêter</button>
+                </div>
+              </section>
+              <section id="training-countdown-screen" class="training-countdown-screen hidden" aria-live="assertive">
+                <p id="training-countdown-step" class="goal-queue-active-step">Exercice 1/3</p>
+                <h4 id="training-countdown-name">Exercice</h4>
+                <p id="training-countdown-amount" class="training-current-amount">30 secondes</p>
+                <div id="training-countdown-motion" class="training-motion training-motion-cardio" aria-hidden="true">
+                  <span id="training-countdown-icon" class="training-motion-icon">⚡</span>
+                </div>
+                <strong id="training-countdown-display">3</strong>
+              </section>
+              <div id="training-session-status" class="training-session-status hidden" aria-live="polite">Séance lancée. Une étape à la fois.</div>
+              <ul id="training-steps" class="training-steps"></ul>
+              <div class="training-meta">
+                <p><span>Durée estimée</span><strong id="training-duration">10-12 min</strong></p>
+                <p><span>Intensité</span><strong id="training-intensity-text">Douce</strong></p>
+              </div>
+              <p id="training-note" class="small-muted">Commence petit. Tu peux ralentir ou arrêter si ton corps te le demande.</p>
+              <section id="training-complete-panel" class="training-complete-panel hidden" aria-live="polite" aria-modal="true" role="dialog" tabindex="-1">
+                <div class="training-complete-card">
+                  <p class="domain-completed-icon training-complete-icon" aria-hidden="true">✓</p>
+                  <h4>Programme terminé</h4>
+                  <div id="training-complete-reward" class="training-complete-reward" aria-label="Jetons gagnés"></div>
+                  <div class="button-row training-complete-actions">
+                    <button id="training-complete-continue" class="primary" type="button">Continuer</button>
+                    <button id="training-complete-shop" class="secondary" type="button">Aller à la boutique</button>
+                  </div>
+                </div>
+              </section>
+              <div class="button-row">
+                <button id="start-training-session" class="primary" type="button">Commencer</button>
+                <button id="reset-training-session" class="secondary" type="button">Changer</button>
+              </div>
+            </section>
+          </article>
+
+          <article id="domain-budget" class="card domain-panel budget-panel hidden">
+            <div class="card-header"><h2>Budget</h2><button class="text-button" data-close-domain type="button">Changer</button></div>
+            <p class="muted">Planificateur financier relié à ton agenda.</p>
+
+            <section class="budget-summary-grid" aria-label="Résumé du budget">
+              <div class="budget-summary-card">
+                <span>Entrées prévues ce mois-ci</span>
+                <strong id="budget-month-income">0 $</strong>
+              </div>
+              <div class="budget-summary-card">
+                <span>Sorties prévues ce mois-ci</span>
+                <strong id="budget-month-payments">0 $</strong>
+              </div>
+              <div class="budget-summary-card">
+                <span>Événements à venir</span>
+                <strong id="budget-upcoming-count">0</strong>
+              </div>
+            </section>
+
+            <section class="budget-section">
+              <div class="card-header compact-header">
+                <h3>Revenus prévus</h3>
+              </div>
+              <div class="budget-form">
+                <input id="budget-income-name" type="text" maxlength="60" placeholder="Nom du revenu">
+                <input id="budget-income-amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant">
+                <input id="budget-income-date" type="date">
+                <select id="budget-income-repeat" aria-label="Récurrence du revenu">
+                  <option value="">Unique</option>
+                  <option value="weekly">Hebdomadaire</option>
+                  <option value="biweekly">Aux 2 semaines</option>
+                  <option value="monthly">Mensuel</option>
+                </select>
+                <button id="budget-add-income" class="primary" type="button">Ajouter revenu</button>
+              </div>
+              <div id="budget-income-list" class="budget-list"></div>
+            </section>
+
+            <section class="budget-section">
+              <div class="card-header compact-header">
+                <h3>Paiements prévus</h3>
+              </div>
+              <div class="budget-form">
+                <input id="budget-payment-name" type="text" maxlength="60" placeholder="Nom du paiement">
+                <input id="budget-payment-amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Montant">
+                <input id="budget-payment-date" type="date">
+                <select id="budget-payment-repeat" aria-label="Récurrence du paiement">
+                  <option value="">Unique</option>
+                  <option value="weekly">Hebdomadaire</option>
+                  <option value="biweekly">Aux 2 semaines</option>
+                  <option value="monthly">Mensuel</option>
+                </select>
+                <button id="budget-add-payment" class="primary" type="button">Ajouter paiement</button>
+              </div>
+              <div id="budget-payment-list" class="budget-list"></div>
+            </section>
+
+            <section class="budget-section">
+              <div class="card-header compact-header">
+                <h3>Objectifs financiers</h3>
+                <span class="small-muted">Future évolution</span>
+              </div>
+            </section>
+
+            <section class="budget-section">
+              <div class="card-header compact-header">
+                <h3>À venir</h3>
+                <span class="small-muted">30 prochains jours</span>
+              </div>
+              <div id="budget-upcoming-list" class="budget-list"></div>
+            </section>
+          </article>
+
+        </section>
+
+        <section id="view-agenda" class="view" aria-labelledby="agenda-title">
+          <div class="section-heading">
+            <p class="step">Calendrier doux</p>
+            <h2 id="agenda-title">Agenda</h2>
+          </div>
+
+          <article class="card agenda-month-card">
+            <div class="card-header">
+              <div>
+                <p class="step">Mois</p>
+                <h2 id="agenda-month-label">Ce mois-ci</h2>
+              </div>
+              <button id="agenda-today" class="secondary" type="button">Aujourd'hui</button>
+            </div>
+            <div class="agenda-month-controls">
+              <button id="agenda-prev-month" class="text-button" type="button">Mois avant</button>
+              <input id="agenda-date" type="date">
+              <button id="agenda-next-month" class="text-button" type="button">Mois après</button>
+            </div>
+            <div class="agenda-weekdays" aria-hidden="true">
+              <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div id="agenda-calendar" class="agenda-calendar" aria-label="Calendrier du mois"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="step">Planification</p>
+                <h2 id="agenda-planning-title">Aujourd'hui</h2>
+              </div>
+              <span id="agenda-planning-count" class="small-muted">0 événement</span>
+            </div>
+            <div class="agenda-view-tabs" role="tablist" aria-label="Vue agenda">
+              <button class="agenda-view-tab" type="button" data-agenda-view="today">Aujourd'hui</button>
+              <button class="agenda-view-tab" type="button" data-agenda-view="week">Semaine</button>
+              <button class="agenda-view-tab" type="button" data-agenda-view="next30">30 prochains jours</button>
+            </div>
+            <div id="agenda-planning-list" class="agenda-planning-list"></div>
+          </article>
+
+          <article id="agenda-form-card" class="card agenda-card hidden">
+            <div class="card-header">
+              <h2>Ajouter</h2>
+              <button id="close-agenda-form" class="text-button" type="button">Fermer</button>
+            </div>
+            <p class="small-muted">Une chose claire suffit.</p>
+            <div class="agenda-form">
+              <label>
+                Type
+                <select id="agenda-type">
+                  <option value="Tâche">Tâche</option>
+                  <option value="Travail">Travail</option>
+                  <option value="Pause">Pause</option>
+                  <option value="Rendez-vous">Rendez-vous</option>
+                  <option value="Habitude">Habitude</option>
+                  <option value="Bloc de temps">Bloc de temps</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Maison">Maison</option>
+                  <option value="Entraînement">Entraînement</option>
+                  <option value="Objectif">Objectif</option>
+                </select>
+              </label>
+              <label>
+                Titre
+                <input id="agenda-text" type="text" maxlength="90" placeholder="Ex.: vaisselle, appel, pause 10 min">
+              </label>
+              <label>
+                Heure optionnelle
+                <input id="agenda-time" type="time">
+              </label>
+              <label>
+                Rappel
+                <select id="agenda-reminder">
+                  <option value="none">Aucun rappel</option>
+                  <option value="0">À l'heure exacte</option>
+                  <option value="5">5 minutes avant</option>
+                  <option value="15">15 minutes avant</option>
+                  <option value="30">30 minutes avant</option>
+                  <option value="60">1 heure avant</option>
+                </select>
+              </label>
+              <label>
+                Récurrence
+                <select id="agenda-repeat">
+                  <option value="">Unique</option>
+                  <option value="weekly">Hebdomadaire</option>
+                  <option value="biweekly">Aux 2 semaines</option>
+                  <option value="monthly">Mensuel</option>
+                </select>
+              </label>
+              <button id="save-agenda-item" class="primary wide" type="button">Ajouter à l'agenda</button>
+            </div>
+            <p class="small-muted">Les rappels fonctionnent quand ÉLAN reste ouvert.</p>
+          </article>
+
+          <button id="open-agenda-form" class="agenda-fab" type="button" aria-label="Ajouter un événement">+</button>
+        </section>
+
+        <section id="view-shop" class="view" aria-labelledby="shop-title">
+          <div class="section-heading">
+            <p class="step">Récompenses</p>
+            <h2 id="shop-title">Boutique</h2>
+          </div>
+          <article class="card shop-balance-card">
+            <p class="step">Monnaie virtuelle</p>
+            <h2 id="coin-balance">0 pièces</h2>
+            <p class="small-muted">Aucune dépense réelle. Tes pièces servent seulement à débloquer des pauses.</p>
+          </article>
+
+          <article id="active-reward-panel" class="card active-reward-card hidden">
+            <p class="step">En cours</p>
+            <h2 id="active-reward-name">—</h2>
+            <p id="active-reward-time" class="active-reward-time">00:00</p>
+            <button id="stop-active-reward" class="secondary wide" type="button">Terminer</button>
+          </article>
+
+          <article id="purchased-rewards-section" class="card hidden">
+            <h2>Mes récompenses</h2>
+            <p class="small-muted">Prêtes à utiliser quand tu veux.</p>
+            <div id="purchased-rewards-list" class="shop-list"></div>
+          </article>
+
+          <article class="card">
+            <h2>Boutique</h2>
+            <p class="small-muted">Choisis une récompense qui te motive vraiment, sans nuire à ton budget.</p>
+            <div id="shop-rewards" class="shop-list"></div>
+          </article>
+
+          <article class="card">
+            <h2>Ajouter une récompense</h2>
+            <p class="small-muted">Ex.: Pause, Vidéo, Activité créative.</p>
+            <label class="idea-label">
+              <span>Récompense personnelle</span>
+              <input id="shop-reward-input" type="text" maxlength="80" placeholder="Ex.: café spécial">
+            </label>
+            <label class="idea-label">
+              <span>Catégorie</span>
+              <select id="shop-reward-category">
+                <option value="Detente">Détente</option>
+                <option value="Loisirs">Loisirs</option>
+                <option value="Divertissement">Divertissement</option>
+                <option value="Calme">Calme</option>
+                <option value="Bonus">Bonus</option>
+              </select>
+            </label>
+            <label class="idea-label">
+              <span>Type</span>
+              <select id="shop-reward-type">
+                <option value="timer">Avec timer</option>
+                <option value="free">Libre</option>
+              </select>
+            </label>
+            <label class="idea-label">
+              <span>Durée</span>
+              <input id="shop-reward-minutes" type="number" min="1" max="180" value="20">
+            </label>
+            <label class="idea-label">
+              <span>Coût</span>
+              <input id="shop-reward-cost" type="number" min="1" max="500" value="20">
+            </label>
+            <button id="save-shop-reward" class="secondary wide" type="button">Ajouter à la boutique</button>
+          </article>
+        </section>
+
+        <section id="view-settings" class="view" aria-labelledby="settings-title">
+          <div class="section-heading">
+            <p class="step">Paramètres</p>
+            <h2 id="settings-title">Réglages simples</h2>
+          </div>
+          <article class="card">
+            <h2>Notifications</h2>
+            <p id="notification-status" class="status-box">Notifications non vérifiées.</p>
+            <label class="switch-line">
+              <input id="notify-important" type="checkbox">
+              <span>Rappels importants</span>
+            </label>
+            <label class="switch-line">
+              <input id="notify-summary" type="checkbox">
+              <span>Résumé quotidien</span>
+            </label>
+            <div class="button-row">
+              <button id="enable-notifications" class="primary">Autoriser</button>
+              <button id="test-notification" class="secondary">Tester</button>
+            </div>
+            <p class="small-muted">Les rappels fonctionnent quand ÉLAN reste ouvert.</p>
+          </article>
+
+          <article class="card">
+            <h2>Installation</h2>
+            <p id="install-status" class="status-box">Vérification de l'installation.</p>
+            <button id="settings-install-button" class="secondary wide">Ajouter ÉLAN à l'écran d'accueil</button>
+            <p id="install-help" class="small-muted">Si le bouton ne fonctionne pas, ouvre le menu Chrome ⋮ puis choisis “Ajouter à l'écran d'accueil”.</p>
+          </article>
+
+          <article class="card">
+            <h2>Suggestions & idées</h2>
+            <p class="small-muted">Idées, commentaires, bugs ou suggestions. Aucun point ici.</p>
+            <label class="idea-label">
+              <span>Écrire une note</span>
+              <textarea id="ideas-input" rows="4" maxlength="500" placeholder="Ex.: ce qui bloque, ce qui aide, une idée à tester"></textarea>
+            </label>
+            <button id="save-idea" class="secondary wide">Garder cette idée</button>
+            <div id="ideas-list" class="idea-list hidden"></div>
+          </article>
+
+          <article class="card">
+            <h2>Recompenses</h2>
+            <p class="small-muted">Ajoute ce qui te fait du bien. Pas d'achat, pas de pression.</p>
+            <label class="idea-label">
+              <span>Nouvelle recompense</span>
+              <input id="reward-input" type="text" maxlength="80" placeholder="Ex.: Musique, Pause, Serie">
+            </label>
+            <button id="save-reward" class="secondary wide">Ajouter une recompense</button>
+            <div id="rewards-list" class="idea-list hidden"></div>
+          </article>
+
+          <article class="card version-card">
+            <h2>À propos</h2>
+            <p class="version-line">
+              <strong id="app-version">Version : v0.12.1</strong>
+              <span id="app-updated" class="muted">Dernière mise à jour : 2026-05-27</span>
+            </p>
+            <p class="small-muted version-heading">Nouveautés</p>
+            <ul id="app-changes" class="version-changes">
+              <li>Domaine Travail retire</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <button id="reset-data" class="danger-button">Effacer mes données locales</button>
+          </article>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" aria-label="Navigation principale">
+        <button class="active" data-view-button="home">Accueil</button>
+        <button data-view-button="domains">Domaines</button>
+        <button data-view-button="agenda">Agenda</button>
+        <button data-view-button="shop">Boutique</button>
+      </nav>
+    </div>
+    <section id="checkin-panel" class="checkin-panel hidden" aria-live="polite">
+      <article class="checkin-card">
+        <div class="card-header">
+          <div>
+            <p class="step">Mes victoires</p>
+            <h2>Historique</h2>
+          </div>
+          <button id="close-checkin" class="text-button" type="button">Fermer</button>
+        </div>
+        <div id="history-list" class="history-list"></div>
+      </article>
+    </section>
+    <section id="goal-selection-dock" class="goal-selection-dock hidden" aria-live="polite">
+      <p id="goal-selection-dock-summary" class="goal-selection-summary">0 objectif sélectionné</p>
+      <button id="start-goal-queue" class="primary" type="button">Commencer la série</button>
+    </section>
+    <section id="goal-queue-active-bar" class="goal-queue-active-bar hidden" aria-live="polite">
+      <div class="goal-queue-active-copy">
+        <p id="goal-queue-active-step" class="goal-queue-active-step">Étape 1 / 1</p>
+        <p id="goal-queue-active-label" class="goal-queue-active-label">Objectif</p>
+        <div class="goal-queue-progress-track" aria-hidden="true"><i id="goal-queue-progress-fill"></i></div>
+      </div>
+      <div class="goal-queue-active-actions">
+        <button id="skip-goal" class="secondary" type="button">Passer</button>
+        <button id="stop-goal-queue" class="secondary" type="button">Arrêter</button>
+      </div>
+    </section>
+    <section id="install-invite" class="install-invite hidden" aria-live="polite">
+      <article class="install-card">
+        <div>
+          <p class="step">Installation</p>
+          <h2>Veux-tu ajouter ÉLAN à ton écran d'accueil ?</h2>
+          <p class="small-muted">Plus facile à ouvrir quand tu veux démarrer vite.</p>
+        </div>
+        <div class="button-row">
+          <button id="install-yes" class="primary">Oui, ajouter</button>
+          <button id="install-later" class="secondary">Pas maintenant</button>
+        </div>
+      </article>
+    </section>
+    <section id="onboarding" class="onboarding hidden" aria-labelledby="onboarding-title" role="dialog" aria-modal="true">
+      <article class="onboarding-card">
+        <p class="step">Première ouverture</p>
+        <h2 id="onboarding-title">Qu'est-ce qui te motive le plus ?</h2>
+        <div class="choice-grid" role="group" aria-label="Motivation principale">
+          <button data-motivation="Jeux vidéo">🎮 Jeux vidéo</button>
+          <button data-motivation="Film / Serie">🎬 Film / Serie</button>
+          <button data-motivation="Temps relax">😌 Temps relax</button>
+          <button data-motivation="Temps libre">🧩 Temps libre</button>
+          <button data-motivation="Streak">🔥 Streak</button>
+          <button data-motivation="Énergie">⚡ Énergie</button>
+          <button data-motivation="Moins procrastiner">🧠 Moins procrastiner</button>
+        </div>
+
+        <h2 class="onboarding-subtitle">Choisis les récompenses que tu aimes</h2>
+        <div class="reward-grid" role="group" aria-label="Récompenses préférées">
+          <button data-reward="Gaming">Gaming</button>
+          <button data-reward="Film">Film</button>
+          <button data-reward="Serie">Serie</button>
+          <button data-reward="Pause">Pause</button>
+          <button data-reward="Musique">Musique</button>
+          <button data-reward="Temps libre">Temps libre</button>
+          <button data-reward="Vidéo">Vidéo</button>
+          <button data-reward="Activité créative">Activité créative</button>
+        </div>
+        <button id="finish-onboarding" class="primary wide">Commencer ÉLAN</button>
+      </article>
+    </section>
+    <section id="challenge-panel" class="challenge-panel hidden" aria-live="polite">
+      <article class="challenge-card">
+        <div>
+          <p class="step">Défi en cours</p>
+          <h2 id="challenge-title">Défi</h2>
+        </div>
+        <div id="challenge-progress" class="challenge-progress" aria-hidden="true">
+          <strong id="challenge-time">08:00</strong>
+        </div>
+        <p id="challenge-message" class="small-muted">Choisis ta durée, puis démarre doucement.</p>
+        <div id="challenge-durations" class="duration-grid" role="group" aria-label="Durée du défi"></div>
+        <div class="button-row">
+          <button id="start-challenge" class="primary">Je suis prêt</button>
+          <button id="finish-challenge" class="primary hidden">Défi terminé</button>
+          <button id="cancel-challenge" class="secondary">Annuler</button>
+        </div>
+      </article>
+    </section>
+    <section id="series-complete-overlay" class="series-complete-overlay hidden" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="series-complete-title">
+      <article class="series-complete-card">
+        <div class="series-complete-icon" aria-hidden="true">✓</div>
+        <p class="step">Domaine terminé</p>
+        <h2 id="series-complete-title">Bravo !</h2>
+        <p id="series-complete-summary" class="series-complete-summary"></p>
+        <div class="series-complete-coins" id="series-complete-coins" aria-label="Pièces gagnées"></div>
+        <div class="button-row series-complete-actions">
+          <button id="series-complete-close" class="primary" type="button">Continuer</button>
+          <button id="series-complete-shop" class="secondary" type="button">Aller à la boutique</button>
+          <button id="series-complete-finish" class="secondary" type="button">Terminer</button>
+        </div>
+      </article>
+    </section>
+    <section id="house-complete-modal" class="house-complete-modal hidden" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="house-complete-title" tabindex="-1">
+      <article class="house-complete-card">
+        <div class="house-complete-icon" aria-hidden="true">🎉</div>
+        <h2 id="house-complete-title">Mission terminée</h2>
+        <p id="house-complete-task-name" class="house-complete-task-name">Mission</p>
+        <div id="house-complete-reward" class="house-complete-reward">+5 jetons gagnés</div>
+        <button id="house-complete-continue" class="primary" type="button">Continuer</button>
+      </article>
+    </section>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  </body>
+</html>
