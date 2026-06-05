@@ -488,21 +488,6 @@ p { line-height: 1.4; }
   font-weight: 800;
 }
 
-.house-plan-row {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.house-plan-row input {
-  min-height: 42px;
-}
-
-.house-plan-row button {
-  min-height: 42px;
-  padding-inline: 12px;
-}
-
 .house-active-mission {
   background: #eef7f2;
   border-color: var(--brand-light);

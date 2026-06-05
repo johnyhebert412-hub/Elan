@@ -83,14 +83,11 @@
     Habitude: "#e8eddc",
     "Bloc de temps": "#ebe6f3",
     Finance: "#f6f0dc",
-    Budget: "#f6f0dc",
-    Maison: "#e7f2ec",
-    "Entraînement": "#e7eef7",
-    Objectif: "#eee8f4"
+    Budget: "#f6f0dc"
   };
 
   const homeDomains = {
-    off: { title: "Congé", subtitle: "Journée plus légère, sans pression.", missions: [{ label: "Choisir une petite chose" }, { label: "Préparer un coin calme" }, { label: "Faire 5 minutes utiles" }, { label: "Sortir prendre l'air" }, { label: "Ranger un petit espace" }, { label: "Planifier un moment relax" }] },
+    off: { title: "Congé", subtitle: "Journée plus légère, sans pression.", missions: [{ label: "Choisir une petite chose" }, { label: "Préparer un coin calme" }, { label: "Faire 5 minutes utiles" }, { label: "Sortir prendre l'air" }, { label: "Ranger un petit espace" }, { label: "Choisir un moment relax" }] },
     house: { title: "Maison", subtitle: "Petits gestes pour avancer à la maison.", missions: [{ label: "Faire la vaisselle" }, { label: "Ranger une surface" }, { label: "Lancer une brassée" }, { label: "Ranger une pièce" }, { label: "Vider une poubelle" }, { label: "Essuyer un comptoir" }, { label: "Plier quelques vêtements" }, { label: "Nettoyer un coin rapide" }] },
     mental: { title: "Urgence mentale", subtitle: "OK. Tu reprends le contrôle.", missions: [{ label: "Prends 3 grandes respirations" }, { label: "Touche 3 objets" }, { label: "Mets les deux pieds au sol" }] }
   };
@@ -795,11 +792,9 @@
     if (taskList && selectedRoom) {
       const availableTasks = selectedRoom.tasks.filter((task) => !isHouseTaskCompleted(task.id));
       taskList.replaceChildren(...availableTasks.map((task) => {
-        const row = document.createElement("article");
-        row.className = "house-task-row";
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "house-task-button";
+        button.className = "house-task-button house-task-row";
         button.dataset.houseTask = task.id;
         button.innerHTML = `
           <span>
@@ -808,14 +803,7 @@
           </span>
           <b>+${task.reward}</b>
         `;
-        const plan = document.createElement("div");
-        plan.className = "house-plan-row";
-        plan.innerHTML = `
-          <input type="date" value="${todayKey()}" data-house-plan-date="${task.id}" aria-label="Date pour ${task.label}">
-          <button class="secondary" type="button" data-house-plan-task="${task.id}">Planifier</button>
-        `;
-        row.append(button, plan);
-        return row;
+        return button;
       }));
       if (!availableTasks.length) {
         const empty = document.createElement("p");
@@ -905,39 +893,6 @@
       quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0 }
     };
     selectHouseTask(tasks[0].id);
-  }
-
-  function planHouseTask(taskId) {
-    const task = houseTaskById(taskId);
-    if (!task) return;
-    const date = document.querySelector(`[data-house-plan-date="${taskId}"]`)?.value || todayKey();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      showToast("Choisis une date valide.");
-      return;
-    }
-    const sourceId = `house-plan-${task.id}-${date}`;
-    const existing = state.agenda.find((item) => item.sourceId === sourceId);
-    const agendaItem = {
-      id: existing?.id || sourceId,
-      sourceId,
-      date,
-      type: "Maison",
-      domain: "Maison",
-      text: task.label,
-      room: task.roomLabel,
-      tokens: task.reward,
-      time: "",
-      reminder: "none",
-      repeat: "",
-      notified: false,
-      done: false
-    };
-    state.agenda = existing
-      ? state.agenda.map((item) => item.sourceId === sourceId ? { ...item, ...agendaItem, done: item.done } : item)
-      : [...state.agenda, agendaItem].slice(-120);
-    saveState();
-    renderAgenda();
-    showToast("Tâche Maison planifiée dans l'Agenda.");
   }
 
   function showHouseCompleteModal(task) {
@@ -3110,8 +3065,11 @@
   }
 
   function agendaManualOccurrencesForRange(start, end) {
+    const financialTypes = new Set(["Finance", "Budget"]);
     return (state.agenda || [])
       .filter((item) => !(item.sourceId || "").startsWith("budget-"))
+      .filter((item) => !(item.sourceId || "").startsWith("house-plan-"))
+      .filter((item) => financialTypes.has(item.type) || financialTypes.has(item.domain))
       .flatMap((item) => budgetOccurrenceDatesBetween(item, start, end).map((date) => ({
         id: `${item.id}-${date}`,
         sourceId: item.sourceId || item.id,
@@ -3157,9 +3115,7 @@
     if (event.icon) return event.icon;
     const icons = {
       Budget: "💰",
-      Maison: "🏠",
-      "Entraînement": "💪",
-      Objectif: "🎯",
+      Finance: "💰",
       Agenda: "📅"
     };
     return icons[event.domain] || icons[event.type] || "📅";
@@ -4226,11 +4182,6 @@
       if (button) selectHouseRoom(button.dataset.houseRoom);
     });
     $("house-task-list")?.addEventListener("click", (event) => {
-      const planButton = event.target.closest("[data-house-plan-task]");
-      if (planButton) {
-        planHouseTask(planButton.dataset.housePlanTask);
-        return;
-      }
       const button = event.target.closest("[data-house-task]");
       if (button) selectHouseTask(button.dataset.houseTask);
     });
