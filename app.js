@@ -660,10 +660,24 @@
     return Math.round(value * (unit.startsWith("min") ? 60 : 1));
   }
 
+  function trainingMotionClassForStep(step) {
+    const label = String(step?.label || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    if (label.includes("planche")) return "training-motion-plank";
+    if (label.includes("pompe")) return "training-motion-pushup";
+    if (label.includes("squat") || label.includes("chaise") || label.includes("fente")) return "training-motion-squat";
+    if (label.includes("jump") || label.includes("burpee")) return "training-motion-jump";
+    if (label.includes("marche") || label.includes("sprint") || label.includes("genoux") || label.includes("mountain")) return "training-motion-run";
+    return "training-motion-run";
+  }
+
   function updateTrainingCountdownDetails(step, stepIndex, totalSteps) {
     const stepLabel = $("training-countdown-step");
     const name = $("training-countdown-name");
     const amount = $("training-countdown-amount");
+    const motion = $("training-countdown-motion");
     if (stepLabel) {
       stepLabel.textContent = stepIndex === 0
         ? `Exercice ${stepIndex + 1}/${totalSteps}`
@@ -671,6 +685,9 @@
     }
     if (name) name.textContent = step.label;
     if (amount) amount.textContent = step.amount;
+    if (motion) {
+      motion.className = `training-motion ${trainingMotionClassForStep(step)}`;
+    }
   }
 
   function renderTrainingTimer(step, stepIndex) {
