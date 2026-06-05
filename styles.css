@@ -330,7 +330,6 @@ p { line-height: 1.4; }
 
 .domain-house { --domain: #548069; --domain-soft: #e6f1eb; }
 .domain-training { --domain: #516d91; --domain-soft: #e8eef6; }
-.domain-shop-tile { --domain: #8a6b2e; --domain-soft: #f7efd9; }
 .domain-budget { --domain: #6f7440; --domain-soft: #eef0d8; }
 .domain-meter {
   background: var(--domain-soft);

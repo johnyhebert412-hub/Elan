@@ -2196,6 +2196,54 @@
       .sort((a, b) => a.date.localeCompare(b.date));
   }
 
+  function addDays(dateValue, days) {
+    const date = new Date(`${dateValue}T12:00:00`);
+    date.setDate(date.getDate() + days);
+    return dateKey(date);
+  }
+
+  function addMonths(dateValue, months) {
+    const date = new Date(`${dateValue}T12:00:00`);
+    date.setMonth(date.getMonth() + months);
+    return dateKey(date);
+  }
+
+  function budgetOccurrenceDates(entry) {
+    if (!entry.date) return [];
+    const today = todayKey();
+    const end = addDays(today, 30);
+    const dates = [];
+    let current = entry.date;
+    const repeat = entry.repeat || "";
+    let guard = 0;
+
+    while (current < today && repeat && guard < 80) {
+      if (repeat === "weekly") current = addDays(current, 7);
+      else if (repeat === "biweekly") current = addDays(current, 14);
+      else if (repeat === "monthly") current = addMonths(current, 1);
+      else break;
+      guard += 1;
+    }
+
+    while (current >= today && current <= end && guard < 120) {
+      dates.push(current);
+      if (repeat === "weekly") current = addDays(current, 7);
+      else if (repeat === "biweekly") current = addDays(current, 14);
+      else if (repeat === "monthly") current = addMonths(current, 1);
+      else break;
+      guard += 1;
+    }
+    return dates;
+  }
+
+  function budgetFinanceOccurrences30Days() {
+    const { incomes, payments } = budgetEntries();
+    return [
+      ...incomes.flatMap((entry) => budgetOccurrenceDates(entry).map((date) => ({ ...entry, date, kind: "income" }))),
+      ...payments.flatMap((entry) => budgetOccurrenceDates(entry).map((date) => ({ ...entry, date, kind: "payment" })))
+    ].sort((a, b) => a.date.localeCompare(b.date));
+  }
+
   function budgetDateText(dateValue) {
     if (!dateValue) return "Sans date";
     if (dateValue === todayKey()) return "Aujourd'hui";
@@ -2270,7 +2318,7 @@
       meta.className = "small-muted";
       meta.textContent = kind === "income"
         ? `${budgetDateText(item.date)} · ${budgetRepeatText(item.repeat)}`
-        : `${budgetDateText(item.date)} · ${budgetCategoryText(item.category)}`;
+        : `${budgetDateText(item.date)} · ${budgetCategoryText(item.category)} · ${budgetRepeatText(item.repeat)}`;
       copy.append(title, meta);
       const side = document.createElement("div");
       const amount = document.createElement("div");
@@ -2334,6 +2382,35 @@
     }));
   }
 
+  function renderAgendaFinanceUpcoming() {
+    const target = $("agenda-finance-upcoming");
+    if (!target) return;
+    const items = budgetFinanceOccurrences30Days();
+    if (!items.length) {
+      const empty = document.createElement("p");
+      empty.className = "budget-empty";
+      empty.textContent = "Aucun revenu ou paiement prévu dans les 30 prochains jours.";
+      target.replaceChildren(empty);
+      return;
+    }
+    target.replaceChildren(...items.map((item) => {
+      const row = document.createElement("article");
+      row.className = "budget-item";
+      const copy = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = item.kind === "income" ? `Paie · ${item.name}` : `${budgetCategoryText(item.category)} · ${item.name}`;
+      const meta = document.createElement("p");
+      meta.className = "small-muted";
+      meta.textContent = budgetDateText(item.date);
+      copy.append(title, meta);
+      const amount = document.createElement("div");
+      amount.className = "budget-amount";
+      amount.textContent = `${item.kind === "income" ? "+" : "-"}${money(item.amount)}`;
+      row.append(copy, amount);
+      return row;
+    }));
+  }
+
   function addBudgetIncome() {
     const name = $("budget-income-name")?.value.trim();
     const amount = Number.parseFloat($("budget-income-amount")?.value);
@@ -2351,6 +2428,7 @@
     ["budget-income-name", "budget-income-amount", "budget-income-date"].forEach((id) => { const field = $(id); if (field) field.value = ""; });
     renderBudget();
     renderAgenda();
+    renderAgendaFinanceUpcoming();
     showToast("Revenu ajouté au Budget et à l'Agenda.");
   }
 
@@ -2359,11 +2437,12 @@
     const amount = Number.parseFloat($("budget-payment-amount")?.value);
     const date = $("budget-payment-date")?.value;
     const category = $("budget-payment-category")?.value || "autre";
+    const repeat = $("budget-payment-repeat")?.value || "";
     if (!name || !Number.isFinite(amount) || amount <= 0 || !date) {
       showToast("Ajoute un nom, un montant et une date.");
       return;
     }
-    const entry = { id: `payment-${Date.now()}`, name, amount, date, category };
+    const entry = { id: `payment-${Date.now()}`, name, amount, date, category, repeat };
     state.budget = state.budget || cloneState(defaultState.budget);
     state.budget.payments = [...(state.budget.payments || []), entry];
     syncBudgetAgendaEntry(entry, "payment");
@@ -2371,6 +2450,7 @@
     ["budget-payment-name", "budget-payment-amount", "budget-payment-date"].forEach((id) => { const field = $(id); if (field) field.value = ""; });
     renderBudget();
     renderAgenda();
+    renderAgendaFinanceUpcoming();
     showToast("Paiement ajouté au Budget et à l'Agenda.");
   }
 
@@ -2386,6 +2466,7 @@
     saveState();
     renderBudget();
     renderAgenda();
+    renderAgendaFinanceUpcoming();
     showToast("Élément supprimé.");
   }
 
@@ -2484,6 +2565,7 @@
     if (dayLabel) dayLabel.textContent = agendaDateLabel(selectedDate);
     if (monthLabel) monthLabel.textContent = agendaMonthLabel(selectedDate);
     renderAgendaCalendar(selectedDate);
+    renderAgendaFinanceUpcoming();
     const items = agendaItemsForSelectedDate();
     const count = $("agenda-count");
     if (count) count.textContent = `${items.length} item${items.length > 1 ? "s" : ""}`;
@@ -2922,9 +3004,9 @@
   function renderShop() {
     const list = $("shop-rewards");
     if (!list) return;
-    const coinText = state.coins + " pieces";
+    const coinText = `🪙 ${state.coins} pièce${state.coins > 1 ? "s" : ""}`;
     const coinEl = $("coin-balance");
-    if (coinEl) coinEl.textContent = state.coins + " piece" + (state.coins > 1 ? "s" : "");
+    if (coinEl) coinEl.textContent = `${state.coins} pièce${state.coins > 1 ? "s" : ""}`;
     const headerBadge = $("header-coin-balance");
     if (headerBadge) headerBadge.textContent = coinText;
 
@@ -3573,6 +3655,7 @@
     renderQuickItems();
     renderAgenda();
     renderBudget();
+    renderAgendaFinanceUpcoming();
     renderIdeas();
     renderRewards();
     renderShop();

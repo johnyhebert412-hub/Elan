@@ -51,7 +51,6 @@
             <div class="domain-choice-grid">
               <button data-select-domain="house">🧹 Maison</button>
               <button data-open-domain="training">🏃 Entraînement</button>
-              <button data-view-button="shop">🎁 Boutique</button>
               <button data-open-domain="budget">💵 Budget</button>
             </div>
           </article>
@@ -112,7 +111,6 @@
           <div class="domain-grid">
             <button type="button" class="domain-tile domain-house" data-open-domain="house" aria-controls="domain-house"><strong>Maison</strong><span>Soulagement</span><em id="count-house">À commencer</em><span class="domain-meter"><i id="progress-house"></i></span></button>
             <button type="button" class="domain-tile domain-training" data-open-domain="training" aria-controls="domain-training"><strong>Entraînement</strong><span>Séance guidée</span><em>Type + niveau</em><span class="domain-meter"><i></i></span></button>
-            <button type="button" class="domain-tile domain-shop-tile" data-view-button="shop"><strong>Boutique</strong><span>Récompenses</span><em>Pièces et pauses</em><span class="domain-meter"><i></i></span></button>
             <button type="button" class="domain-tile domain-budget" data-open-domain="budget" aria-controls="domain-budget"><strong>Budget</strong><span>Prévision simple</span><em>Agenda financier</em><span class="domain-meter"><i></i></span></button>
           </div>
 
@@ -275,6 +273,12 @@
                   <option value="assurance">Assurance</option>
                   <option value="autre">Autre</option>
                 </select>
+                <select id="budget-payment-repeat" aria-label="Récurrence du paiement">
+                  <option value="">Une fois</option>
+                  <option value="weekly">Chaque semaine</option>
+                  <option value="biweekly">Aux 2 semaines</option>
+                  <option value="monthly">Chaque mois</option>
+                </select>
                 <button id="budget-add-payment" class="primary" type="button">Ajouter paiement</button>
               </div>
               <div id="budget-payment-list" class="budget-list"></div>
@@ -325,6 +329,16 @@
               <span id="agenda-count" class="small-muted">0 item</span>
             </div>
             <div id="agenda-list" class="agenda-list"></div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="step">Budget</p>
+                <h2>À venir — 30 jours</h2>
+              </div>
+            </div>
+            <div id="agenda-finance-upcoming" class="agenda-finance-upcoming"></div>
           </article>
 
           <article id="agenda-form-card" class="card agenda-card hidden">
