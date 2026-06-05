@@ -960,17 +960,16 @@
     return Math.round(value * (unit.startsWith("min") ? 60 : 1));
   }
 
-  function trainingMotionClassForStep(step) {
+  function trainingMotionForStep(step) {
     const label = String(step?.label || "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
-    if (label.includes("planche")) return "training-motion-plank";
-    if (label.includes("pompe")) return "training-motion-pushup";
-    if (label.includes("squat") || label.includes("chaise") || label.includes("fente")) return "training-motion-squat";
-    if (label.includes("jump") || label.includes("burpee")) return "training-motion-jump";
-    if (label.includes("marche") || label.includes("sprint") || label.includes("genoux") || label.includes("mountain")) return "training-motion-run";
-    return "training-motion-run";
+    if (label.includes("planche") || label.includes("chaise")) return { icon: "⏱️", className: "training-motion-timer" };
+    if (label.includes("pompe") || label.includes("squat") || label.includes("fente")) return { icon: "💪", className: "training-motion-force" };
+    if (label.includes("jump") || label.includes("burpee") || label.includes("mountain")) return { icon: "⚡", className: "training-motion-energy" };
+    if (label.includes("marche") || label.includes("sprint") || label.includes("genoux")) return { icon: "🏃", className: "training-motion-cardio" };
+    return { icon: "⚡", className: "training-motion-energy" };
   }
 
   function updateTrainingCountdownDetails(step, stepIndex, totalSteps) {
@@ -978,6 +977,7 @@
     const name = $("training-countdown-name");
     const amount = $("training-countdown-amount");
     const motion = $("training-countdown-motion");
+    const motionIcon = $("training-countdown-icon");
     if (stepLabel) {
       stepLabel.textContent = stepIndex === 0
         ? `Exercice ${stepIndex + 1}/${totalSteps}`
@@ -986,7 +986,9 @@
     if (name) name.textContent = step.label;
     if (amount) amount.textContent = step.amount;
     if (motion) {
-      motion.className = `training-motion ${trainingMotionClassForStep(step)}`;
+      const motionMeta = trainingMotionForStep(step);
+      motion.className = `training-motion ${motionMeta.className}`;
+      if (motionIcon) motionIcon.textContent = motionMeta.icon;
     }
   }
 

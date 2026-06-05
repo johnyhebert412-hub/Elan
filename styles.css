@@ -893,175 +893,53 @@ p { line-height: 1.4; }
 }
 
 .training-motion {
-  height: 92px;
+  align-items: center;
+  background: rgba(76, 125, 94, 0.12);
+  border: 1px solid rgba(76, 125, 94, 0.18);
+  border-radius: 999px;
+  display: inline-flex;
   margin: 0 0 6px;
+  min-height: 78px;
+  min-width: 78px;
   position: relative;
-  width: 118px;
+  justify-content: center;
+  width: 78px;
 }
 
-.training-motion i {
+.training-motion::after {
+  animation: training-motion-bar 1.2s ease-in-out infinite;
   background: var(--brand);
-  display: block;
+  border-radius: 999px;
+  bottom: -10px;
+  content: "";
+  height: 4px;
+  left: 16px;
+  opacity: 0.6;
   position: absolute;
+  width: 46px;
 }
 
-.motion-head {
-  border-radius: 999px;
-  height: 22px;
-  left: 49px;
-  top: 4px;
-  width: 22px;
+.training-motion-icon {
+  animation: training-motion-pulse 1.05s ease-in-out infinite;
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
 }
 
-.motion-body {
-  border-radius: 999px;
-  height: 38px;
-  left: 56px;
-  top: 28px;
-  transform-origin: center top;
-  width: 11px;
+.training-motion-cardio {
+  background: rgba(220, 238, 232, 0.92);
 }
 
-.motion-arm,
-.motion-leg {
-  border-radius: 999px;
-  height: 34px;
-  transform-origin: center top;
-  width: 8px;
+.training-motion-force {
+  background: rgba(243, 232, 212, 0.92);
 }
 
-.motion-arm-left {
-  left: 47px;
-  top: 32px;
+.training-motion-timer {
+  background: rgba(231, 240, 243, 0.95);
 }
 
-.motion-arm-right {
-  left: 66px;
-  top: 32px;
-}
-
-.motion-leg-left {
-  left: 53px;
-  top: 62px;
-}
-
-.motion-leg-right {
-  left: 65px;
-  top: 62px;
-}
-
-.training-motion-run {
-  animation: training-motion-bob 0.55s ease-in-out infinite;
-}
-
-.training-motion-run .motion-arm-left,
-.training-motion-run .motion-leg-right {
-  animation: training-limb-forward 0.55s ease-in-out infinite;
-}
-
-.training-motion-run .motion-arm-right,
-.training-motion-run .motion-leg-left {
-  animation: training-limb-back 0.55s ease-in-out infinite;
-}
-
-.training-motion-jump {
-  animation: training-motion-jump 0.7s ease-in-out infinite;
-}
-
-.training-motion-jump .motion-arm-left {
-  transform: rotate(-135deg);
-}
-
-.training-motion-jump .motion-arm-right {
-  transform: rotate(135deg);
-}
-
-.training-motion-jump .motion-leg-left {
-  transform: rotate(26deg);
-}
-
-.training-motion-jump .motion-leg-right {
-  transform: rotate(-26deg);
-}
-
-.training-motion-squat {
-  animation: training-motion-squat 0.8s ease-in-out infinite;
-}
-
-.training-motion-squat .motion-leg-left {
-  transform: rotate(20deg);
-}
-
-.training-motion-squat .motion-leg-right {
-  transform: rotate(-20deg);
-}
-
-.training-motion-plank,
-.training-motion-pushup {
-  height: 78px;
-}
-
-.training-motion-plank .motion-head,
-.training-motion-pushup .motion-head {
-  left: 88px;
-  top: 28px;
-}
-
-.training-motion-plank .motion-body,
-.training-motion-pushup .motion-body {
-  height: 62px;
-  left: 45px;
-  top: 36px;
-  transform: rotate(90deg);
-  width: 12px;
-}
-
-.training-motion-plank .motion-arm-left,
-.training-motion-plank .motion-arm-right,
-.training-motion-pushup .motion-arm-left,
-.training-motion-pushup .motion-arm-right {
-  height: 28px;
-  top: 42px;
-}
-
-.training-motion-plank .motion-arm-left,
-.training-motion-pushup .motion-arm-left {
-  left: 78px;
-  transform: rotate(8deg);
-}
-
-.training-motion-plank .motion-arm-right,
-.training-motion-pushup .motion-arm-right {
-  left: 86px;
-  transform: rotate(-8deg);
-}
-
-.training-motion-plank .motion-leg-left,
-.training-motion-plank .motion-leg-right,
-.training-motion-pushup .motion-leg-left,
-.training-motion-pushup .motion-leg-right {
-  height: 30px;
-  top: 42px;
-}
-
-.training-motion-plank .motion-leg-left,
-.training-motion-pushup .motion-leg-left {
-  left: 28px;
-  transform: rotate(-70deg);
-}
-
-.training-motion-plank .motion-leg-right,
-.training-motion-pushup .motion-leg-right {
-  left: 34px;
-  transform: rotate(-86deg);
-}
-
-.training-motion-plank {
-  animation: training-motion-hold 1.2s ease-in-out infinite;
-}
-
-.training-motion-pushup {
-  animation: training-motion-pushup 0.85s ease-in-out infinite;
+.training-motion-energy {
+  background: rgba(235, 230, 243, 0.92);
 }
 
 .training-countdown-screen strong {
@@ -1070,73 +948,25 @@ p { line-height: 1.4; }
   line-height: 1;
 }
 
-@keyframes training-motion-bob {
+@keyframes training-motion-pulse {
   0%,
   100% {
-    transform: translateY(0);
+    transform: scale(1);
   }
   50% {
-    transform: translateY(-7px);
+    transform: scale(1.08);
   }
 }
 
-@keyframes training-limb-forward {
+@keyframes training-motion-bar {
   0%,
   100% {
-    transform: rotate(28deg);
+    opacity: 0.35;
+    transform: scaleX(0.65);
   }
   50% {
-    transform: rotate(-28deg);
-  }
-}
-
-@keyframes training-limb-back {
-  0%,
-  100% {
-    transform: rotate(-28deg);
-  }
-  50% {
-    transform: rotate(28deg);
-  }
-}
-
-@keyframes training-motion-jump {
-  0%,
-  100% {
-    transform: translateY(8px);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
-}
-
-@keyframes training-motion-squat {
-  0%,
-  100% {
-    transform: translateY(0) scaleY(1);
-  }
-  50% {
-    transform: translateY(14px) scaleY(0.9);
-  }
-}
-
-@keyframes training-motion-hold {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(2px);
-  }
-}
-
-@keyframes training-motion-pushup {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(12px);
+    opacity: 0.8;
+    transform: scaleX(1);
   }
 }
 
