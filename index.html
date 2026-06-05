@@ -115,8 +115,11 @@
           </div>
 
           <article id="domain-house" class="card domain-panel hidden">
-            <div class="card-header"><h2>Maison</h2><button class="text-button" data-close-domain>Changer</button></div>
-            <p class="muted">Coach d'entretien simple pour garder la maison en ordre.</p>
+            <div class="card-header"><h2>🏠 Maison</h2><button class="text-button" data-close-domain>Changer</button></div>
+            <section class="house-hero" aria-labelledby="house-hero-title">
+              <p class="step">Coach d'entretien</p>
+              <h3 id="house-hero-title">Que veux-tu entretenir aujourd'hui ?</h3>
+            </section>
             <section class="house-quick-mission" aria-labelledby="house-quick-title">
               <div class="card-header compact-header">
                 <div>
@@ -156,6 +159,10 @@
                 <button id="house-back-rooms" class="text-button" type="button">Retour</button>
               </div>
               <div id="house-task-list" class="house-task-list"></div>
+              <div id="house-selected-summary" class="house-selected-summary hidden">
+                <p><strong id="house-selected-count">0 tâche sélectionnée</strong><span id="house-selected-reward">+0 jetons</span></p>
+                <button id="house-start-selected" class="primary wide" type="button">Commencer</button>
+              </div>
               <div id="house-completed-section" class="house-completed-section hidden">
                 <p class="domain-section-label">Terminés</p>
                 <div id="house-completed-list" class="house-completed-list"></div>

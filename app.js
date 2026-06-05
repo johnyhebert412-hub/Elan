@@ -343,7 +343,7 @@
     history: [],
     notifications: { important: false, summary: false },
     budget: { incomes: [], payments: [] },
-    houseCoach: { selectedRoom: "", activeTask: null, completed: {}, quickMission: null },
+    houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, quickMission: null },
     training: { mode: "quick", type: "cardio", level: "beginner", started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
@@ -411,6 +411,7 @@
         houseCoach: saved.houseCoach && typeof saved.houseCoach === "object"
           ? {
               selectedRoom: typeof saved.houseCoach.selectedRoom === "string" ? saved.houseCoach.selectedRoom : "",
+              selectedTasks: Array.isArray(saved.houseCoach.selectedTasks) ? saved.houseCoach.selectedTasks : [],
               activeTask: saved.houseCoach.activeTask && typeof saved.houseCoach.activeTask === "object" ? saved.houseCoach.activeTask : null,
               completed: saved.houseCoach.completed && typeof saved.houseCoach.completed === "object" ? saved.houseCoach.completed : {},
               quickMission: saved.houseCoach.quickMission && typeof saved.houseCoach.quickMission === "object" ? saved.houseCoach.quickMission : null
@@ -659,6 +660,19 @@
     return ordered.slice(0, 3);
   }
 
+  function selectedHouseTasks() {
+    const selected = Array.isArray(state.houseCoach?.selectedTasks) ? state.houseCoach.selectedTasks : [];
+    return selected
+      .map((taskId) => houseTaskById(taskId))
+      .filter((task) => task && !isHouseTaskCompleted(task.id));
+  }
+
+  function selectedHouseTaskIdsForRoom(roomId) {
+    return selectedHouseTasks()
+      .filter((task) => !roomId || task.roomId === roomId)
+      .map((task) => task.id);
+  }
+
   function activeHouseTaskRemaining() {
     const active = state.houseCoach?.activeTask;
     if (!active?.endsAt) return active?.durationMs || 0;
@@ -736,10 +750,13 @@
     const taskList = $("house-task-list");
     const completedSection = $("house-completed-section");
     const completedList = $("house-completed-list");
+    const selectedSummary = $("house-selected-summary");
     const activePanel = $("house-active-mission");
     const activeTask = state.houseCoach?.activeTask ? houseTaskById(state.houseCoach.activeTask.id) : null;
     const selectedRoom = houseRoomById(state.houseCoach?.selectedRoom);
     const quickTasks = houseQuickTasks();
+    const selectedTasks = selectedHouseTasks();
+    const selectedInRoom = selectedHouseTaskIdsForRoom(selectedRoom?.id);
 
     if (percent) percent.textContent = `${stats.percent} %`;
     if (progress) progress.style.width = `${stats.percent}%`;
@@ -779,7 +796,7 @@
           <span class="house-room-icon" aria-hidden="true">${room.icon}</span>
           <strong>${room.label}</strong>
           <span>${available} tâche${available > 1 ? "s" : ""} disponible${available > 1 ? "s" : ""}</span>
-          <span>Progression : ${roomPercent} %</span>
+          <span>${roomPercent} % complété</span>
           <span>${roomTokens} jetons restants</span>
           <i class="house-room-meter" aria-hidden="true"><b style="width:${roomPercent}%"></b></i>
         `;
@@ -795,10 +812,11 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "house-task-button house-task-row";
+        if (selectedInRoom.includes(task.id)) button.classList.add("selected");
         button.dataset.houseTask = task.id;
         button.innerHTML = `
           <span>
-            <strong>${task.label}</strong>
+            <strong>${selectedInRoom.includes(task.id) ? "☑" : "□"} ${task.label}</strong>
             ${task.season ? `<em>${task.season}</em>` : ""}
           </span>
           <b>+${task.reward}</b>
@@ -813,6 +831,16 @@
       }
     } else if (taskList) {
       taskList.replaceChildren();
+    }
+
+    if (selectedSummary && selectedRoom) {
+      const tasks = selectedTasks.filter((task) => task.roomId === selectedRoom.id);
+      const reward = tasks.reduce((sum, task) => sum + task.reward, 0);
+      selectedSummary.classList.toggle("hidden", !tasks.length || Boolean(activeTask));
+      $("house-selected-count").textContent = `${tasks.length} tâche${tasks.length > 1 ? "s" : ""} sélectionnée${tasks.length > 1 ? "s" : ""}`;
+      $("house-selected-reward").textContent = `+${reward} jetons`;
+    } else {
+      selectedSummary?.classList.add("hidden");
     }
 
     if (completedSection && completedList && selectedRoom) {
@@ -845,7 +873,7 @@
 
   function selectHouseRoom(roomId) {
     if (!houseRoomById(roomId)) return;
-    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: roomId };
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: roomId, selectedTasks: [] };
     state.selectedDomain = "house";
     saveState();
     renderHouseCoach();
@@ -853,12 +881,12 @@
   }
 
   function backToHouseRooms() {
-    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: "" };
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: "", selectedTasks: [] };
     saveState();
     renderHouseCoach();
   }
 
-  function selectHouseTask(taskId) {
+  function startHouseTask(taskId) {
     const task = houseTaskById(taskId);
     if (!task || isHouseTaskCompleted(task.id)) return;
     const now = Date.now();
@@ -873,6 +901,18 @@
     renderHouseCoach();
     startHouseTaskTicker();
     $("house-active-mission")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function toggleHouseTaskSelection(taskId) {
+    const task = houseTaskById(taskId);
+    if (!task || isHouseTaskCompleted(task.id) || state.houseCoach?.activeTask) return;
+    const current = Array.isArray(state.houseCoach?.selectedTasks) ? state.houseCoach.selectedTasks : [];
+    const selected = current.includes(task.id)
+      ? current.filter((id) => id !== task.id)
+      : [...current, task.id];
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), selectedRoom: task.roomId, selectedTasks: selected };
+    saveState();
+    renderHouseCoach();
   }
 
   function cancelHouseTask() {
@@ -890,9 +930,24 @@
     }
     state.houseCoach = {
       ...(state.houseCoach || defaultState.houseCoach),
-      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0 }
+      selectedTasks: [],
+      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0, source: "quick" }
     };
-    selectHouseTask(tasks[0].id);
+    startHouseTask(tasks[0].id);
+  }
+
+  function startSelectedHouseMission() {
+    const tasks = selectedHouseTasks().filter((task) => task.roomId === state.houseCoach?.selectedRoom);
+    if (!tasks.length) {
+      showToast("Sélectionne au moins une tâche.");
+      return;
+    }
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0, source: "selection" }
+    };
+    saveState();
+    startHouseTask(tasks[0].id);
   }
 
   function showHouseCompleteModal(task) {
@@ -909,7 +964,7 @@
     const quick = state.houseCoach?.quickMission;
     const nextTaskId = Array.isArray(quick?.taskIds) ? quick.taskIds[quick.currentIndex || 0] : "";
     if (nextTaskId && !state.houseCoach?.activeTask && !isHouseTaskCompleted(nextTaskId)) {
-      selectHouseTask(nextTaskId);
+      startHouseTask(nextTaskId);
     }
   }
 
@@ -926,6 +981,7 @@
       activeTask: null,
       selectedRoom: task.roomId,
       quickMission: state.houseCoach?.quickMission || null,
+      selectedTasks: (state.houseCoach?.selectedTasks || []).filter((id) => id !== task.id),
       completed: {
         ...(state.houseCoach?.completed || {}),
         [date]: [...completed, task.id]
@@ -3068,7 +3124,6 @@
     const financialTypes = new Set(["Finance", "Budget"]);
     return (state.agenda || [])
       .filter((item) => !(item.sourceId || "").startsWith("budget-"))
-      .filter((item) => !(item.sourceId || "").startsWith("house-plan-"))
       .filter((item) => financialTypes.has(item.type) || financialTypes.has(item.domain))
       .flatMap((item) => budgetOccurrenceDatesBetween(item, start, end).map((date) => ({
         id: `${item.id}-${date}`,
@@ -4183,13 +4238,14 @@
     });
     $("house-task-list")?.addEventListener("click", (event) => {
       const button = event.target.closest("[data-house-task]");
-      if (button) selectHouseTask(button.dataset.houseTask);
+      if (button) toggleHouseTaskSelection(button.dataset.houseTask);
     });
     bindById("house-back-rooms", "click", backToHouseRooms);
     bindById("house-complete-task", "click", completeHouseTask);
     bindById("house-cancel-task", "click", cancelHouseTask);
     bindById("house-complete-continue", "click", closeHouseCompleteModal);
     bindById("house-start-quick", "click", startHouseQuickMission);
+    bindById("house-start-selected", "click", startSelectedHouseMission);
     bindById("close-selected-domain", "click", closeSelectedDomain);
     bindById("add-selected-goal", "click", () => addCustomGoal($("add-selected-goal").dataset.addGoal));
     document.querySelectorAll("[data-toggle-missions]").forEach((button) => {

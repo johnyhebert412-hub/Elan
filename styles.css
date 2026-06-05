@@ -277,6 +277,21 @@ p { line-height: 1.4; }
   padding: 14px;
 }
 
+.house-hero {
+  background: linear-gradient(135deg, #eef7f2, #fff9e8);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  margin-top: 12px;
+  padding: 16px;
+}
+
+.house-hero h3 {
+  color: var(--ink);
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 4px 0 0;
+}
+
 .house-quick-mission {
   background: #fff9e8;
   border: 1px solid #eadfb8;
@@ -385,8 +400,8 @@ p { line-height: 1.4; }
 
 .house-room-grid {
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   margin-top: 10px;
 }
 
@@ -394,12 +409,13 @@ p { line-height: 1.4; }
   align-items: flex-start;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(25, 38, 32, 0.06);
   color: var(--ink);
   display: grid;
   gap: 5px;
-  min-height: 148px;
-  padding: 13px;
+  min-height: 166px;
+  padding: 15px;
   text-align: left;
 }
 
@@ -413,7 +429,7 @@ p { line-height: 1.4; }
 }
 
 .house-room-card strong {
-  font-size: 1.02rem;
+  font-size: 1.12rem;
 }
 
 .house-room-card span:not(.house-room-icon) {
@@ -448,6 +464,12 @@ p { line-height: 1.4; }
   display: grid;
   gap: 8px;
   padding: 8px;
+}
+
+.house-task-row.selected {
+  background: #e9f5ef;
+  border-color: var(--brand-light);
+  box-shadow: inset 0 0 0 1px rgba(76, 125, 94, 0.18);
 }
 
 .house-task-button {
@@ -485,6 +507,27 @@ p { line-height: 1.4; }
 .house-task-button b,
 .house-active-reward {
   color: var(--brand);
+  font-weight: 800;
+}
+
+.house-selected-summary {
+  background: var(--brand);
+  border-radius: 16px;
+  color: white;
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.house-selected-summary p {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.house-selected-summary span {
   font-weight: 800;
 }
 
