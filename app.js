@@ -720,6 +720,28 @@
     return `Disponible dans ${days} jours`;
   }
 
+  function houseMissionIcon(task) {
+    const label = String(task?.label || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+    if (label.includes("chaussure")) return "👟";
+    if (label.includes("manteau")) return "🧥";
+    if (label.includes("balayer") || label.includes("plancher")) return "🧹";
+    if (label.includes("vaisselle") || label.includes("evier")) return "🍽️";
+    if (label.includes("comptoir") || label.includes("table")) return "🧽";
+    if (label.includes("poubelle") || label.includes("dechet")) return "🗑️";
+    if (label.includes("lit")) return "🛏️";
+    if (label.includes("vetement") || label.includes("brassee")) return "🧺";
+    if (label.includes("aspirateur")) return "🌀";
+    if (label.includes("toilette") || label.includes("lavabo") || label.includes("douche")) return "🚿";
+    if (label.includes("miroir") || label.includes("vitre")) return "🪟";
+    if (label.includes("micro")) return "🍳";
+    if (label.includes("pelouse") || label.includes("plante")) return "🌱";
+    if (label.includes("deneiger") || label.includes("glacer") || label.includes("sabler")) return "❄️";
+    return task?.roomIcon || "🏠";
+  }
+
   function houseRoomHealth(availableCount, totalCount) {
     if (availableCount <= 0) return { label: "Excellent", percent: 100 };
     const ratio = totalCount ? availableCount / totalCount : 0;
@@ -919,19 +941,20 @@
       const roomTasks = houseTasksForRoom(selectedRoom.id);
       const availableTasks = roomTasks.filter((task) => isHouseTaskAvailable(task));
       taskList.replaceChildren(...availableTasks.map((task) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "house-task-button house-task-row";
-        if (selectedInRoom.includes(task.id)) button.classList.add("selected");
-        button.dataset.houseTask = task.id;
-        button.innerHTML = `
-          <span>
-            <strong>${selectedInRoom.includes(task.id) ? "☑" : "□"} ${task.label}</strong>
-            ${task.season ? `<em>${task.season}</em>` : ""}
-          </span>
-          <b>+${task.reward}</b>
+        const card = document.createElement("article");
+        card.className = "house-mission-card";
+        card.innerHTML = `
+          <div class="house-mission-copy">
+            <span class="house-mission-icon" aria-hidden="true">${houseMissionIcon(task)}</span>
+            <div>
+              <strong>${task.label}</strong>
+              ${task.season ? `<em>${task.season}</em>` : ""}
+            </div>
+          </div>
+          <p class="house-mission-reward">+${task.reward} jetons</p>
+          <button class="primary wide" type="button" data-start-house-task="${task.id}">Commencer</button>
         `;
-        return button;
+        return card;
       }));
       if (!availableTasks.length) {
         const empty = document.createElement("p");
@@ -971,13 +994,16 @@
     if (activePanel) activePanel.classList.toggle("hidden", !activeTask);
     if (activeTask) {
       const activeState = state.houseCoach.activeTask;
+      const isSingleMission = !Array.isArray(state.houseCoach?.quickMission?.taskIds) || state.houseCoach.quickMission.taskIds.length <= 1;
       const remainingMs = activeHouseTaskRemaining();
       const durationMs = activeState.durationMs || houseTaskDurationMs(activeTask);
       const ratio = durationMs ? Math.max(0, Math.min(1, remainingMs / durationMs)) : 0;
       $("house-active-step").textContent = activeHouseSeriesLabel();
-      $("house-active-task-name").textContent = activeTask.label;
+      $("house-active-task-name").textContent = `${houseMissionIcon(activeTask)} ${activeTask.label}`;
       $("house-active-task-room").textContent = `${activeTask.roomIcon} ${activeTask.roomLabel}`;
       $("house-active-task-reward").textContent = `+${activeTask.reward} jetons`;
+      activePanel?.classList.toggle("house-single-mission", isSingleMission);
+      $("house-skip-task")?.classList.toggle("hidden", isSingleMission);
       $("house-timer-display").textContent = formatRemaining(remainingMs);
       $("house-timer-status").textContent = activeState.status === "done" ? "Temps écoulé" : "Mission en cours";
       $("house-timer-progress").style.width = `${ratio * 100}%`;
@@ -1049,6 +1075,22 @@
     };
     saveState();
     startHouseTask(tasks[0].id);
+  }
+
+  function startHouseSingleMission(taskId) {
+    const task = houseTaskById(taskId);
+    if (!task || !isHouseTaskAvailable(task)) {
+      showToast("Cette mission n'est pas disponible maintenant.");
+      return;
+    }
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      selectedRoom: task.roomId,
+      selectedTasks: [task.id],
+      quickMission: { taskIds: [task.id], currentIndex: 0, source: "single", earned: 0, bonus: 0, roomId: task.roomId }
+    };
+    saveState();
+    startHouseTask(task.id);
   }
 
   function startSelectedHouseMission() {
@@ -1232,15 +1274,16 @@
       } else {
         state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), quickMission: null };
         saveState();
+        const singleMission = quick.source === "single" || quick.taskIds.length === 1;
         showHouseCompleteModal({
-          title: roomBonus ? "🏆 Pièce complétée" : "🎉 Série terminée",
-          text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : `${quick.taskIds.length} objectif${quick.taskIds.length > 1 ? "s" : ""} complété${quick.taskIds.length > 1 ? "s" : ""} · retour automatique`,
+          title: roomBonus ? "🏆 Pièce complétée" : (singleMission ? "🎉 Mission complétée" : "🎉 Série terminée"),
+          text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : (singleMission ? `${task.label} · ${houseTaskReturnText(task)}` : `${quick.taskIds.length} objectifs complétés · retour automatique`),
           reward: seriesReward
         });
       }
     } else {
       showHouseCompleteModal({
-        title: roomBonus ? "🏆 Pièce complétée" : "🎉 Série terminée",
+        title: roomBonus ? "🏆 Pièce complétée" : "🎉 Mission complétée",
         text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : `${task.label} · ${houseTaskReturnText(task)}`,
         reward: earnedForTask + roomBonus
       });
@@ -4558,6 +4601,11 @@
       if (button) selectHouseRoom(button.dataset.houseRoom);
     });
     $("house-task-list")?.addEventListener("click", (event) => {
+      const startButton = event.target.closest("[data-start-house-task]");
+      if (startButton) {
+        startHouseSingleMission(startButton.dataset.startHouseTask);
+        return;
+      }
       const button = event.target.closest("[data-house-task]");
       if (button) toggleHouseTaskSelection(button.dataset.houseTask);
     });
