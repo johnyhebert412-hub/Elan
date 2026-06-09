@@ -696,12 +696,12 @@
   }
 
   function houseRoomHealth(availableCount, totalCount) {
-    if (availableCount <= 0) return { label: "✨ Excellent état", percent: 100 };
+    if (availableCount <= 0) return { label: "Excellent", percent: 100 };
     const ratio = totalCount ? availableCount / totalCount : 0;
-    if (ratio <= 0.2) return { label: "👍 Très bon état", percent: 86 };
+    if (ratio <= 0.2) return { label: "Très bon", percent: 86 };
     if (ratio <= 0.4) return { label: "Bon état", percent: 68 };
-    if (ratio <= 0.65) return { label: "⚠️ À surveiller", percent: 46 };
-    return { label: "🔴 Nécessite de l'attention", percent: 24 };
+    if (ratio <= 0.65) return { label: "À surveiller", percent: 46 };
+    return { label: "Attention", percent: 24 };
   }
 
   function completedHouseRoomIds(date = todayKey()) {

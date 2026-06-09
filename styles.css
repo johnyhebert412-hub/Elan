@@ -423,8 +423,11 @@ p { line-height: 1.4; }
   box-shadow: 0 10px 24px rgba(25, 38, 32, 0.06);
   color: var(--ink);
   display: grid;
-  gap: 5px;
+  gap: 4px;
+  grid-template-rows: auto auto auto auto 1fr;
+  height: 166px;
   min-height: 166px;
+  overflow: hidden;
   padding: 15px;
   text-align: left;
 }
@@ -440,14 +443,25 @@ p { line-height: 1.4; }
 
 .house-room-card strong {
   font-size: 1.12rem;
+  line-height: 1.12;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .house-room-card span:not(.house-room-icon) {
   color: var(--muted);
   font-size: 0.84rem;
+  line-height: 1.18;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .house-room-meter {
+  align-self: end;
   margin-top: 4px;
   width: 100%;
 }
@@ -2971,10 +2985,17 @@ body.goal-series-active.challenge-open .app-shell {
   border: 0;
   border-radius: 24px;
   box-shadow: 0 16px 34px rgba(23, 39, 33, 0.10);
+  height: auto;
   min-height: 0;
+  overflow: hidden;
   padding: 14px;
   position: relative;
   transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.domain-immersive .house-room-card {
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr;
 }
 
 .domain-immersive .house-room-card {
@@ -3000,15 +3021,23 @@ body.goal-series-active.challenge-open .app-shell {
 .domain-immersive .training-type-card strong {
   font-size: 1.12rem;
   line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .domain-immersive .house-room-card span:not(.house-room-icon),
 .domain-immersive .training-type-card span:not(.training-type-icon) {
   font-size: 0.78rem;
+  line-height: 1.16;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .domain-immersive .house-room-meter,
 .domain-immersive .training-type-meter {
+  align-self: end;
   bottom: 13px;
   left: 14px;
   position: absolute;
