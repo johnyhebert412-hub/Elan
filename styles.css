@@ -2838,3 +2838,189 @@ body.goal-series-active.challenge-open .app-shell {
 .domain-completed-actions button {
   width: 100%;
 }
+
+/* ── Domaines immersifs : Maison et Entraînement seulement ── */
+#view-domains.domain-immersive-active > .section-heading,
+#view-domains.domain-immersive-active > .domain-grid {
+  display: none;
+}
+
+.domain-immersive {
+  animation: domain-enter 240ms ease both;
+  border: 0;
+  box-shadow: none;
+  margin: -4px -16px 0;
+  min-height: calc(100dvh - var(--bottom-nav-height) - 36px);
+  overflow: hidden;
+  padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
+}
+
+.domain-immersive-house {
+  background:
+    radial-gradient(circle at 16% 8%, rgba(244, 174, 74, 0.22), transparent 34%),
+    linear-gradient(180deg, #f7fbf5 0%, #fffaf0 100%);
+}
+
+.domain-immersive-training {
+  background:
+    radial-gradient(circle at 86% 10%, rgba(81, 109, 145, 0.20), transparent 34%),
+    linear-gradient(180deg, #f4f7fb 0%, #fff7ec 100%);
+}
+
+.immersive-header {
+  align-items: center;
+  background: rgba(255, 253, 248, 0.82);
+  border: 1px solid rgba(222, 216, 205, 0.78);
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(23, 39, 33, 0.08);
+  margin-bottom: 14px;
+  padding: 10px 12px;
+}
+
+.immersive-header h2 {
+  font-size: 1.55rem;
+  margin: 0;
+}
+
+.immersive-header .text-button {
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(222, 216, 205, 0.78);
+  border-radius: 14px;
+  color: var(--brand);
+  min-height: 42px;
+  padding-inline: 12px;
+}
+
+.domain-immersive .house-hero,
+.domain-immersive .training-hero {
+  border: 0;
+  box-shadow: 0 16px 36px rgba(23, 39, 33, 0.09);
+  margin-top: 0;
+  padding: 18px;
+}
+
+.domain-immersive .house-hero h3,
+.domain-immersive .training-hero h3 {
+  font-size: 1.65rem;
+}
+
+.domain-immersive .domain-section-label {
+  margin-top: 18px;
+}
+
+.domain-immersive .house-room-grid,
+.domain-immersive .training-type-cards {
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.domain-immersive .house-room-card,
+.domain-immersive .training-type-card {
+  aspect-ratio: 1 / 1;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: 0 16px 34px rgba(23, 39, 33, 0.10);
+  min-height: 0;
+  padding: 14px;
+  position: relative;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.domain-immersive .house-room-card {
+  background: linear-gradient(155deg, #ffffff 0%, #edf7f1 100%);
+}
+
+.domain-immersive .training-type-card {
+  background: linear-gradient(155deg, #ffffff 0%, #eef3fb 100%);
+}
+
+.domain-immersive .house-room-card:active,
+.domain-immersive .training-type-card:active {
+  box-shadow: 0 10px 20px rgba(23, 39, 33, 0.08);
+  transform: translateY(2px) scale(0.985);
+}
+
+.domain-immersive .house-room-icon,
+.domain-immersive .training-type-icon {
+  font-size: 2.1rem;
+}
+
+.domain-immersive .house-room-card strong,
+.domain-immersive .training-type-card strong {
+  font-size: 1.12rem;
+  line-height: 1.1;
+}
+
+.domain-immersive .house-room-card span:not(.house-room-icon),
+.domain-immersive .training-type-card span:not(.training-type-icon) {
+  font-size: 0.78rem;
+}
+
+.domain-immersive .house-room-meter,
+.domain-immersive .training-type-meter {
+  bottom: 13px;
+  left: 14px;
+  position: absolute;
+  right: 14px;
+  width: auto;
+}
+
+.domain-immersive .house-room-detail,
+.domain-immersive .house-active-mission,
+.domain-immersive .training-control,
+.domain-immersive .training-program-card {
+  animation: domain-card-rise 220ms ease both;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: 0 16px 34px rgba(23, 39, 33, 0.10);
+}
+
+.domain-immersive .house-task-button {
+  min-height: 64px;
+}
+
+.domain-immersive .training-level-cards {
+  grid-template-columns: 1fr;
+}
+
+.domain-immersive .training-level-cards button {
+  border: 0;
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(23, 39, 33, 0.08);
+  font-size: 1rem;
+  min-height: 70px;
+  padding: 16px;
+}
+
+.domain-immersive .training-fast-session {
+  border: 0;
+  border-radius: 22px;
+  box-shadow: 0 14px 30px rgba(23, 39, 33, 0.08);
+}
+
+.domain-immersive .training-active-step {
+  min-height: calc(100dvh - 230px);
+}
+
+@keyframes domain-enter {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes domain-card-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 560px) {
+  .domain-immersive {
+    border-radius: 28px;
+    margin-inline: 0;
+    padding-inline: 18px;
+  }
+
+  .domain-immersive .house-room-grid,
+  .domain-immersive .training-type-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

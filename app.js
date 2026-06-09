@@ -582,14 +582,21 @@
     const quickButton = $("quick-add-button");
     if (quickButton) quickButton.classList.toggle("hidden", name !== "home");
     if (name !== "home") closeQuickAdd();
+    if (name !== "domains") closeDomain();
   }
 
   function openDomain(domain) {
     const panel = $(`domain-${domain}`);
     if (!panel) return;
+    const domainsView = $("view-domains");
+    const isImmersiveDomain = domain === "house" || domain === "training";
     state.selectedDomain = domain;
     saveState();
     document.querySelectorAll(".domain-panel").forEach((panel) => panel.classList.add("hidden"));
+    if (domainsView) {
+      domainsView.classList.toggle("domain-immersive-active", isImmersiveDomain);
+      domainsView.dataset.activeDomain = isImmersiveDomain ? domain : "";
+    }
     panel.classList.remove("hidden");
     renderHomeSuggestion();
     if (domain === "house") renderHouseCoach();
@@ -606,6 +613,11 @@
 
   function closeDomain() {
     document.querySelectorAll(".domain-panel").forEach((panel) => panel.classList.add("hidden"));
+    const domainsView = $("view-domains");
+    if (domainsView) {
+      domainsView.classList.remove("domain-immersive-active");
+      domainsView.dataset.activeDomain = "";
+    }
   }
 
   function todayKey() {
@@ -2007,6 +2019,11 @@
     document.querySelectorAll(".domain-panel").forEach((panel) => {
       panel.classList.toggle("hidden", panel.id !== "domain-training");
     });
+    const domainsView = $("view-domains");
+    if (domainsView) {
+      domainsView.classList.add("domain-immersive-active");
+      domainsView.dataset.activeDomain = "training";
+    }
     showView("domains");
     $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
