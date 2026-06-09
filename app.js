@@ -349,7 +349,7 @@
     notifications: { important: false, summary: false },
     budget: { incomes: [], payments: [] },
     houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, completedRooms: {}, quickMission: null },
-    training: { mode: "quick", type: "cardio", level: "beginner", paneOpen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
+    training: { mode: "quick", type: "cardio", level: "beginner", paneOpen: false, levelChosen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
   let state = loadState();
@@ -429,6 +429,7 @@
               type: trainingPrograms[saved.training.type] ? saved.training.type : defaultState.training.type,
               level: trainingPrograms[saved.training.type]?.[saved.training.level] ? saved.training.level : defaultState.training.level,
               paneOpen: Boolean(saved.training.paneOpen),
+              levelChosen: Boolean(saved.training.levelChosen),
               started: Boolean(saved.training.started),
               currentStep: Number.isFinite(saved.training.currentStep) ? saved.training.currentStep : 0,
               completed: Boolean(saved.training.completed),
@@ -763,6 +764,9 @@
 
   function renderHouseCoach() {
     const roomGrid = $("house-room-grid");
+    const panel = $("domain-house");
+    const hero = $("domain-house")?.querySelector(".house-hero");
+    const overview = $("house-room-overview");
     const detail = $("house-room-detail");
     const detailTitle = $("house-room-title");
     const taskList = $("house-task-list");
@@ -774,6 +778,11 @@
     const selectedRoom = houseRoomById(state.houseCoach?.selectedRoom);
     const selectedTasks = selectedHouseTasks();
     const selectedInRoom = selectedHouseTaskIdsForRoom(selectedRoom?.id);
+
+    panel?.classList.toggle("house-room-open", Boolean(selectedRoom) && !activeTask);
+    panel?.classList.toggle("house-active-domain", Boolean(activeTask));
+    hero?.classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask));
+    overview?.classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask));
 
     if (roomGrid) {
       roomGrid.replaceChildren(...houseRooms.map((room) => {
@@ -794,7 +803,7 @@
       }));
     }
 
-    if (detail) detail.classList.toggle("hidden", !selectedRoom);
+    if (detail) detail.classList.toggle("hidden", !selectedRoom || Boolean(activeTask));
     if (detailTitle && selectedRoom) detailTitle.textContent = `${selectedRoom.icon} ${selectedRoom.label}`;
     if (taskList && selectedRoom) {
       const availableTasks = selectedRoom.tasks.filter((task) => !isHouseTaskCompleted(task.id));
@@ -944,6 +953,14 @@
   }
 
   function completeHouseTask() {
+    finishHouseTask(false);
+  }
+
+  function skipHouseTask() {
+    finishHouseTask(true);
+  }
+
+  function finishHouseTask(skipped = false) {
     const task = state.houseCoach?.activeTask ? houseTaskById(state.houseCoach.activeTask.id) : null;
     if (!task || isHouseTaskCompleted(task.id)) {
       cancelHouseTask();
@@ -952,14 +969,15 @@
     const date = todayKey();
     const completed = completedHouseTaskIds(date);
     const quick = state.houseCoach?.quickMission || null;
-    const completedNext = [...completed, task.id];
+    const completedNext = skipped ? completed : [...completed, task.id];
     const room = houseRoomById(task.roomId);
     const roomCompletedNow = Boolean(room)
       && !isHouseRoomCompleted(task.roomId)
       && room.tasks.every((roomTask) => completedNext.includes(roomTask.id));
-    const roomBonus = roomCompletedNow ? 25 : 0;
+    const roomBonus = skipped ? 0 : (roomCompletedNow ? 25 : 0);
     const completedRooms = completedHouseRoomIds(date);
-    const seriesReward = (quick?.earned || 0) + task.reward + roomBonus;
+    const earnedForTask = skipped ? 0 : task.reward;
+    const seriesReward = (quick?.earned || 0) + earnedForTask + roomBonus;
     const seriesBonus = (quick?.bonus || 0) + roomBonus;
     state.houseCoach = {
       ...(state.houseCoach || defaultState.houseCoach),
@@ -977,16 +995,18 @@
       }
     };
     state.selectedDomain = "house";
-    state.wins += 1;
-    state.coins += task.reward + roomBonus;
-    state.progress.house = (state.progress.house || 0) + 1;
-    const historyItems = [{
+    if (!skipped) {
+      state.wins += 1;
+      state.coins += task.reward + roomBonus;
+      state.progress.house = (state.progress.house || 0) + 1;
+    }
+    const historyItems = skipped ? [] : [{
       label: `Maison - ${task.roomLabel} : ${task.label}`,
       coins: task.reward,
       at: Date.now(),
       domain: "house"
     }];
-    if (roomBonus) {
+    if (!skipped && roomBonus) {
       historyItems.push({
         label: `Maison - ${task.roomLabel} complétée`,
         coins: roomBonus,
@@ -994,7 +1014,7 @@
         domain: "house"
       });
     }
-    state.history = [...historyItems, ...state.history].slice(0, 50);
+    if (historyItems.length) state.history = [...historyItems, ...state.history].slice(0, 50);
     saveState();
     stopHouseTaskTicker();
     renderHouseCoach();
@@ -1002,7 +1022,7 @@
     renderShop();
     renderHistoryList();
     renderAgenda();
-    showToast(houseCompletionMessage(task));
+    showToast(skipped ? `Mission passée. ${task.label}` : houseCompletionMessage(task));
     if (quick?.taskIds?.length) {
       const nextIndex = (quick.currentIndex || 0) + 1;
       const nextTaskId = quick.taskIds[nextIndex];
@@ -1026,7 +1046,7 @@
       showHouseCompleteModal({
         title: roomBonus ? "🏆 Pièce complétée" : "🎉 Série terminée",
         text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : task.label,
-        reward: task.reward + roomBonus
+        reward: earnedForTask + roomBonus
       });
     }
   }
@@ -1104,7 +1124,10 @@
     const isStarted = Boolean(state.training?.started && !state.training?.completed);
     const isCompleted = Boolean(state.training?.completed);
     const paneOpen = Boolean(state.training?.paneOpen || isStarted || isCompleted || mode === "custom");
+    const levelChosen = Boolean(mode === "custom" || state.training?.levelChosen || isStarted || isCompleted);
     panel.classList.toggle("training-active-domain", isStarted);
+    panel.classList.toggle("training-level-domain", paneOpen && !levelChosen && !isStarted && !isCompleted);
+    panel.classList.toggle("training-program-domain", paneOpen && levelChosen && !isStarted && !isCompleted);
     document.querySelectorAll("[data-training-mode]").forEach((button) => {
       const active = button.dataset.trainingMode === mode;
       button.classList.toggle("selected", active);
@@ -1146,11 +1169,11 @@
     const selectedTypeTitle = $("training-selected-type-title");
 
     renderTrainingTypeCards();
-    if (overview) overview.classList.toggle("hidden", mode !== "quick" || isStarted || isCompleted);
-    if (quickBuilder) quickBuilder.classList.toggle("hidden", mode !== "quick" || !paneOpen || isStarted || isCompleted);
+    if (overview) overview.classList.toggle("hidden", mode !== "quick" || paneOpen || isStarted || isCompleted);
+    if (quickBuilder) quickBuilder.classList.toggle("hidden", mode !== "quick" || !paneOpen || levelChosen || isStarted || isCompleted);
     if (customBuilder) customBuilder.classList.toggle("hidden", mode !== "custom" || isStarted);
     if (programCard) {
-      programCard.classList.toggle("hidden", !paneOpen);
+      programCard.classList.toggle("hidden", !paneOpen || !levelChosen);
       programCard.classList.toggle("training-session-focused", isStarted);
       programCard.classList.toggle("training-countdown-active", isStarted && trainingTimerPhase === "countdown");
     }
@@ -1433,7 +1456,7 @@
   function setTrainingMode(mode) {
     if (!["quick", "custom"].includes(mode)) return;
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), mode, paneOpen: mode === "custom" ? true : Boolean(state.training?.paneOpen), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), mode, paneOpen: mode === "custom" ? true : Boolean(state.training?.paneOpen), levelChosen: mode === "custom" ? true : Boolean(state.training?.levelChosen), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
@@ -1441,7 +1464,7 @@
   function setTrainingType(type) {
     if (!trainingPrograms[type]) return;
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), type, paneOpen: true, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), type, paneOpen: true, levelChosen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
   }
@@ -1456,9 +1479,10 @@
     const type = trainingPrograms[state.training?.type] ? state.training.type : defaultState.training.type;
     if (!trainingPrograms[type]?.[level]) return;
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), level, paneOpen: true, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), level, paneOpen: true, levelChosen: true, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
+    $("training-program-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function startTrainingSession() {
@@ -1469,7 +1493,7 @@
     }
     clearMaisonRuntimeState("démarrage entraînement");
     debugActivityLog("démarrage activité", { type: "training", mode: state.training?.mode, level: state.training?.level });
-    state.training = { ...(state.training || defaultState.training), paneOpen: true, started: true, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), paneOpen: true, levelChosen: true, started: true, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     renderGoalQueue();
@@ -1487,7 +1511,7 @@
 
   function backToTrainingOverview() {
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), mode: "quick", paneOpen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), mode: "quick", paneOpen: false, levelChosen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     $("training-overview")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1495,7 +1519,7 @@
 
   function resetTrainingSession() {
     stopTrainingTimer();
-    state.training = { ...(state.training || defaultState.training), paneOpen: Boolean(state.training?.paneOpen), started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
+    state.training = { ...(state.training || defaultState.training), paneOpen: Boolean(state.training?.paneOpen), levelChosen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0 };
     saveState();
     renderTrainingProgram();
     $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2008,6 +2032,7 @@
     state.training = {
       ...(state.training || defaultState.training),
       paneOpen: false,
+      levelChosen: false,
       started: false,
       completed: false,
       currentStep: 0,
@@ -2034,6 +2059,7 @@
       ...(state.training || defaultState.training),
       mode: "quick",
       paneOpen: false,
+      levelChosen: false,
       started: false,
       completed: false,
       currentStep: 0,
@@ -2050,6 +2076,7 @@
     state.training = {
       ...(state.training || defaultState.training),
       paneOpen: false,
+      levelChosen: false,
       started: false,
       completed: false,
       currentStep: 0,
@@ -4326,6 +4353,7 @@
     });
     bindById("house-back-rooms", "click", backToHouseRooms);
     bindById("house-complete-task", "click", completeHouseTask);
+    bindById("house-skip-task", "click", skipHouseTask);
     bindById("house-cancel-task", "click", cancelHouseTask);
     bindById("house-complete-continue", "click", closeHouseCompleteModal);
     bindById("house-start-selected", "click", startSelectedHouseMission);
