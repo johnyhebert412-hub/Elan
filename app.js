@@ -201,9 +201,9 @@
     }
   };
   const trainingTypeMeta = {
-    cardio: { icon: "🏃", description: "Améliore ton souffle et ton endurance." },
-    force: { icon: "🏋️", description: "Développe ta force et ta puissance." },
-    endurance: { icon: "🔥", description: "Travaille ta résistance et ta constance." }
+    cardio: { icon: "🏃", description: "Améliore ton souffle" },
+    force: { icon: "🏋️", description: "Développe la force" },
+    endurance: { icon: "🔥", description: "Travaille l'endurance" }
   };
   const trainingRewardByLevel = {
     beginner: 5,
@@ -1304,8 +1304,8 @@
         <span class="training-type-icon" aria-hidden="true">${meta.icon}</span>
         <strong>${trainingLabels.type[type]}</strong>
         <span>${meta.description}</span>
+        <span class="training-type-count">${count} séance${count > 1 ? "s" : ""}</span>
         <i class="training-type-meter" aria-hidden="true"><b style="width:${percent}%"></b></i>
-        <em>${count} séance${count > 1 ? "s" : ""} complétée${count > 1 ? "s" : ""}</em>
       `;
       return button;
     }));
