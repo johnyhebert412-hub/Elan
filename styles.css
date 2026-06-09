@@ -284,6 +284,45 @@ p { line-height: 1.4; }
   margin: 4px 0 0;
 }
 
+.house-quick-mission {
+  background: #fff9e8;
+  border: 1px solid #eadfb8;
+  border-radius: 22px;
+  box-shadow: 0 14px 30px rgba(23, 39, 33, 0.07);
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.house-quick-mission h3 {
+  color: var(--ink);
+  font-size: 1.08rem;
+  margin: 0;
+}
+
+#house-quick-reward {
+  color: var(--brand);
+  font-size: 1rem;
+}
+
+.house-quick-list {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0;
+}
+
+.house-quick-list p,
+.house-completed-list p {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink);
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 9px 10px;
+}
+
 .house-completed-list p {
   align-items: center;
   background: var(--surface);
@@ -298,6 +337,18 @@ p { line-height: 1.4; }
 
 .house-completed-list strong {
   color: var(--brand);
+}
+
+.house-completed-list span {
+  display: grid;
+  gap: 3px;
+}
+
+.house-completed-list em {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .house-room-detail h3,

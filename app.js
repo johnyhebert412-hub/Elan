@@ -98,12 +98,12 @@
       icon: "🛋️",
       label: "Salon",
       tasks: [
-        { id: "salon-aspirateur", label: "Passer l'aspirateur", reward: 10 },
-        { id: "salon-depoussierer", label: "Dépoussiérer", reward: 5 },
-        { id: "salon-ranger-objets", label: "Ranger les objets", reward: 5 },
-        { id: "salon-nettoyer-table", label: "Nettoyer la table", reward: 5 },
-        { id: "salon-nettoyer-vitres", label: "Nettoyer les vitres", reward: 10 },
-        { id: "salon-dechets", label: "Ramasser les déchets", reward: 5 }
+        { id: "salon-aspirateur", label: "Passer l'aspirateur", reward: 10, repeatDays: 7 },
+        { id: "salon-depoussierer", label: "Dépoussiérer", reward: 5, repeatDays: 7 },
+        { id: "salon-ranger-objets", label: "Ranger les objets", reward: 5, repeatDays: 1 },
+        { id: "salon-nettoyer-table", label: "Nettoyer la table", reward: 5, repeatDays: 3 },
+        { id: "salon-nettoyer-vitres", label: "Nettoyer les vitres", reward: 10, repeatDays: 60 },
+        { id: "salon-dechets", label: "Ramasser les déchets", reward: 5, repeatDays: 1 }
       ]
     },
     {
@@ -111,13 +111,13 @@
       icon: "🍳",
       label: "Cuisine",
       tasks: [
-        { id: "cuisine-vaisselle", label: "Faire la vaisselle", reward: 5 },
-        { id: "cuisine-comptoir", label: "Nettoyer le comptoir", reward: 5 },
-        { id: "cuisine-balayer", label: "Balayer le plancher", reward: 10 },
-        { id: "cuisine-poubelles", label: "Sortir les poubelles", reward: 5 },
-        { id: "cuisine-micro-ondes", label: "Nettoyer le micro-ondes", reward: 10 },
-        { id: "cuisine-epicerie", label: "Ranger l'épicerie", reward: 5 },
-        { id: "cuisine-evier", label: "Nettoyer l'évier", reward: 5 }
+        { id: "cuisine-vaisselle", label: "Faire la vaisselle", reward: 5, repeatDays: 1 },
+        { id: "cuisine-comptoir", label: "Nettoyer le comptoir", reward: 5, repeatDays: 1 },
+        { id: "cuisine-balayer", label: "Balayer le plancher", reward: 10, repeatDays: 7 },
+        { id: "cuisine-poubelles", label: "Sortir les poubelles", reward: 5, repeatDays: 7 },
+        { id: "cuisine-micro-ondes", label: "Nettoyer le micro-ondes", reward: 10, repeatDays: 14 },
+        { id: "cuisine-epicerie", label: "Ranger l'épicerie", reward: 5, repeatDays: 3 },
+        { id: "cuisine-evier", label: "Nettoyer l'évier", reward: 5, repeatDays: 3 }
       ]
     },
     {
@@ -125,11 +125,11 @@
       icon: "🛏️",
       label: "Chambre",
       tasks: [
-        { id: "chambre-lit", label: "Faire le lit", reward: 5 },
-        { id: "chambre-vetements", label: "Ranger les vêtements", reward: 5 },
-        { id: "chambre-aspirateur", label: "Aspirateur", reward: 10 },
-        { id: "chambre-depoussierer", label: "Dépoussiérer", reward: 5 },
-        { id: "chambre-poubelle", label: "Vider la poubelle", reward: 5 }
+        { id: "chambre-lit", label: "Faire le lit", reward: 5, repeatDays: 1 },
+        { id: "chambre-vetements", label: "Ranger les vêtements", reward: 5, repeatDays: 3 },
+        { id: "chambre-aspirateur", label: "Aspirateur", reward: 10, repeatDays: 7 },
+        { id: "chambre-depoussierer", label: "Dépoussiérer", reward: 5, repeatDays: 7 },
+        { id: "chambre-poubelle", label: "Vider la poubelle", reward: 5, repeatDays: 7 }
       ]
     },
     {
@@ -137,13 +137,13 @@
       icon: "🚿",
       label: "Salle de bain",
       tasks: [
-        { id: "bain-toilette", label: "Nettoyer la toilette", reward: 10 },
-        { id: "bain-lavabo", label: "Nettoyer le lavabo", reward: 5 },
-        { id: "bain-miroir", label: "Nettoyer le miroir", reward: 5 },
-        { id: "bain-douche", label: "Nettoyer la douche", reward: 10 },
-        { id: "bain-serviettes", label: "Changer les serviettes", reward: 5 },
-        { id: "bain-balayer", label: "Balayer", reward: 5 },
-        { id: "bain-plancher", label: "Laver le plancher", reward: 10 }
+        { id: "bain-toilette", label: "Nettoyer la toilette", reward: 10, repeatDays: 7 },
+        { id: "bain-lavabo", label: "Nettoyer le lavabo", reward: 5, repeatDays: 3 },
+        { id: "bain-miroir", label: "Nettoyer le miroir", reward: 5, repeatDays: 7 },
+        { id: "bain-douche", label: "Nettoyer la douche", reward: 10, repeatDays: 14 },
+        { id: "bain-serviettes", label: "Changer les serviettes", reward: 5, repeatDays: 7 },
+        { id: "bain-balayer", label: "Balayer", reward: 5, repeatDays: 7 },
+        { id: "bain-plancher", label: "Laver le plancher", reward: 10, repeatDays: 14 }
       ]
     },
     {
@@ -151,11 +151,11 @@
       icon: "🧺",
       label: "Buanderie",
       tasks: [
-        { id: "buanderie-brassee", label: "Faire une brassée", reward: 5 },
-        { id: "buanderie-plier", label: "Plier les vêtements", reward: 5 },
-        { id: "buanderie-ranger", label: "Ranger les vêtements", reward: 5 },
-        { id: "buanderie-secheuse", label: "Nettoyer la sécheuse", reward: 5 },
-        { id: "buanderie-plancher", label: "Nettoyer le plancher", reward: 5 }
+        { id: "buanderie-brassee", label: "Faire une brassée", reward: 5, repeatDays: 3 },
+        { id: "buanderie-plier", label: "Plier les vêtements", reward: 5, repeatDays: 3 },
+        { id: "buanderie-ranger", label: "Ranger les vêtements", reward: 5, repeatDays: 3 },
+        { id: "buanderie-secheuse", label: "Nettoyer la sécheuse", reward: 5, repeatDays: 30 },
+        { id: "buanderie-plancher", label: "Nettoyer le plancher", reward: 5, repeatDays: 14 }
       ]
     },
     {
@@ -163,11 +163,11 @@
       icon: "🚪",
       label: "Entrée",
       tasks: [
-        { id: "entree-chaussures", label: "Ranger les chaussures", reward: 5 },
-        { id: "entree-manteaux", label: "Ranger les manteaux", reward: 5 },
-        { id: "entree-balayer", label: "Balayer", reward: 5 },
-        { id: "entree-porte", label: "Nettoyer la porte", reward: 5 },
-        { id: "entree-tapis", label: "Nettoyer le tapis", reward: 5 }
+        { id: "entree-chaussures", label: "Ranger les chaussures", reward: 5, repeatDays: 1 },
+        { id: "entree-manteaux", label: "Ranger les manteaux", reward: 5, repeatDays: 3 },
+        { id: "entree-balayer", label: "Balayer", reward: 5, repeatDays: 7 },
+        { id: "entree-porte", label: "Nettoyer la porte", reward: 5, repeatDays: 30 },
+        { id: "entree-tapis", label: "Nettoyer le tapis", reward: 5, repeatDays: 14 }
       ]
     },
     {
@@ -175,15 +175,15 @@
       icon: "🌳",
       label: "Extérieur",
       tasks: [
-        { id: "exterieur-pelouse", label: "Tondre la pelouse", reward: 15, season: "Été" },
-        { id: "exterieur-desherber", label: "Désherber", reward: 10, season: "Été" },
-        { id: "exterieur-arroser", label: "Arroser les plantes", reward: 5, season: "Été" },
-        { id: "exterieur-branches", label: "Ramasser les branches", reward: 10, season: "Été" },
-        { id: "exterieur-patio", label: "Nettoyer le patio", reward: 10, season: "Été" },
-        { id: "exterieur-deneiger", label: "Déneiger l'entrée", reward: 15, season: "Hiver" },
-        { id: "exterieur-deglacer", label: "Déglacer les marches", reward: 10, season: "Hiver" },
-        { id: "exterieur-sabler", label: "Sabler", reward: 5, season: "Hiver" },
-        { id: "exterieur-voiture", label: "Dégager la voiture", reward: 10, season: "Hiver" }
+        { id: "exterieur-pelouse", label: "Tondre la pelouse", reward: 15, repeatDays: 7, season: "Été" },
+        { id: "exterieur-desherber", label: "Désherber", reward: 10, repeatDays: 14, season: "Été" },
+        { id: "exterieur-arroser", label: "Arroser les plantes", reward: 5, repeatDays: 3, season: "Été" },
+        { id: "exterieur-branches", label: "Ramasser les branches", reward: 10, repeatDays: 14, season: "Été" },
+        { id: "exterieur-patio", label: "Nettoyer le patio", reward: 10, repeatDays: 30, season: "Été" },
+        { id: "exterieur-deneiger", label: "Déneiger l'entrée", reward: 15, repeatDays: 1, season: "Hiver" },
+        { id: "exterieur-deglacer", label: "Déglacer les marches", reward: 10, repeatDays: 3, season: "Hiver" },
+        { id: "exterieur-sabler", label: "Sabler", reward: 5, repeatDays: 3, season: "Hiver" },
+        { id: "exterieur-voiture", label: "Dégager la voiture", reward: 10, repeatDays: 3, season: "Hiver" }
       ]
     }
   ];
@@ -625,6 +625,19 @@
     return new Date().toISOString().slice(0, 10);
   }
 
+  function dateKeyToMs(dateKey) {
+    const [year, month, day] = String(dateKey || "").split("-").map(Number);
+    if (!year || !month || !day) return 0;
+    return new Date(year, month - 1, day).setHours(0, 0, 0, 0);
+  }
+
+  function daysBetweenKeys(fromKey, toKey = todayKey()) {
+    const from = dateKeyToMs(fromKey);
+    const to = dateKeyToMs(toKey);
+    if (!from || !to) return 0;
+    return Math.floor((to - from) / 86400000);
+  }
+
   function allHouseTasks() {
     return houseRooms.flatMap((room) => room.tasks.map((task) => ({ ...task, roomId: room.id, roomLabel: room.label, roomIcon: room.icon })));
   }
@@ -644,6 +657,51 @@
 
   function isHouseTaskCompleted(taskId) {
     return completedHouseTaskIds().includes(taskId);
+  }
+
+  function lastHouseTaskCompletionDate(taskId) {
+    const completedMap = state.houseCoach?.completed || {};
+    return Object.keys(completedMap)
+      .filter((date) => Array.isArray(completedMap[date]) && completedMap[date].includes(taskId))
+      .sort()
+      .at(-1) || "";
+  }
+
+  function houseTaskRepeatDays(task) {
+    return Math.max(1, Number.isFinite(task?.repeatDays) ? task.repeatDays : 7);
+  }
+
+  function daysUntilHouseTaskAvailable(task) {
+    const lastDate = lastHouseTaskCompletionDate(task?.id);
+    if (!lastDate) return 0;
+    const elapsed = Math.max(0, daysBetweenKeys(lastDate));
+    return Math.max(0, houseTaskRepeatDays(task) - elapsed);
+  }
+
+  function isHouseTaskAvailable(task) {
+    return daysUntilHouseTaskAvailable(task) <= 0;
+  }
+
+  function houseTaskReturnText(task) {
+    const days = houseTaskRepeatDays(task);
+    if (days <= 1) return "Revient demain";
+    return `Revient dans ${days} jours`;
+  }
+
+  function houseTaskAvailableText(task) {
+    const days = daysUntilHouseTaskAvailable(task);
+    if (days <= 0) return "Disponible maintenant";
+    if (days === 1) return "Disponible demain";
+    return `Disponible dans ${days} jours`;
+  }
+
+  function houseRoomHealth(availableCount, totalCount) {
+    if (availableCount <= 0) return { label: "✨ Excellent état", percent: 100 };
+    const ratio = totalCount ? availableCount / totalCount : 0;
+    if (ratio <= 0.2) return { label: "👍 Très bon état", percent: 86 };
+    if (ratio <= 0.4) return { label: "Bon état", percent: 68 };
+    if (ratio <= 0.65) return { label: "⚠️ À surveiller", percent: 46 };
+    return { label: "🔴 Nécessite de l'attention", percent: 24 };
   }
 
   function completedHouseRoomIds(date = todayKey()) {
@@ -685,11 +743,20 @@
     return `Mission ${(series.currentIndex || 0) + 1}/${series.taskIds.length}`;
   }
 
+  function houseQuickTasks() {
+    const available = allHouseTasks().filter((task) => isHouseTaskAvailable(task));
+    const preferred = ["cuisine-vaisselle", "cuisine-comptoir", "chambre-lit", "salon-ranger-objets"];
+    return [
+      ...preferred.map((id) => available.find((task) => task.id === id)).filter(Boolean),
+      ...available.filter((task) => !preferred.includes(task.id))
+    ].slice(0, 3);
+  }
+
   function selectedHouseTasks() {
     const selected = Array.isArray(state.houseCoach?.selectedTasks) ? state.houseCoach.selectedTasks : [];
     return selected
       .map((taskId) => houseTaskById(taskId))
-      .filter((task) => task && !isHouseTaskCompleted(task.id));
+      .filter((task) => task && isHouseTaskAvailable(task));
   }
 
   function selectedHouseTaskIdsForRoom(roomId) {
@@ -759,7 +826,7 @@
   }
 
   function houseCompletionMessage(task) {
-    return `✓ ${task.label} terminé · +${task.reward} jetons`;
+    return `✓ ${task.label} terminé · +${task.reward} jetons · ${houseTaskReturnText(task)}`;
   }
 
   function renderHouseCoach() {
@@ -778,16 +845,33 @@
     const selectedRoom = houseRoomById(state.houseCoach?.selectedRoom);
     const selectedTasks = selectedHouseTasks();
     const selectedInRoom = selectedHouseTaskIdsForRoom(selectedRoom?.id);
+    const quickTasks = houseQuickTasks();
 
     panel?.classList.toggle("house-room-open", Boolean(selectedRoom) && !activeTask);
     panel?.classList.toggle("house-active-domain", Boolean(activeTask));
     hero?.classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask));
     overview?.classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask));
 
+    if ($("house-quick-mission")) $("house-quick-mission").classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask) || !quickTasks.length);
+    if ($("house-quick-list")) {
+      $("house-quick-list").replaceChildren(...quickTasks.map((task) => {
+        const item = document.createElement("p");
+        item.innerHTML = `<span>☑ ${task.label}</span><strong>+${task.reward}</strong>`;
+        return item;
+      }));
+    }
+    if ($("house-quick-reward")) {
+      $("house-quick-reward").textContent = `+${quickTasks.reduce((sum, task) => sum + task.reward, 0)}`;
+    }
+    if ($("house-start-quick")) {
+      $("house-start-quick").disabled = !quickTasks.length || Boolean(activeTask);
+      $("house-start-quick").textContent = quickTasks.length ? "Commencer" : "Rien pour maintenant";
+    }
+
     if (roomGrid) {
       roomGrid.replaceChildren(...houseRooms.map((room) => {
-        const completedInRoom = room.tasks.filter((task) => isHouseTaskCompleted(task.id)).length;
-        const roomPercent = room.tasks.length ? Math.round((completedInRoom / room.tasks.length) * 100) : 0;
+        const availableTasks = room.tasks.filter((task) => isHouseTaskAvailable(task));
+        const roomHealth = houseRoomHealth(availableTasks.length, room.tasks.length);
         const button = document.createElement("button");
         button.type = "button";
         button.className = "house-room-card";
@@ -795,9 +879,9 @@
         button.innerHTML = `
           <span class="house-room-icon" aria-hidden="true">${room.icon}</span>
           <strong>${room.label}</strong>
-          <span>${completedInRoom} / ${room.tasks.length} objectifs complétés</span>
-          <span>${roomPercent} % complété</span>
-          <i class="house-room-meter" aria-hidden="true"><b style="width:${roomPercent}%"></b></i>
+          <span>${availableTasks.length} tâche${availableTasks.length > 1 ? "s" : ""} disponible${availableTasks.length > 1 ? "s" : ""}</span>
+          <span>${roomHealth.label}</span>
+          <i class="house-room-meter" aria-hidden="true"><b style="width:${roomHealth.percent}%"></b></i>
         `;
         return button;
       }));
@@ -806,7 +890,7 @@
     if (detail) detail.classList.toggle("hidden", !selectedRoom || Boolean(activeTask));
     if (detailTitle && selectedRoom) detailTitle.textContent = `${selectedRoom.icon} ${selectedRoom.label}`;
     if (taskList && selectedRoom) {
-      const availableTasks = selectedRoom.tasks.filter((task) => !isHouseTaskCompleted(task.id));
+      const availableTasks = selectedRoom.tasks.filter((task) => isHouseTaskAvailable(task));
       taskList.replaceChildren(...availableTasks.map((task) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -825,7 +909,7 @@
       if (!availableTasks.length) {
         const empty = document.createElement("p");
         empty.className = "small-muted";
-        empty.textContent = "Toutes les tâches de cette pièce sont terminées aujourd'hui.";
+        empty.textContent = "Rien d'urgent dans cette pièce pour maintenant.";
         taskList.replaceChildren(empty);
       }
     } else if (taskList) {
@@ -843,11 +927,13 @@
     }
 
     if (completedSection && completedList && selectedRoom) {
-      const completedTasks = selectedRoom.tasks.filter((task) => isHouseTaskCompleted(task.id));
-      completedSection.classList.toggle("hidden", !completedTasks.length);
-      completedList.replaceChildren(...completedTasks.map((task) => {
+      const laterTasks = selectedRoom.tasks
+        .filter((task) => !isHouseTaskAvailable(task))
+        .sort((a, b) => daysUntilHouseTaskAvailable(a) - daysUntilHouseTaskAvailable(b));
+      completedSection.classList.toggle("hidden", !laterTasks.length);
+      completedList.replaceChildren(...laterTasks.map((task) => {
         const item = document.createElement("p");
-        item.innerHTML = `<span>✓ ${task.label}</span><strong>+${task.reward}</strong>`;
+        item.innerHTML = `<span>🕒 ${task.label}<em>${houseTaskAvailableText(task)}</em></span><strong>+${task.reward}</strong>`;
         return item;
       }));
     } else {
@@ -888,7 +974,7 @@
 
   function startHouseTask(taskId) {
     const task = houseTaskById(taskId);
-    if (!task || isHouseTaskCompleted(task.id)) return;
+    if (!task || !isHouseTaskAvailable(task)) return;
     const now = Date.now();
     const durationMs = houseTaskDurationMs(task);
     state.houseCoach = {
@@ -905,7 +991,7 @@
 
   function toggleHouseTaskSelection(taskId) {
     const task = houseTaskById(taskId);
-    if (!task || isHouseTaskCompleted(task.id) || state.houseCoach?.activeTask) return;
+    if (!task || !isHouseTaskAvailable(task) || state.houseCoach?.activeTask) return;
     const current = Array.isArray(state.houseCoach?.selectedTasks) ? state.houseCoach.selectedTasks : [];
     const selected = current.includes(task.id)
       ? current.filter((id) => id !== task.id)
@@ -920,6 +1006,22 @@
     stopHouseTaskTicker();
     saveState();
     renderHouseCoach();
+  }
+
+  function startHouseQuickMission() {
+    const tasks = houseQuickTasks();
+    if (!tasks.length) {
+      showToast("Rien d'urgent pour maintenant.");
+      return;
+    }
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      selectedRoom: tasks[0]?.roomId || "",
+      selectedTasks: tasks.map((task) => task.id),
+      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0, source: "quick", earned: 0, bonus: 0, roomId: tasks[0]?.roomId || "" }
+    };
+    saveState();
+    startHouseTask(tasks[0].id);
   }
 
   function startSelectedHouseMission() {
@@ -1026,7 +1128,8 @@
     if (quick?.taskIds?.length) {
       const nextIndex = (quick.currentIndex || 0) + 1;
       const nextTaskId = quick.taskIds[nextIndex];
-      if (nextTaskId && !isHouseTaskCompleted(nextTaskId)) {
+      const nextTask = houseTaskById(nextTaskId);
+      if (nextTask && isHouseTaskAvailable(nextTask)) {
         state.houseCoach = {
           ...(state.houseCoach || defaultState.houseCoach),
           quickMission: { ...quick, currentIndex: nextIndex, earned: seriesReward, bonus: seriesBonus }
@@ -1038,14 +1141,14 @@
         saveState();
         showHouseCompleteModal({
           title: roomBonus ? "🏆 Pièce complétée" : "🎉 Série terminée",
-          text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : `${quick.taskIds.length} objectifs complétés`,
+          text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : `${quick.taskIds.length} objectif${quick.taskIds.length > 1 ? "s" : ""} complété${quick.taskIds.length > 1 ? "s" : ""} · retour automatique`,
           reward: seriesReward
         });
       }
     } else {
       showHouseCompleteModal({
         title: roomBonus ? "🏆 Pièce complétée" : "🎉 Série terminée",
-        text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : task.label,
+        text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : `${task.label} · ${houseTaskReturnText(task)}`,
         reward: earnedForTask + roomBonus
       });
     }
@@ -4356,6 +4459,7 @@
     bindById("house-skip-task", "click", skipHouseTask);
     bindById("house-cancel-task", "click", cancelHouseTask);
     bindById("house-complete-continue", "click", closeHouseCompleteModal);
+    bindById("house-start-quick", "click", startHouseQuickMission);
     bindById("house-start-selected", "click", startSelectedHouseMission);
     bindById("close-selected-domain", "click", closeSelectedDomain);
     bindById("add-selected-goal", "click", () => addCustomGoal($("add-selected-goal").dataset.addGoal));

@@ -118,7 +118,18 @@
             <div class="card-header immersive-header"><h2>🏠 Maison</h2><button class="text-button" data-close-domain>Accueil</button></div>
             <section class="house-hero" aria-labelledby="house-hero-title">
               <p class="step">Coach d'entretien</p>
-              <h3 id="house-hero-title">Choisis une pièce</h3>
+              <h3 id="house-hero-title">Aujourd'hui</h3>
+            </section>
+            <section id="house-quick-mission" class="house-quick-mission" aria-labelledby="house-quick-title">
+              <div class="card-header compact-header">
+                <div>
+                  <p class="step">Raccourci</p>
+                  <h3 id="house-quick-title">⚡ Mission rapide</h3>
+                </div>
+                <strong id="house-quick-reward">+0</strong>
+              </div>
+              <div id="house-quick-list" class="house-quick-list"></div>
+              <button id="house-start-quick" class="primary wide" type="button">Commencer</button>
             </section>
             <section id="house-room-overview">
               <p class="domain-section-label">Pièces</p>
@@ -132,13 +143,14 @@
                 </div>
                 <button id="house-back-rooms" class="text-button" type="button">Retour</button>
               </div>
+              <p class="domain-section-label">Disponibles maintenant</p>
               <div id="house-task-list" class="house-task-list"></div>
               <div id="house-selected-summary" class="house-selected-summary hidden">
                 <p><strong id="house-selected-count">0 objectif sélectionné</strong><span id="house-selected-reward">+0 jetons</span></p>
                 <button id="house-start-selected" class="primary wide" type="button">Commencer la série</button>
               </div>
               <div id="house-completed-section" class="house-completed-section hidden">
-                <p class="domain-section-label">Terminés</p>
+                <p class="domain-section-label">Disponibles plus tard</p>
                 <div id="house-completed-list" class="house-completed-list"></div>
               </div>
             </section>
