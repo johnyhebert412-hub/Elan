@@ -153,6 +153,7 @@
                 <p class="domain-section-label">Disponibles plus tard</p>
                 <div id="house-completed-list" class="house-completed-list"></div>
               </div>
+              <button id="open-house-task-form" class="secondary wide add-domain-action" type="button">+ Ajouter une tâche</button>
             </section>
             <section id="house-active-mission" class="house-active-mission hidden" aria-live="polite">
               <p id="house-active-step" class="step">Mission active</p>
@@ -479,11 +480,18 @@
             <div id="shop-rewards" class="shop-list"></div>
           </article>
 
-          <article class="card">
+          <article class="card shop-add-card">
             <h2>Ajouter une récompense</h2>
             <p class="small-muted">Ex.: Pause, Vidéo, Activité créative.</p>
+            <button id="open-shop-reward-form" class="secondary wide add-domain-action" type="button">+ Ajouter une récompense</button>
+          </article>
+
+          <section id="shop-reward-form-screen" class="domain-form-screen hidden" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="shop-reward-form-title" tabindex="-1">
+            <article class="domain-form-card">
+              <p class="step">Boutique</p>
+              <h2 id="shop-reward-form-title">🎁 Nouvelle récompense</h2>
             <label class="idea-label">
-              <span>Récompense personnelle</span>
+              <span>Nom de la récompense</span>
               <input id="shop-reward-input" type="text" maxlength="80" placeholder="Ex.: café spécial">
             </label>
             <label class="idea-label">
@@ -508,11 +516,15 @@
               <input id="shop-reward-minutes" type="number" min="1" max="180" value="20">
             </label>
             <label class="idea-label">
-              <span>Coût</span>
+              <span>Coût en jetons</span>
               <input id="shop-reward-cost" type="number" min="1" max="500" value="20">
             </label>
-            <button id="save-shop-reward" class="secondary wide" type="button">Ajouter à la boutique</button>
-          </article>
+              <div class="domain-form-actions">
+                <button id="save-shop-reward" class="primary wide" type="button">Ajouter</button>
+                <button id="cancel-shop-reward-form" class="secondary wide" type="button">Annuler</button>
+              </div>
+            </article>
+          </section>
         </section>
 
         <section id="view-settings" class="view" aria-labelledby="settings-title">
@@ -699,6 +711,39 @@
         <p id="house-complete-task-name" class="house-complete-task-name">Objectifs complétés</p>
         <div id="house-complete-reward" class="house-complete-reward">+5 jetons gagnés</div>
         <button id="house-complete-continue" class="primary" type="button">Continuer</button>
+      </article>
+    </section>
+    <section id="house-task-form-screen" class="domain-form-screen hidden" aria-live="polite" role="dialog" aria-modal="true" aria-labelledby="house-task-form-title" tabindex="-1">
+      <article class="domain-form-card">
+        <p class="step">Maison</p>
+        <h2 id="house-task-form-title">🏠 Nouvelle tâche</h2>
+        <label class="idea-label">
+          <span>Nom de la tâche</span>
+          <input id="house-task-name" type="text" maxlength="80" placeholder="Ex.: Nettoyer une tablette">
+        </label>
+        <label class="idea-label">
+          <span>Pièce</span>
+          <select id="house-task-room"></select>
+        </label>
+        <label class="idea-label">
+          <span>Fréquence</span>
+          <select id="house-task-frequency">
+            <option value="1">Chaque jour</option>
+            <option value="3">Tous les 3 jours</option>
+            <option value="7">Chaque semaine</option>
+            <option value="14">Aux 2 semaines</option>
+            <option value="30">Chaque mois</option>
+            <option value="60">Aux 2 mois</option>
+          </select>
+        </label>
+        <label class="idea-label">
+          <span>Récompense en jetons</span>
+          <input id="house-task-reward" type="number" min="1" max="50" value="5">
+        </label>
+        <div class="domain-form-actions">
+          <button id="save-house-task" class="primary wide" type="button">Ajouter</button>
+          <button id="cancel-house-task-form" class="secondary wide" type="button">Annuler</button>
+        </div>
       </article>
     </section>
     <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>

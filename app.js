@@ -348,7 +348,7 @@
     history: [],
     notifications: { important: false, summary: false },
     budget: { incomes: [], payments: [] },
-    houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, completedRooms: {}, quickMission: null },
+    houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, completedRooms: {}, quickMission: null, customTasks: [] },
     training: { mode: "quick", type: "cardio", level: "beginner", paneOpen: false, levelChosen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
@@ -420,7 +420,20 @@
               activeTask: saved.houseCoach.activeTask && typeof saved.houseCoach.activeTask === "object" ? saved.houseCoach.activeTask : null,
               completed: saved.houseCoach.completed && typeof saved.houseCoach.completed === "object" ? saved.houseCoach.completed : {},
               completedRooms: saved.houseCoach.completedRooms && typeof saved.houseCoach.completedRooms === "object" ? saved.houseCoach.completedRooms : {},
-              quickMission: saved.houseCoach.quickMission && typeof saved.houseCoach.quickMission === "object" ? saved.houseCoach.quickMission : null
+              quickMission: saved.houseCoach.quickMission && typeof saved.houseCoach.quickMission === "object" ? saved.houseCoach.quickMission : null,
+              customTasks: Array.isArray(saved.houseCoach.customTasks)
+                ? saved.houseCoach.customTasks
+                    .filter((task) => task && typeof task.id === "string" && typeof task.label === "string" && typeof task.roomId === "string")
+                    .map((task) => ({
+                      id: task.id,
+                      label: task.label.trim(),
+                      roomId: task.roomId,
+                      reward: Math.max(1, Math.round(Number(task.reward) || 5)),
+                      repeatDays: Math.max(1, Math.round(Number(task.repeatDays) || 7))
+                    }))
+                    .filter((task) => task.label && houseRooms.some((room) => room.id === task.roomId))
+                    .slice(-30)
+                : []
             }
           : cloneState(defaultState.houseCoach),
         training: saved.training && typeof saved.training === "object"
@@ -639,7 +652,19 @@
   }
 
   function allHouseTasks() {
-    return houseRooms.flatMap((room) => room.tasks.map((task) => ({ ...task, roomId: room.id, roomLabel: room.label, roomIcon: room.icon })));
+    const baseTasks = houseRooms.flatMap((room) => room.tasks.map((task) => ({ ...task, roomId: room.id, roomLabel: room.label, roomIcon: room.icon })));
+    const customTasks = Array.isArray(state.houseCoach?.customTasks) ? state.houseCoach.customTasks : [];
+    return [
+      ...baseTasks,
+      ...customTasks.map((task) => {
+        const room = houseRoomById(task.roomId);
+        return { ...task, roomId: task.roomId, roomLabel: room?.label || "Maison", roomIcon: room?.icon || "🏠", custom: true };
+      })
+    ];
+  }
+
+  function houseTasksForRoom(roomId) {
+    return allHouseTasks().filter((task) => task.roomId === roomId);
   }
 
   function houseTaskById(taskId) {
@@ -870,8 +895,9 @@
 
     if (roomGrid) {
       roomGrid.replaceChildren(...houseRooms.map((room) => {
-        const availableTasks = room.tasks.filter((task) => isHouseTaskAvailable(task));
-        const roomHealth = houseRoomHealth(availableTasks.length, room.tasks.length);
+        const roomTasks = houseTasksForRoom(room.id);
+        const availableTasks = roomTasks.filter((task) => isHouseTaskAvailable(task));
+        const roomHealth = houseRoomHealth(availableTasks.length, roomTasks.length);
         const button = document.createElement("button");
         button.type = "button";
         button.className = "house-room-card";
@@ -890,7 +916,8 @@
     if (detail) detail.classList.toggle("hidden", !selectedRoom || Boolean(activeTask));
     if (detailTitle && selectedRoom) detailTitle.textContent = `${selectedRoom.icon} ${selectedRoom.label}`;
     if (taskList && selectedRoom) {
-      const availableTasks = selectedRoom.tasks.filter((task) => isHouseTaskAvailable(task));
+      const roomTasks = houseTasksForRoom(selectedRoom.id);
+      const availableTasks = roomTasks.filter((task) => isHouseTaskAvailable(task));
       taskList.replaceChildren(...availableTasks.map((task) => {
         const button = document.createElement("button");
         button.type = "button";
@@ -927,7 +954,7 @@
     }
 
     if (completedSection && completedList && selectedRoom) {
-      const laterTasks = selectedRoom.tasks
+      const laterTasks = houseTasksForRoom(selectedRoom.id)
         .filter((task) => !isHouseTaskAvailable(task))
         .sort((a, b) => daysUntilHouseTaskAvailable(a) - daysUntilHouseTaskAvailable(b));
       completedSection.classList.toggle("hidden", !laterTasks.length);
@@ -1049,6 +1076,70 @@
     window.requestAnimationFrame(() => modal.focus({ preventScroll: true }));
   }
 
+  function renderHouseTaskFormRooms() {
+    const select = $("house-task-room");
+    if (!select) return;
+    const current = select.value || state.houseCoach?.selectedRoom || "cuisine";
+    select.replaceChildren(...houseRooms.map((room) => {
+      const option = document.createElement("option");
+      option.value = room.id;
+      option.textContent = `${room.icon} ${room.label}`;
+      return option;
+    }));
+    select.value = houseRoomById(current) ? current : "cuisine";
+  }
+
+  function openHouseTaskForm() {
+    renderHouseTaskFormRooms();
+    const roomSelect = $("house-task-room");
+    if (roomSelect && state.houseCoach?.selectedRoom) roomSelect.value = state.houseCoach.selectedRoom;
+    const screen = $("house-task-form-screen");
+    screen?.classList.remove("hidden");
+    window.requestAnimationFrame(() => {
+      $("house-task-name")?.focus({ preventScroll: true });
+      screen?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function closeHouseTaskForm() {
+    $("house-task-form-screen")?.classList.add("hidden");
+  }
+
+  function saveHouseTask() {
+    const nameInput = $("house-task-name");
+    const label = nameInput?.value.trim();
+    const roomId = $("house-task-room")?.value || state.houseCoach?.selectedRoom || "cuisine";
+    const repeatDays = Math.max(1, Math.round(Number($("house-task-frequency")?.value) || 7));
+    const reward = Math.max(1, Math.min(50, Math.round(Number($("house-task-reward")?.value) || 5)));
+    if (!label) {
+      showToast("Écris une tâche.");
+      return;
+    }
+    if (!houseRoomById(roomId)) {
+      showToast("Choisis une pièce.");
+      return;
+    }
+    const slug = label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48) || "tache";
+    const customTask = {
+      id: `custom-${roomId}-${slug}-${Date.now().toString(36)}`,
+      label,
+      roomId,
+      reward,
+      repeatDays
+    };
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      selectedRoom: roomId,
+      customTasks: [...(state.houseCoach?.customTasks || []), customTask].slice(-30)
+    };
+    saveState();
+    nameInput.value = "";
+    $("house-task-reward").value = "5";
+    closeHouseTaskForm();
+    renderHouseCoach();
+    showToast("Tâche ajoutée.");
+  }
+
   function closeHouseCompleteModal() {
     $("house-complete-modal")?.classList.add("hidden");
     renderHouseCoach();
@@ -1073,9 +1164,11 @@
     const quick = state.houseCoach?.quickMission || null;
     const completedNext = skipped ? completed : [...completed, task.id];
     const room = houseRoomById(task.roomId);
+    const roomTasks = houseTasksForRoom(task.roomId);
     const roomCompletedNow = Boolean(room)
       && !isHouseRoomCompleted(task.roomId)
-      && room.tasks.every((roomTask) => completedNext.includes(roomTask.id));
+      && roomTasks.length > 0
+      && roomTasks.every((roomTask) => completedNext.includes(roomTask.id));
     const roomBonus = skipped ? 0 : (roomCompletedNow ? 25 : 0);
     const completedRooms = completedHouseRoomIds(date);
     const earnedForTask = skipped ? 0 : task.reward;
@@ -4203,7 +4296,21 @@
     renderRewards();
     renderShop();
     renderOnboarding();
+    closeShopRewardForm();
     showToast("Récompense ajoutée à la boutique.");
+  }
+
+  function openShopRewardForm() {
+    const screen = $("shop-reward-form-screen");
+    screen?.classList.remove("hidden");
+    window.requestAnimationFrame(() => {
+      $("shop-reward-input")?.focus({ preventScroll: true });
+      screen?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function closeShopRewardForm() {
+    $("shop-reward-form-screen")?.classList.add("hidden");
   }
 
   function notificationPermissionText() {
@@ -4461,6 +4568,12 @@
     bindById("house-complete-continue", "click", closeHouseCompleteModal);
     bindById("house-start-quick", "click", startHouseQuickMission);
     bindById("house-start-selected", "click", startSelectedHouseMission);
+    bindById("open-house-task-form", "click", openHouseTaskForm);
+    bindById("save-house-task", "click", saveHouseTask);
+    bindById("cancel-house-task-form", "click", closeHouseTaskForm);
+    bindById("house-task-name", "keydown", (event) => {
+      if (event.key === "Enter") saveHouseTask();
+    });
     bindById("close-selected-domain", "click", closeSelectedDomain);
     bindById("add-selected-goal", "click", () => addCustomGoal($("add-selected-goal").dataset.addGoal));
     document.querySelectorAll("[data-toggle-missions]").forEach((button) => {
@@ -4534,7 +4647,9 @@
     });
     $("open-agenda-form")?.addEventListener("click", openAgendaForm);
     $("close-agenda-form")?.addEventListener("click", closeAgendaForm);
+    $("open-shop-reward-form")?.addEventListener("click", openShopRewardForm);
     $("save-shop-reward")?.addEventListener("click", saveShopReward);
+    $("cancel-shop-reward-form")?.addEventListener("click", closeShopRewardForm);
     $("shop-reward-input")?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") saveShopReward();
     });
