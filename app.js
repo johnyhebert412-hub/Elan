@@ -348,7 +348,7 @@
     history: [],
     notifications: { important: false, summary: false },
     budget: { incomes: [], payments: [] },
-    houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, quickMission: null },
+    houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, completedRooms: {}, quickMission: null },
     training: { mode: "quick", type: "cardio", level: "beginner", paneOpen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
   };
 
@@ -419,6 +419,7 @@
               selectedTasks: Array.isArray(saved.houseCoach.selectedTasks) ? saved.houseCoach.selectedTasks : [],
               activeTask: saved.houseCoach.activeTask && typeof saved.houseCoach.activeTask === "object" ? saved.houseCoach.activeTask : null,
               completed: saved.houseCoach.completed && typeof saved.houseCoach.completed === "object" ? saved.houseCoach.completed : {},
+              completedRooms: saved.houseCoach.completedRooms && typeof saved.houseCoach.completedRooms === "object" ? saved.houseCoach.completedRooms : {},
               quickMission: saved.houseCoach.quickMission && typeof saved.houseCoach.quickMission === "object" ? saved.houseCoach.quickMission : null
             }
           : cloneState(defaultState.houseCoach),
@@ -632,6 +633,15 @@
     return completedHouseTaskIds().includes(taskId);
   }
 
+  function completedHouseRoomIds(date = todayKey()) {
+    const completedRooms = state.houseCoach?.completedRooms?.[date];
+    return Array.isArray(completedRooms) ? completedRooms : [];
+  }
+
+  function isHouseRoomCompleted(roomId) {
+    return completedHouseRoomIds().includes(roomId);
+  }
+
   function houseStats() {
     const completedIds = completedHouseTaskIds();
     const tasks = allHouseTasks();
@@ -656,14 +666,10 @@
     return 2 * 60000;
   }
 
-  function houseQuickTasks() {
-    const tasks = allHouseTasks().filter((task) => !isHouseTaskCompleted(task.id));
-    const preferred = ["cuisine-vaisselle", "cuisine-comptoir", "salon-ranger-objets"];
-    const ordered = [
-      ...preferred.map((id) => tasks.find((task) => task.id === id)).filter(Boolean),
-      ...tasks.filter((task) => !preferred.includes(task.id))
-    ];
-    return ordered.slice(0, 3);
+  function activeHouseSeriesLabel() {
+    const series = state.houseCoach?.quickMission;
+    if (!Array.isArray(series?.taskIds) || !series.taskIds.length) return "Mission active";
+    return `Mission ${(series.currentIndex || 0) + 1}/${series.taskIds.length}`;
   }
 
   function selectedHouseTasks() {
@@ -744,12 +750,6 @@
   }
 
   function renderHouseCoach() {
-    const stats = houseStats();
-    const percent = $("house-dashboard-percent");
-    const progress = $("house-dashboard-progress");
-    const doneCount = $("house-done-count");
-    const earned = $("house-earned-tokens");
-    const remaining = $("house-remaining-tokens");
     const roomGrid = $("house-room-grid");
     const detail = $("house-room-detail");
     const detailTitle = $("house-room-title");
@@ -760,40 +760,13 @@
     const activePanel = $("house-active-mission");
     const activeTask = state.houseCoach?.activeTask ? houseTaskById(state.houseCoach.activeTask.id) : null;
     const selectedRoom = houseRoomById(state.houseCoach?.selectedRoom);
-    const quickTasks = houseQuickTasks();
     const selectedTasks = selectedHouseTasks();
     const selectedInRoom = selectedHouseTaskIdsForRoom(selectedRoom?.id);
-
-    if (percent) percent.textContent = `${stats.percent} %`;
-    if (progress) progress.style.width = `${stats.percent}%`;
-    if (doneCount) doneCount.textContent = `${stats.completedCount}`;
-    if (earned) earned.textContent = `${stats.earnedTokens}`;
-    if (remaining) remaining.textContent = `${stats.remainingTokens}`;
-
-    if ($("house-quick-list")) {
-      $("house-quick-list").replaceChildren(...quickTasks.map((task) => {
-        const item = document.createElement("p");
-        item.innerHTML = `<span>☑ ${task.label}</span><strong>+${task.reward}</strong>`;
-        return item;
-      }));
-    }
-    if ($("house-quick-reward")) {
-      const quickReward = quickTasks.reduce((sum, task) => sum + task.reward, 0);
-      $("house-quick-reward").textContent = `+${quickReward}`;
-    }
-    if ($("house-start-quick")) {
-      $("house-start-quick").disabled = !quickTasks.length || Boolean(state.houseCoach?.activeTask);
-      $("house-start-quick").textContent = quickTasks.length ? "Commencer" : "Tout est terminé";
-    }
 
     if (roomGrid) {
       roomGrid.replaceChildren(...houseRooms.map((room) => {
         const completedInRoom = room.tasks.filter((task) => isHouseTaskCompleted(task.id)).length;
-        const available = room.tasks.length - completedInRoom;
         const roomPercent = room.tasks.length ? Math.round((completedInRoom / room.tasks.length) * 100) : 0;
-        const roomTokens = room.tasks
-          .filter((task) => !isHouseTaskCompleted(task.id))
-          .reduce((sum, task) => sum + task.reward, 0);
         const button = document.createElement("button");
         button.type = "button";
         button.className = "house-room-card";
@@ -801,9 +774,8 @@
         button.innerHTML = `
           <span class="house-room-icon" aria-hidden="true">${room.icon}</span>
           <strong>${room.label}</strong>
-          <span>${available} tâche${available > 1 ? "s" : ""} disponible${available > 1 ? "s" : ""}</span>
+          <span>${completedInRoom} / ${room.tasks.length} objectifs complétés</span>
           <span>${roomPercent} % complété</span>
-          <span>${roomTokens} jetons restants</span>
           <i class="house-room-meter" aria-hidden="true"><b style="width:${roomPercent}%"></b></i>
         `;
         return button;
@@ -843,7 +815,7 @@
       const tasks = selectedTasks.filter((task) => task.roomId === selectedRoom.id);
       const reward = tasks.reduce((sum, task) => sum + task.reward, 0);
       selectedSummary.classList.toggle("hidden", !tasks.length || Boolean(activeTask));
-      $("house-selected-count").textContent = `${tasks.length} tâche${tasks.length > 1 ? "s" : ""} sélectionnée${tasks.length > 1 ? "s" : ""}`;
+      $("house-selected-count").textContent = `${tasks.length} objectif${tasks.length > 1 ? "s" : ""} sélectionné${tasks.length > 1 ? "s" : ""}`;
       $("house-selected-reward").textContent = `+${reward} jetons`;
     } else {
       selectedSummary?.classList.add("hidden");
@@ -868,6 +840,7 @@
       const remainingMs = activeHouseTaskRemaining();
       const durationMs = activeState.durationMs || houseTaskDurationMs(activeTask);
       const ratio = durationMs ? Math.max(0, Math.min(1, remainingMs / durationMs)) : 0;
+      $("house-active-step").textContent = activeHouseSeriesLabel();
       $("house-active-task-name").textContent = activeTask.label;
       $("house-active-task-room").textContent = `${activeTask.roomIcon} ${activeTask.roomLabel}`;
       $("house-active-task-reward").textContent = `+${activeTask.reward} jetons`;
@@ -928,20 +901,6 @@
     renderHouseCoach();
   }
 
-  function startHouseQuickMission() {
-    const tasks = houseQuickTasks();
-    if (!tasks.length) {
-      showToast("Tout est terminé pour aujourd'hui.");
-      return;
-    }
-    state.houseCoach = {
-      ...(state.houseCoach || defaultState.houseCoach),
-      selectedTasks: [],
-      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0, source: "quick" }
-    };
-    startHouseTask(tasks[0].id);
-  }
-
   function startSelectedHouseMission() {
     const tasks = selectedHouseTasks().filter((task) => task.roomId === state.houseCoach?.selectedRoom);
     if (!tasks.length) {
@@ -950,28 +909,26 @@
     }
     state.houseCoach = {
       ...(state.houseCoach || defaultState.houseCoach),
-      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0, source: "selection" }
+      selectedTasks: tasks.map((task) => task.id),
+      quickMission: { taskIds: tasks.map((task) => task.id), currentIndex: 0, source: "selection", earned: 0, bonus: 0, roomId: state.houseCoach?.selectedRoom || tasks[0]?.roomId || "" }
     };
     saveState();
     startHouseTask(tasks[0].id);
   }
 
-  function showHouseCompleteModal(task) {
+  function showHouseCompleteModal(summary) {
     const modal = $("house-complete-modal");
     if (!modal) return;
-    $("house-complete-task-name").textContent = task.label;
-    $("house-complete-reward").textContent = `+${task.reward} jetons gagnés`;
+    $("house-complete-title").textContent = summary?.title || "Série terminée";
+    $("house-complete-task-name").textContent = summary?.text || "Objectifs complétés";
+    $("house-complete-reward").textContent = `+${summary?.reward || 0} jetons gagnés`;
     modal.classList.remove("hidden");
     window.requestAnimationFrame(() => modal.focus({ preventScroll: true }));
   }
 
   function closeHouseCompleteModal() {
     $("house-complete-modal")?.classList.add("hidden");
-    const quick = state.houseCoach?.quickMission;
-    const nextTaskId = Array.isArray(quick?.taskIds) ? quick.taskIds[quick.currentIndex || 0] : "";
-    if (nextTaskId && !state.houseCoach?.activeTask && !isHouseTaskCompleted(nextTaskId)) {
-      startHouseTask(nextTaskId);
-    }
+    renderHouseCoach();
   }
 
   function completeHouseTask() {
@@ -982,27 +939,50 @@
     }
     const date = todayKey();
     const completed = completedHouseTaskIds(date);
+    const quick = state.houseCoach?.quickMission || null;
+    const completedNext = [...completed, task.id];
+    const room = houseRoomById(task.roomId);
+    const roomCompletedNow = Boolean(room)
+      && !isHouseRoomCompleted(task.roomId)
+      && room.tasks.every((roomTask) => completedNext.includes(roomTask.id));
+    const roomBonus = roomCompletedNow ? 25 : 0;
+    const completedRooms = completedHouseRoomIds(date);
+    const seriesReward = (quick?.earned || 0) + task.reward + roomBonus;
+    const seriesBonus = (quick?.bonus || 0) + roomBonus;
     state.houseCoach = {
       ...(state.houseCoach || defaultState.houseCoach),
       activeTask: null,
       selectedRoom: task.roomId,
-      quickMission: state.houseCoach?.quickMission || null,
+      quickMission: quick ? { ...quick, earned: seriesReward, bonus: seriesBonus } : null,
       selectedTasks: (state.houseCoach?.selectedTasks || []).filter((id) => id !== task.id),
       completed: {
         ...(state.houseCoach?.completed || {}),
-        [date]: [...completed, task.id]
+        [date]: completedNext
+      },
+      completedRooms: {
+        ...(state.houseCoach?.completedRooms || {}),
+        [date]: roomCompletedNow ? [...completedRooms, task.roomId] : completedRooms
       }
     };
     state.selectedDomain = "house";
     state.wins += 1;
-    state.coins += task.reward;
+    state.coins += task.reward + roomBonus;
     state.progress.house = (state.progress.house || 0) + 1;
-    state.history = [{
+    const historyItems = [{
       label: `Maison - ${task.roomLabel} : ${task.label}`,
       coins: task.reward,
       at: Date.now(),
       domain: "house"
-    }, ...state.history].slice(0, 50);
+    }];
+    if (roomBonus) {
+      historyItems.push({
+        label: `Maison - ${task.roomLabel} complétée`,
+        coins: roomBonus,
+        at: Date.now(),
+        domain: "house"
+      });
+    }
+    state.history = [...historyItems, ...state.history].slice(0, 50);
     saveState();
     stopHouseTaskTicker();
     renderHouseCoach();
@@ -1010,19 +990,32 @@
     renderShop();
     renderHistoryList();
     renderAgenda();
-    showHouseCompleteModal(task);
     showToast(houseCompletionMessage(task));
-    const quick = state.houseCoach?.quickMission;
     if (quick?.taskIds?.length) {
       const nextIndex = (quick.currentIndex || 0) + 1;
       const nextTaskId = quick.taskIds[nextIndex];
       if (nextTaskId && !isHouseTaskCompleted(nextTaskId)) {
-        state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), quickMission: { ...quick, currentIndex: nextIndex } };
+        state.houseCoach = {
+          ...(state.houseCoach || defaultState.houseCoach),
+          quickMission: { ...quick, currentIndex: nextIndex, earned: seriesReward, bonus: seriesBonus }
+        };
         saveState();
+        startHouseTask(nextTaskId);
       } else {
         state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), quickMission: null };
         saveState();
+        showHouseCompleteModal({
+          title: roomBonus ? "🏆 Pièce complétée" : "🎉 Série terminée",
+          text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : `${quick.taskIds.length} objectifs complétés`,
+          reward: seriesReward
+        });
       }
+    } else {
+      showHouseCompleteModal({
+        title: roomBonus ? "🏆 Pièce complétée" : "🎉 Série terminée",
+        text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : task.label,
+        reward: task.reward + roomBonus
+      });
     }
   }
 
@@ -2032,8 +2025,7 @@
     };
     saveState();
     renderTrainingProgram();
-    showView("domains");
-    $("domain-training")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    showView("shop");
   }
 
   function finishAfterTrainingComplete() {
@@ -4319,7 +4311,6 @@
     bindById("house-complete-task", "click", completeHouseTask);
     bindById("house-cancel-task", "click", cancelHouseTask);
     bindById("house-complete-continue", "click", closeHouseCompleteModal);
-    bindById("house-start-quick", "click", startHouseQuickMission);
     bindById("house-start-selected", "click", startSelectedHouseMission);
     bindById("close-selected-domain", "click", closeSelectedDomain);
     bindById("add-selected-goal", "click", () => addCustomGoal($("add-selected-goal").dataset.addGoal));

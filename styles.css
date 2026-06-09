@@ -269,14 +269,6 @@ p { line-height: 1.4; }
   color: white;
 }
 
-.house-dashboard {
-  background: var(--soft);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  margin: 16px 0;
-  padding: 14px;
-}
-
 .house-hero {
   background: linear-gradient(135deg, #eef7f2, #fff9e8);
   border: 1px solid var(--border);
@@ -292,32 +284,6 @@ p { line-height: 1.4; }
   margin: 4px 0 0;
 }
 
-.house-quick-mission {
-  background: #fff9e8;
-  border: 1px solid #eadfb8;
-  border-radius: 18px;
-  margin-top: 16px;
-  padding: 14px;
-}
-
-.house-quick-mission h3 {
-  color: var(--ink);
-  font-size: 1.08rem;
-  margin: 0;
-}
-
-#house-quick-reward {
-  color: var(--brand);
-  font-size: 1rem;
-}
-
-.house-quick-list {
-  display: grid;
-  gap: 7px;
-  margin: 10px 0;
-}
-
-.house-quick-list p,
 .house-completed-list p {
   align-items: center;
   background: var(--surface);
@@ -330,22 +296,15 @@ p { line-height: 1.4; }
   padding: 9px 10px;
 }
 
-.house-quick-list strong,
 .house-completed-list strong {
   color: var(--brand);
 }
 
-.house-dashboard h3,
 .house-room-detail h3,
 .house-active-mission h3 {
   color: var(--ink);
   font-size: 1.1rem;
   margin: 0;
-}
-
-#house-dashboard-percent {
-  color: var(--brand);
-  font-size: 1.25rem;
 }
 
 .house-progress-track,
