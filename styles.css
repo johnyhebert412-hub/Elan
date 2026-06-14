@@ -2322,6 +2322,32 @@ textarea {
   padding: 11px 12px;
 }
 
+.settings-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(23, 39, 33, 0.05);
+}
+
+.settings-card h2 {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+
+.settings-dev-card {
+  background: #fffaf0;
+  border-color: #eadfb8;
+}
+
+.settings-dev-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.settings-dev-actions button {
+  min-height: 46px;
+  text-align: left;
+}
+
 .help-box {
   background: #fff3dc;
   border-radius: 13px;
@@ -2378,6 +2404,7 @@ textarea {
   background: transparent;
   border-color: #e5c2bd;
   color: var(--danger);
+  margin-top: 10px;
   width: 100%;
 }
 

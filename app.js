@@ -3155,6 +3155,7 @@
 
   function renderIdeas() {
     const list = $("ideas-list");
+    if (!list) return;
     const recentIdeas = state.ideas.slice(-3).reverse();
     if (!recentIdeas.length) {
       list.classList.add("hidden");
@@ -3194,6 +3195,7 @@
 
   function saveIdea() {
     const input = $("ideas-input");
+    if (!input) return;
     const text = input.value.trim();
     if (!text) {
       showToast("Écris une idée d'abord.");
@@ -4672,6 +4674,11 @@
     }
   }
 
+  function checkNotificationPermissions() {
+    renderSettings();
+    showToast(notificationPermissionText());
+  }
+
   function testNotification() {
     if (!("Notification" in window) || Notification.permission !== "granted") {
       showToast("Autorise les notifications d'abord.");
@@ -4871,6 +4878,7 @@
       showToast("Réglage enregistré.");
     });
     bindById("enable-notifications", "click", requestNotifications);
+    bindById("check-notification-permissions", "click", checkNotificationPermissions);
     bindById("test-notification", "click", testNotification);
     bindById("settings-install-button", "click", startInstall);
     bindById("install-yes", "click", startInstall);

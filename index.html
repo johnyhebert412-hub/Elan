@@ -533,11 +533,11 @@
 
         <section id="view-settings" class="view" aria-labelledby="settings-title">
           <div class="section-heading">
-            <p class="step">Paramètres</p>
-            <h2 id="settings-title">Réglages simples</h2>
+            <p class="step">Système</p>
+            <h2 id="settings-title">⚙️ ÉLAN</h2>
           </div>
-          <article class="card">
-            <h2>Notifications</h2>
+          <article class="card settings-card">
+            <h2>🔔 Notifications</h2>
             <p id="notification-status" class="status-box">Notifications non vérifiées.</p>
             <label class="switch-line">
               <input id="notify-important" type="checkbox">
@@ -547,44 +547,25 @@
               <input id="notify-summary" type="checkbox">
               <span>Résumé quotidien</span>
             </label>
-            <div class="button-row">
-              <button id="enable-notifications" class="primary">Autoriser</button>
-              <button id="test-notification" class="secondary">Tester</button>
-            </div>
             <p class="small-muted">Les rappels fonctionnent quand ÉLAN reste ouvert.</p>
           </article>
 
-          <article class="card">
-            <h2>Installation</h2>
+          <article class="card settings-card">
+            <h2>🎨 Apparence</h2>
+            <p class="status-box">Mode doux activé.</p>
+            <p class="small-muted">Interface simple, claire et mobile-first.</p>
+          </article>
+
+          <article class="card settings-card">
+            <h2>💾 Sauvegarde</h2>
             <p id="install-status" class="status-box">Vérification de l'installation.</p>
             <button id="settings-install-button" class="secondary wide">Ajouter ÉLAN à l'écran d'accueil</button>
             <p id="install-help" class="small-muted">Si le bouton ne fonctionne pas, ouvre le menu Chrome ⋮ puis choisis “Ajouter à l'écran d'accueil”.</p>
+            <button id="reset-data" class="danger-button">Effacer mes données locales</button>
           </article>
 
-          <article class="card">
-            <h2>Suggestions & idées</h2>
-            <p class="small-muted">Idées, commentaires, bugs ou suggestions. Aucun point ici.</p>
-            <label class="idea-label">
-              <span>Écrire une note</span>
-              <textarea id="ideas-input" rows="4" maxlength="500" placeholder="Ex.: ce qui bloque, ce qui aide, une idée à tester"></textarea>
-            </label>
-            <button id="save-idea" class="secondary wide">Garder cette idée</button>
-            <div id="ideas-list" class="idea-list hidden"></div>
-          </article>
-
-          <article class="card">
-            <h2>Recompenses</h2>
-            <p class="small-muted">Ajoute ce qui te fait du bien. Pas d'achat, pas de pression.</p>
-            <label class="idea-label">
-              <span>Nouvelle recompense</span>
-              <input id="reward-input" type="text" maxlength="80" placeholder="Ex.: Musique, Pause, Serie">
-            </label>
-            <button id="save-reward" class="secondary wide">Ajouter une recompense</button>
-            <div id="rewards-list" class="idea-list hidden"></div>
-          </article>
-
-          <article class="card version-card">
-            <h2>À propos</h2>
+          <article class="card version-card settings-card">
+            <h2>ℹ️ À propos</h2>
             <p class="version-line">
               <strong id="app-version">Version : v0.12.1</strong>
               <span id="app-updated" class="muted">Dernière mise à jour : 2026-05-27</span>
@@ -595,8 +576,14 @@
             </ul>
           </article>
 
-          <article class="card">
-            <button id="reset-data" class="danger-button">Effacer mes données locales</button>
+          <article class="card settings-card settings-dev-card">
+            <h2>🛠 Développement</h2>
+            <p class="small-muted">Outils temporaires pour valider les notifications pendant le développement.</p>
+            <div class="settings-dev-actions">
+              <button id="enable-notifications" class="secondary wide">Autoriser les notifications</button>
+              <button id="check-notification-permissions" class="secondary wide">📱 Vérifier les permissions</button>
+              <button id="test-notification" class="secondary wide">🔔 Tester les notifications</button>
+            </div>
           </article>
         </section>
       </main>
