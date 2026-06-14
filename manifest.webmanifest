@@ -1,24 +1,18 @@
 {
-  "name": "Élan - Coach du quotidien",
-  "short_name": "Élan",
-  "description": "Un coach simple pour avancer une action à la fois.",
-  "lang": "fr-CA",
-  "id": "/",
-  "start_url": "/",
-  "scope": "/",
+  "name": "ÉLAN",
+  "short_name": "ÉLAN",
+  "description": "Coach mobile simple pour agir, planifier et gagner des jetons.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#f4f1e9",
+  "background_color": "#fffaf0",
   "theme_color": "#165446",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]

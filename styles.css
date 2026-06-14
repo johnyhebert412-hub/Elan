@@ -2337,6 +2337,37 @@ textarea {
   border-color: #eadfb8;
 }
 
+.notification-diagnostic-card {
+  background: linear-gradient(155deg, #ffffff 0%, #eef7f2 100%);
+}
+
+.notification-diagnostic-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.notification-diagnostic-grid p {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 10px 11px;
+}
+
+.notification-diagnostic-grid span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.notification-diagnostic-grid strong {
+  color: var(--brand);
+  font-size: 0.88rem;
+  text-align: right;
+}
+
 .settings-dev-actions {
   display: grid;
   gap: 8px;

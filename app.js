@@ -393,6 +393,7 @@
     activeReward: null,
     history: [],
     notifications: { important: false, summary: false },
+    notificationDiagnostics: { lastTestAt: 0, lastTestStatus: "" },
     budget: { incomes: [], payments: [] },
     houseCoach: { selectedRoom: "", selectedTasks: [], activeTask: null, completed: {}, completedRooms: {}, quickMission: null, customTasks: [] },
     training: { mode: "quick", type: "cardio", level: "beginner", paneOpen: false, levelChosen: false, started: false, currentStep: 0, completed: false, skippedSteps: 0, lastReward: 0, customSteps: [] }
@@ -412,6 +413,7 @@
   let activeRewardTimerId = null;
   let trainingTimerId = null;
   let houseTimerId = null;
+  let serviceWorkerRegistrationPromise = null;
   let trainingTimerStepKey = "";
   let trainingTimerRemaining = 0;
   let trainingTimerElapsed = false;
@@ -453,6 +455,12 @@
         activeReward: (saved.activeReward && typeof saved.activeReward === "object") ? saved.activeReward : null,
         history: Array.isArray(saved.history) ? saved.history : [],
         notifications: { ...defaultState.notifications, ...saved.notifications },
+        notificationDiagnostics: saved.notificationDiagnostics && typeof saved.notificationDiagnostics === "object"
+          ? {
+              lastTestAt: Number.isFinite(saved.notificationDiagnostics.lastTestAt) ? saved.notificationDiagnostics.lastTestAt : 0,
+              lastTestStatus: typeof saved.notificationDiagnostics.lastTestStatus === "string" ? saved.notificationDiagnostics.lastTestStatus : ""
+            }
+          : cloneState(defaultState.notificationDiagnostics),
         budget: saved.budget && typeof saved.budget === "object"
           ? {
               incomes: Array.isArray(saved.budget.incomes) ? saved.budget.incomes : [],
@@ -2729,7 +2737,10 @@
   function notifyChallengeDone() {
     if ("vibrate" in navigator) navigator.vibrate([25, 40, 25]);
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("Défi terminé", { body: "Belle présence. Tu peux valider quand c'est fait." });
+      sendElanNotification("Défi terminé", {
+        body: "Belle présence. Tu peux valider quand c'est fait.",
+        tag: "elan-challenge-done"
+      });
     }
     showToast("Défi terminé. Tu as tenu le cap.");
   }
@@ -3999,9 +4010,9 @@
 
   function sendAgendaNotification(item) {
     if (!("Notification" in window) || Notification.permission !== "granted") return;
-    new Notification("ÉLAN - Agenda", {
+    sendElanNotification("ÉLAN - Agenda", {
       body: `${item.time} · ${item.text}`,
-      icon: "icons/icon-192.png"
+      tag: `agenda-${item.id || item.date || Date.now()}`
     });
   }
 
@@ -4017,10 +4028,13 @@
       if (delay < 0 || delay > 2147483647) return;
       agendaReminderTimers.push(window.setTimeout(() => {
         sendAgendaNotification(item);
+        state.notificationDiagnostics = { lastTestAt: Date.now(), lastTestStatus: "Rappel automatique" };
         item.notified = true;
         saveState();
+        renderSettings();
       }, delay));
     });
+    updateNotificationDiagnostics();
   }
 
   function shopRewards() {
@@ -4515,8 +4529,69 @@
     $("shop-reward-form-screen")?.classList.add("hidden");
   }
 
+  function isNotificationSecureContext() {
+    return window.isSecureContext || location.protocol === "https:" || ["localhost", "127.0.0.1"].includes(location.hostname);
+  }
+
+  function notificationSupportText() {
+    if (!("Notification" in window)) return "Non supportées";
+    if (!isNotificationSecureContext()) return "HTTPS requis";
+    return "Supportées";
+  }
+
+  function notificationPermissionLabel() {
+    if (!("Notification" in window)) return "Non disponible";
+    if (Notification.permission === "granted") return "Accordée";
+    if (Notification.permission === "denied") return "Refusée";
+    return "À demander";
+  }
+
+  function pwaStatusText() {
+    return isInstalled() ? "Installée" : "Navigateur";
+  }
+
+  function activeAgendaReminderCount() {
+    return Array.isArray(agendaReminderTimers) ? agendaReminderTimers.length : 0;
+  }
+
+  function setDiagnosticText(id, text) {
+    const element = $(id);
+    if (element) element.textContent = text;
+  }
+
+  function formatDiagnosticDate(timestamp) {
+    if (!timestamp) return "Aucun test";
+    const date = new Date(timestamp);
+    return date.toLocaleString("fr-CA", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+  }
+
+  function serviceWorkerDiagnosticText() {
+    if (!("serviceWorker" in navigator)) return Promise.resolve("Non supporté");
+    if (!isNotificationSecureContext()) return Promise.resolve("HTTPS requis");
+    return ensureServiceWorkerRegistration()
+      .then((registration) => {
+        if (registration?.active) return navigator.serviceWorker.controller ? "Actif" : "Actif après recharge";
+        if (registration?.installing || registration?.waiting) return "Installation en cours";
+        return "Non actif";
+      })
+      .catch(() => "Erreur d'enregistrement");
+  }
+
+  async function updateNotificationDiagnostics() {
+    setDiagnosticText("notification-diagnostic-permission", notificationPermissionLabel());
+    setDiagnosticText("notification-diagnostic-support", notificationSupportText());
+    setDiagnosticText("notification-diagnostic-pwa", pwaStatusText());
+    setDiagnosticText("notification-diagnostic-auto", `${activeAgendaReminderCount()} rappel${activeAgendaReminderCount() > 1 ? "s" : ""} actif${activeAgendaReminderCount() > 1 ? "s" : ""}`);
+    const last = state.notificationDiagnostics || defaultState.notificationDiagnostics;
+    setDiagnosticText("notification-diagnostic-last", last.lastTestAt ? `${formatDiagnosticDate(last.lastTestAt)} · ${last.lastTestStatus || "test"}` : "Aucun test");
+    setDiagnosticText("notification-diagnostic-sw", "Vérification...");
+    const swText = await serviceWorkerDiagnosticText();
+    setDiagnosticText("notification-diagnostic-sw", swText);
+  }
+
   function notificationPermissionText() {
     if (!("Notification" in window)) return "Notifications non disponibles dans ce navigateur.";
+    if (!isNotificationSecureContext()) return "Ouvre ÉLAN en HTTPS ou en PWA installée.";
     if (Notification.permission === "granted") return "Notifications activées.";
     if (Notification.permission === "denied") return "Notifications bloquées dans les réglages Android.";
     return "Autorisation nécessaire pour recevoir des notifications.";
@@ -4530,6 +4605,7 @@
     if (notifySummary) notifySummary.checked = state.notifications.summary;
     if (notificationStatus) notificationStatus.textContent = notificationPermissionText();
     renderInstallState();
+    updateNotificationDiagnostics();
   }
 
   function isInstalled() {
@@ -4665,7 +4741,13 @@
       renderSettings();
       return;
     }
+    if (!isNotificationSecureContext()) {
+      showToast("Ouvre ÉLAN en HTTPS ou depuis l'app installée.");
+      renderSettings();
+      return;
+    }
     try {
+      await ensureServiceWorkerRegistration();
       await Notification.requestPermission();
       renderSettings();
       showToast(notificationPermissionText());
@@ -4679,30 +4761,81 @@
     showToast(notificationPermissionText());
   }
 
-  function testNotification() {
+  async function sendElanNotification(title, options = {}) {
+    if (!("Notification" in window) || Notification.permission !== "granted") return false;
+    const payload = {
+      body: options.body || "",
+      tag: options.tag || "elan-notification",
+      renotify: Boolean(options.renotify),
+      badge: "icons/icon.svg",
+      icon: "icons/icon.svg",
+      data: { url: location.href, ...(options.data || {}) }
+    };
+    try {
+      const registration = await ensureServiceWorkerRegistration();
+      if (registration?.showNotification) {
+        await registration.showNotification(title, payload);
+        return true;
+      }
+    } catch (error) {
+      // Fallback below keeps desktop/local testing usable when the SW is unavailable.
+    }
+    try {
+      new Notification(title, payload);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async function testNotification() {
     if (!("Notification" in window) || Notification.permission !== "granted") {
       showToast("Autorise les notifications d'abord.");
+      state.notificationDiagnostics = { lastTestAt: Date.now(), lastTestStatus: "Permission manquante" };
+      saveState();
+      renderSettings();
       return;
     }
-    new Notification("Élan", { body: "Notification test reçue.", icon: "icons/icon-192.png" });
-    showToast("Notification envoyée.");
+    const sent = await sendElanNotification("ÉLAN", {
+      body: "Notification test reçue.",
+      tag: `elan-test-${Date.now()}`
+    });
+    state.notificationDiagnostics = {
+      lastTestAt: Date.now(),
+      lastTestStatus: sent ? "Envoyé" : "Échec"
+    };
+    saveState();
+    renderSettings();
+    showToast(sent ? "Notification envoyée." : "Notification non envoyée.");
+  }
+
+  function ensureServiceWorkerRegistration() {
+    if (!("serviceWorker" in navigator)) return Promise.resolve(null);
+    if (!isNotificationSecureContext()) return Promise.resolve(null);
+    if (!serviceWorkerRegistrationPromise) {
+      serviceWorkerRegistrationPromise = navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
+        .then((registration) => registration.update().then(() => registration).catch(() => registration))
+        .then((registration) => navigator.serviceWorker.ready.then(() => registration).catch(() => registration));
+    }
+    return serviceWorkerRegistrationPromise;
   }
 
   function registerServiceWorker() {
-    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-      const hadController = Boolean(navigator.serviceWorker.controller);
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (!hadController || refreshing) return;
-        refreshing = true;
-        location.reload();
+    if (!("serviceWorker" in navigator) || !isNotificationSecureContext()) return;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!hadController || refreshing) return;
+      refreshing = true;
+      location.reload();
+    });
+    ensureServiceWorkerRegistration()
+      .then(() => renderSettings())
+      .catch(() => {
+        serviceWorkerRegistrationPromise = null;
+        renderSettings();
+        showToast("Service Worker indisponible pour le moment.");
       });
-      navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
-        .then((registration) => registration.update())
-        .catch(() => {
-          showToast("Installation hors ligne indisponible pour le moment.");
-        });
-    }
   }
 
   function bindInstallEvents() {
