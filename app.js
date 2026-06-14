@@ -175,14 +175,17 @@
       icon: "🌳",
       label: "Extérieur",
       tasks: [
+        { id: "exterieur-printemps-branches", label: "Ramasser les branches", reward: 10, repeatDays: 14, season: "Printemps" },
+        { id: "exterieur-printemps-fenetres", label: "Nettoyer les fenêtres extérieures", reward: 10, repeatDays: 60, season: "Printemps" },
+        { id: "exterieur-printemps-nettoyage", label: "Nettoyage de printemps", reward: 15, repeatDays: 30, season: "Printemps" },
         { id: "exterieur-pelouse", label: "Tondre la pelouse", reward: 15, repeatDays: 7, season: "Été" },
-        { id: "exterieur-desherber", label: "Désherber", reward: 10, repeatDays: 14, season: "Été" },
         { id: "exterieur-arroser", label: "Arroser les plantes", reward: 5, repeatDays: 3, season: "Été" },
-        { id: "exterieur-branches", label: "Ramasser les branches", reward: 10, repeatDays: 14, season: "Été" },
         { id: "exterieur-patio", label: "Nettoyer le patio", reward: 10, repeatDays: 30, season: "Été" },
+        { id: "exterieur-automne-feuilles", label: "Ramasser les feuilles", reward: 10, repeatDays: 7, season: "Automne" },
+        { id: "exterieur-automne-preparer", label: "Préparer l'hiver", reward: 10, repeatDays: 30, season: "Automne" },
+        { id: "exterieur-automne-verifier", label: "Vérifier l'extérieur", reward: 5, repeatDays: 30, season: "Automne" },
         { id: "exterieur-deneiger", label: "Déneiger l'entrée", reward: 15, repeatDays: 1, season: "Hiver" },
         { id: "exterieur-deglacer", label: "Déglacer les marches", reward: 10, repeatDays: 3, season: "Hiver" },
-        { id: "exterieur-sabler", label: "Sabler", reward: 5, repeatDays: 3, season: "Hiver" },
         { id: "exterieur-voiture", label: "Dégager la voiture", reward: 10, repeatDays: 3, season: "Hiver" }
       ]
     }
@@ -664,8 +667,21 @@
     ];
   }
 
+  function currentHouseSeason(date = new Date()) {
+    const month = date.getMonth() + 1;
+    if (month >= 3 && month <= 5) return { label: "Printemps", icon: "🌿" };
+    if (month >= 6 && month <= 8) return { label: "Été", icon: "☀️" };
+    if (month >= 9 && month <= 11) return { label: "Automne", icon: "🍂" };
+    return { label: "Hiver", icon: "❄️" };
+  }
+
+  function isHouseTaskInActiveSeason(task) {
+    if (!task?.season) return true;
+    return task.season === currentHouseSeason().label;
+  }
+
   function houseTasksForRoom(roomId) {
-    return allHouseTasks().filter((task) => task.roomId === roomId);
+    return allHouseTasks().filter((task) => task.roomId === roomId && isHouseTaskInActiveSeason(task));
   }
 
   function houseTaskById(taskId) {
@@ -738,8 +754,13 @@
     if (label.includes("toilette") || label.includes("lavabo") || label.includes("douche")) return "🚿";
     if (label.includes("miroir") || label.includes("vitre")) return "🪟";
     if (label.includes("micro")) return "🍳";
+    if (label.includes("feuille")) return "🍂";
+    if (label.includes("printemps")) return "🌿";
+    if (label.includes("patio")) return "🪑";
+    if (label.includes("verifier") || label.includes("préparer") || label.includes("preparer")) return "🛠";
     if (label.includes("pelouse") || label.includes("plante")) return "🌱";
     if (label.includes("deneiger") || label.includes("glacer") || label.includes("sabler")) return "❄️";
+    if (label.includes("voiture")) return "🚗";
     return task?.roomIcon || "🏠";
   }
 
@@ -792,8 +813,10 @@
     if (id.includes("vaisselle") || id.includes("poubelle") || id.includes("dechets") || id.includes("serviettes") || id.includes("arroser")) return 5;
     if (id.includes("balayer") || label === "balayer") return 5;
     if (id.includes("toilette")) return 7;
-    if (id.includes("aspirateur") || id.includes("depoussierer") || id.includes("vetements") || id.includes("epicerie") || id.includes("secheuse") || id.includes("tapis") || id.includes("porte") || id.includes("branches") || id.includes("deglacer") || id.includes("voiture")) return 10;
+    if (id.includes("aspirateur") || id.includes("depoussierer") || id.includes("vetements") || id.includes("epicerie") || id.includes("secheuse") || id.includes("tapis") || id.includes("porte") || id.includes("branches") || id.includes("deglacer") || id.includes("voiture") || id.includes("feuilles") || id.includes("verifier")) return 10;
     if (id.includes("douche") || id.includes("plancher") || id.includes("desherber") || id.includes("patio")) return 15;
+    if (id.includes("printemps-nettoyage") || id.includes("preparer")) return 20;
+    if (id.includes("fenetres")) return 25;
     if (id.includes("micro-ondes")) return 12;
     if (id.includes("frigo")) return 30;
     if (id.includes("pelouse")) return 45;
@@ -832,7 +855,7 @@
   }
 
   function houseQuickTasks() {
-    const available = allHouseTasks().filter((task) => isHouseTaskAvailable(task));
+    const available = allHouseTasks().filter((task) => isHouseTaskAvailable(task) && isHouseTaskInActiveSeason(task));
     const preferred = ["cuisine-vaisselle", "cuisine-comptoir", "chambre-lit", "salon-ranger-objets"];
     return [
       ...preferred.map((id) => available.find((task) => task.id === id)).filter(Boolean),
@@ -844,7 +867,7 @@
     const selected = Array.isArray(state.houseCoach?.selectedTasks) ? state.houseCoach.selectedTasks : [];
     return selected
       .map((taskId) => houseTaskById(taskId))
-      .filter((task) => task && isHouseTaskAvailable(task));
+      .filter((task) => task && isHouseTaskAvailable(task) && isHouseTaskInActiveSeason(task));
   }
 
   function selectedHouseTaskIdsForRoom(roomId) {
@@ -964,6 +987,7 @@
         const roomTasks = houseTasksForRoom(room.id);
         const availableTasks = roomTasks.filter((task) => isHouseTaskAvailable(task));
         const roomHealth = houseRoomHealth(availableTasks.length, roomTasks.length);
+        const season = room.id === "exterieur" ? currentHouseSeason() : null;
         const button = document.createElement("button");
         button.type = "button";
         button.className = "house-room-card";
@@ -971,7 +995,8 @@
         button.innerHTML = `
           <span class="house-room-icon" aria-hidden="true">${room.icon}</span>
           <strong>${room.label}</strong>
-          <span>${availableTasks.length} tâche${availableTasks.length > 1 ? "s" : ""} disponible${availableTasks.length > 1 ? "s" : ""}</span>
+          ${season ? `<span class="house-room-season">${season.icon} ${season.label}</span>` : ""}
+          <span>${availableTasks.length} mission${availableTasks.length > 1 ? "s" : ""} disponible${availableTasks.length > 1 ? "s" : ""}</span>
           <span>${roomHealth.label}</span>
           <i class="house-room-meter" aria-hidden="true"><b style="width:${roomHealth.percent}%"></b></i>
         `;
@@ -980,7 +1005,10 @@
     }
 
     if (detail) detail.classList.toggle("hidden", !selectedRoom || Boolean(activeTask));
-    if (detailTitle && selectedRoom) detailTitle.textContent = `${selectedRoom.icon} ${selectedRoom.label}`;
+    if (detailTitle && selectedRoom) {
+      const season = selectedRoom.id === "exterieur" ? currentHouseSeason() : null;
+      detailTitle.textContent = `${selectedRoom.icon} ${selectedRoom.label}${season ? ` · ${season.icon} ${season.label}` : ""}`;
+    }
     if (taskList && selectedRoom) {
       const roomTasks = houseTasksForRoom(selectedRoom.id);
       const availableTasks = roomTasks.filter((task) => isHouseTaskAvailable(task));
@@ -1024,11 +1052,17 @@
       const reward = tasks.reduce((sum, task) => sum + task.reward, 0);
       const duration = totalHouseTaskDurationMinutes(tasks);
       selectedSummary.classList.toggle("hidden", !tasks.length || Boolean(activeTask));
+      $("house-selected-list")?.replaceChildren(...tasks.map((task) => {
+        const item = document.createElement("p");
+        item.innerHTML = `<span>${houseMissionIcon(task)} ${task.label}</span><strong>+${task.reward}</strong>`;
+        return item;
+      }));
       $("house-selected-count").textContent = `${tasks.length} objectif${tasks.length > 1 ? "s" : ""} sélectionné${tasks.length > 1 ? "s" : ""}`;
       $("house-selected-duration").textContent = `⏱ ${formatHouseDuration(duration)}`;
       $("house-selected-reward").textContent = `💰 +${reward} jetons`;
     } else {
       selectedSummary?.classList.add("hidden");
+      $("house-selected-list")?.replaceChildren();
     }
 
     if (completedSection && completedList && selectedRoom) {
@@ -1169,7 +1203,7 @@
     const modal = $("house-complete-modal");
     if (!modal) return;
     $("house-complete-title").textContent = summary?.title || "Série terminée";
-    $("house-complete-task-name").textContent = summary?.text || "Objectifs complétés";
+    $("house-complete-task-name").textContent = summary?.text || "Missions complétées";
     $("house-complete-reward").textContent = `+${summary?.reward || 0} jetons gagnés`;
     modal.classList.remove("hidden");
     window.requestAnimationFrame(() => modal.focus({ preventScroll: true }));
@@ -1337,7 +1371,7 @@
         const singleMission = quick.source === "single" || quick.taskIds.length === 1;
         showHouseCompleteModal({
           title: roomBonus ? "🏆 Pièce complétée" : (singleMission ? "🎉 Mission complétée" : "🎉 Série terminée"),
-          text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : (singleMission ? `${task.label} · ${houseTaskReturnText(task)}` : `${quick.taskIds.length} objectifs complétés · retour automatique`),
+          text: roomBonus ? `${task.roomLabel} complétée · bonus +25 jetons` : (singleMission ? `${task.label} · ${houseTaskReturnText(task)}` : `${quick.taskIds.length} missions complétées`),
           reward: seriesReward
         });
       }

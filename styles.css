@@ -439,9 +439,9 @@ p { line-height: 1.4; }
   color: var(--ink);
   display: grid;
   gap: 4px;
-  grid-template-rows: auto auto auto auto 1fr;
-  height: 166px;
-  min-height: 166px;
+  grid-template-rows: auto auto auto auto auto 1fr;
+  height: 178px;
+  min-height: 178px;
   overflow: hidden;
   padding: 15px;
   text-align: left;
@@ -473,6 +473,11 @@ p { line-height: 1.4; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.house-room-card .house-room-season {
+  color: var(--brand);
+  font-weight: 900;
 }
 
 .house-room-meter {
@@ -680,13 +685,14 @@ p { line-height: 1.4; }
 }
 
 .house-selected-summary {
-  background: var(--brand);
-  border-radius: 16px;
+  background: linear-gradient(155deg, var(--brand) 0%, #2f8d71 100%);
+  border-radius: 20px;
   color: white;
   display: grid;
-  gap: 10px;
+  gap: 12px;
   margin-top: 12px;
-  padding: 12px;
+  padding: 14px;
+  box-shadow: 0 16px 34px rgba(33, 112, 94, 0.2);
 }
 
 .house-selected-summary p {
@@ -694,6 +700,34 @@ p { line-height: 1.4; }
   display: flex;
   justify-content: space-between;
   margin: 0;
+}
+
+.house-series-kicker {
+  font-size: 1.02rem;
+  font-weight: 900;
+}
+
+.house-selected-list {
+  display: grid;
+  gap: 7px;
+}
+
+.house-selected-list p {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 9px 10px;
+}
+
+.house-selected-list span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.house-selected-list strong {
+  font-size: 0.86rem;
 }
 
 .house-selected-summary .house-selected-details {
