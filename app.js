@@ -4723,9 +4723,12 @@
       const response = await fetch(`./version.json?release=${Date.now()}`, { cache: "no-store" });
       if (!response.ok) return;
       const release = await response.json();
-      $("app-version").textContent = `Version : ${release.version}`;
-      $("app-updated").textContent = `Dernière mise à jour : ${release.updated}`;
-      $("app-changes").replaceChildren(...release.changes.map((change) => {
+      const version = $("app-version");
+      const updated = $("app-updated");
+      const changes = $("app-changes");
+      if (version) version.textContent = `Version : ${release.version}`;
+      if (updated) updated.textContent = `Dernière mise à jour : ${release.updated}`;
+      if (changes) changes.replaceChildren(...release.changes.map((change) => {
         const item = document.createElement("li");
         item.textContent = change;
         return item;
@@ -4733,6 +4736,149 @@
     } catch (error) {
       // The embedded summary remains visible when opened as a local file.
     }
+  }
+
+  function openAdminHouseMissions() {
+    showView("domains");
+    openDomain("house");
+    window.requestAnimationFrame(openHouseTaskForm);
+  }
+
+  function editableHouseTasks() {
+    return Array.isArray(state.houseCoach?.customTasks) ? state.houseCoach.customTasks : [];
+  }
+
+  function chooseEditableHouseTask(actionLabel) {
+    const tasks = editableHouseTasks();
+    if (!tasks.length) {
+      showToast("Aucune mission personnalisée.");
+      return null;
+    }
+    const list = tasks.map((task, index) => `${index + 1}. ${task.label}`).join("\n");
+    const choice = window.prompt(`${actionLabel}\n${list}`);
+    if (!choice) return null;
+    const index = Number(choice) - 1;
+    return Number.isInteger(index) && tasks[index] ? { task: tasks[index], index } : null;
+  }
+
+  function editAdminHouseMission() {
+    const selected = chooseEditableHouseTask("Mission à modifier :");
+    if (!selected) return;
+    const nextLabel = window.prompt("Nouveau nom de la mission", selected.task.label)?.trim();
+    if (!nextLabel) return;
+    const nextReward = Math.max(1, Math.min(50, Math.round(Number(window.prompt("Jetons", selected.task.reward || 5)) || selected.task.reward || 5)));
+    const nextDuration = Math.max(1, Math.min(180, Math.round(Number(window.prompt("Durée estimée en minutes", selected.task.durationMinutes || 5)) || selected.task.durationMinutes || 5)));
+    const customTasks = editableHouseTasks().map((task, index) => index === selected.index
+      ? { ...task, label: nextLabel, reward: nextReward, durationMinutes: nextDuration }
+      : task);
+    state.houseCoach = { ...(state.houseCoach || defaultState.houseCoach), customTasks };
+    saveState();
+    renderHouseCoach();
+    showToast("Mission modifiée.");
+  }
+
+  function deleteAdminHouseMission() {
+    const selected = chooseEditableHouseTask("Mission à supprimer :");
+    if (!selected || !window.confirm(`Supprimer "${selected.task.label}" ?`)) return;
+    state.houseCoach = {
+      ...(state.houseCoach || defaultState.houseCoach),
+      customTasks: editableHouseTasks().filter((_, index) => index !== selected.index),
+      selectedTasks: (state.houseCoach?.selectedTasks || []).filter((id) => id !== selected.task.id)
+    };
+    saveState();
+    renderHouseCoach();
+    showToast("Mission supprimée.");
+  }
+
+  function openAdminTrainingProgram() {
+    showView("domains");
+    openDomain("training");
+    setTrainingMode("custom");
+    window.requestAnimationFrame(() => $("training-custom-name")?.focus({ preventScroll: true }));
+  }
+
+  function editAdminTrainingProgram() {
+    openAdminTrainingProgram();
+    showToast("Modifie les exercices du programme personnalisé.");
+  }
+
+  function deleteAdminTrainingProgram() {
+    const customSteps = Array.isArray(state.training?.customSteps) ? state.training.customSteps : [];
+    if (!customSteps.length) {
+      showToast("Aucun programme personnalisé.");
+      return;
+    }
+    if (!window.confirm("Supprimer le programme personnalisé ?")) return;
+    state.training = {
+      ...(state.training || defaultState.training),
+      customSteps: [],
+      started: false,
+      currentStep: 0,
+      completed: false,
+      skippedSteps: 0,
+      lastReward: 0
+    };
+    saveState();
+    renderTrainingProgram();
+    showToast("Programme supprimé.");
+  }
+
+  function openAdminAgenda() {
+    showView("agenda");
+  }
+
+  function addAdminAgendaItem() {
+    showView("agenda");
+    window.requestAnimationFrame(openAgendaForm);
+  }
+
+  function exportLocalData() {
+    const payload = {
+      app: "ELAN",
+      exportedAt: new Date().toISOString(),
+      storageKey: STORAGE_KEY,
+      state
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `elan-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast("Export prêt.");
+  }
+
+  function importLocalData() {
+    $("import-data-file")?.click();
+  }
+
+  function readImportedData(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      try {
+        const parsed = JSON.parse(String(reader.result || "{}"));
+        const imported = parsed.state && typeof parsed.state === "object" ? parsed.state : parsed;
+        if (!imported || typeof imported !== "object" || !window.confirm("Importer cette sauvegarde ?")) return;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
+        state = loadState();
+        render();
+        closeDomain();
+        closeCheckIn();
+        closeSeriesComplete();
+        showView("home");
+        showToast("Données importées.");
+      } catch (error) {
+        showToast("Fichier invalide.");
+      } finally {
+        event.target.value = "";
+      }
+    });
+    reader.readAsText(file);
   }
 
   async function requestNotifications() {
@@ -5014,6 +5160,17 @@
     bindById("check-notification-permissions", "click", checkNotificationPermissions);
     bindById("test-notification", "click", testNotification);
     bindById("settings-install-button", "click", startInstall);
+    bindById("admin-add-mission", "click", openAdminHouseMissions);
+    bindById("admin-edit-mission", "click", editAdminHouseMission);
+    bindById("admin-delete-mission", "click", deleteAdminHouseMission);
+    bindById("admin-add-program", "click", openAdminTrainingProgram);
+    bindById("admin-edit-program", "click", editAdminTrainingProgram);
+    bindById("admin-delete-program", "click", deleteAdminTrainingProgram);
+    bindById("admin-open-agenda", "click", openAdminAgenda);
+    bindById("admin-add-agenda-item", "click", addAdminAgendaItem);
+    bindById("export-data", "click", exportLocalData);
+    bindById("import-data", "click", importLocalData);
+    bindById("import-data-file", "change", readImportedData);
     bindById("install-yes", "click", startInstall);
     bindById("install-later", "click", dismissInstallInvite);
     bindById("save-idea", "click", saveIdea);

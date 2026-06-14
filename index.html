@@ -533,70 +533,91 @@
 
         <section id="view-settings" class="view" aria-labelledby="settings-title">
           <div class="section-heading">
-            <p class="step">Système</p>
+            <p class="step">Administration</p>
             <h2 id="settings-title">⚙️ ÉLAN</h2>
+            <p>Gère les outils principaux de l'application.</p>
           </div>
-          <article class="card settings-card">
-            <h2>🔔 Notifications</h2>
-            <p id="notification-status" class="status-box">Notifications non vérifiées.</p>
-            <label class="switch-line">
-              <input id="notify-important" type="checkbox">
-              <span>Rappels importants</span>
-            </label>
-            <label class="switch-line">
-              <input id="notify-summary" type="checkbox">
-              <span>Résumé quotidien</span>
-            </label>
-            <p class="small-muted">Les rappels fonctionnent quand ÉLAN reste ouvert.</p>
-          </article>
 
-          <article class="card settings-card notification-diagnostic-card">
-            <h2>🧪 Diagnostic Notifications</h2>
-            <div class="notification-diagnostic-grid">
-              <p><span>Permission</span><strong id="notification-diagnostic-permission">Non vérifiée</strong></p>
-              <p><span>Notifications</span><strong id="notification-diagnostic-support">Non vérifiées</strong></p>
-              <p><span>Service Worker</span><strong id="notification-diagnostic-sw">Non vérifié</strong></p>
-              <p><span>Chrome/PWA</span><strong id="notification-diagnostic-pwa">Non vérifié</strong></p>
-              <p><span>Rappels auto</span><strong id="notification-diagnostic-auto">Non vérifiés</strong></p>
-              <p><span>Dernier test</span><strong id="notification-diagnostic-last">Aucun test</strong></p>
-            </div>
-          </article>
+          <div class="settings-admin-grid">
+            <article class="card settings-card settings-admin-card">
+              <div>
+                <p class="settings-admin-kicker">🏠 Missions</p>
+                <h2>Missions Maison</h2>
+              </div>
+              <div class="settings-action-list">
+                <button id="admin-add-mission" class="secondary wide" type="button">Ajouter mission</button>
+                <button id="admin-edit-mission" class="secondary wide" type="button">Modifier mission</button>
+                <button id="admin-delete-mission" class="secondary wide" type="button">Supprimer mission</button>
+              </div>
+            </article>
 
-          <article class="card settings-card">
-            <h2>🎨 Apparence</h2>
-            <p class="status-box">Mode doux activé.</p>
-            <p class="small-muted">Interface simple, claire et mobile-first.</p>
-          </article>
+            <article class="card settings-card settings-admin-card">
+              <div>
+                <p class="settings-admin-kicker">💪 Programmes</p>
+                <h2>Programmes Entraînement</h2>
+              </div>
+              <div class="settings-action-list">
+                <button id="admin-add-program" class="secondary wide" type="button">Ajouter programme</button>
+                <button id="admin-edit-program" class="secondary wide" type="button">Modifier programme</button>
+                <button id="admin-delete-program" class="secondary wide" type="button">Supprimer programme</button>
+              </div>
+            </article>
 
-          <article class="card settings-card">
-            <h2>💾 Sauvegarde</h2>
-            <p id="install-status" class="status-box">Vérification de l'installation.</p>
-            <button id="settings-install-button" class="secondary wide">Ajouter ÉLAN à l'écran d'accueil</button>
-            <p id="install-help" class="small-muted">Si le bouton ne fonctionne pas, ouvre le menu Chrome ⋮ puis choisis “Ajouter à l'écran d'accueil”.</p>
-            <button id="reset-data" class="danger-button">Effacer mes données locales</button>
-          </article>
+            <article class="card settings-card settings-admin-card notification-diagnostic-card">
+              <div>
+                <p class="settings-admin-kicker">🔔 Notifications</p>
+                <h2>Diagnostic Android</h2>
+              </div>
+              <p id="notification-status" class="status-box">Notifications non vérifiées.</p>
+              <div class="settings-action-list">
+                <button id="test-notification" class="secondary wide" type="button">Tester les notifications</button>
+                <button id="check-notification-permissions" class="secondary wide" type="button">Vérifier les permissions</button>
+                <button id="enable-notifications" class="secondary wide" type="button">Autoriser les notifications</button>
+              </div>
+              <div class="notification-diagnostic-grid compact">
+                <p><span>Permission</span><strong id="notification-diagnostic-permission">Non vérifiée</strong></p>
+                <p><span>Notifications</span><strong id="notification-diagnostic-support">Non vérifiées</strong></p>
+                <p><span>Service Worker</span><strong id="notification-diagnostic-sw">Non vérifié</strong></p>
+                <p><span>Chrome/PWA</span><strong id="notification-diagnostic-pwa">Non vérifié</strong></p>
+                <p><span>Rappels auto</span><strong id="notification-diagnostic-auto">Non vérifiés</strong></p>
+                <p><span>Dernier test</span><strong id="notification-diagnostic-last">Aucun test</strong></p>
+              </div>
+            </article>
 
-          <article class="card version-card settings-card">
-            <h2>ℹ️ À propos</h2>
-            <p class="version-line">
-              <strong id="app-version">Version : v0.12.1</strong>
-              <span id="app-updated" class="muted">Dernière mise à jour : 2026-05-27</span>
-            </p>
-            <p class="small-muted version-heading">Nouveautés</p>
-            <ul id="app-changes" class="version-changes">
-              <li>Domaine Travail retire</li>
-            </ul>
-          </article>
+            <article class="card settings-card settings-admin-card">
+              <div>
+                <p class="settings-admin-kicker">📅 Agenda</p>
+                <h2>Planification</h2>
+              </div>
+              <div class="settings-action-list">
+                <button id="admin-open-agenda" class="secondary wide" type="button">Ouvrir l'agenda</button>
+                <button id="admin-add-agenda-item" class="secondary wide" type="button">Ajouter événement</button>
+              </div>
+            </article>
 
-          <article class="card settings-card settings-dev-card">
-            <h2>🛠 Développement</h2>
-            <p class="small-muted">Outils temporaires pour valider les notifications pendant le développement.</p>
-            <div class="settings-dev-actions">
-              <button id="enable-notifications" class="secondary wide">Autoriser les notifications</button>
-              <button id="check-notification-permissions" class="secondary wide">📱 Vérifier les permissions</button>
-              <button id="test-notification" class="secondary wide">🔔 Tester les notifications</button>
-            </div>
-          </article>
+            <article class="card settings-card settings-admin-card">
+              <div>
+                <p class="settings-admin-kicker">💾 Données</p>
+                <h2>Sauvegarde locale</h2>
+              </div>
+              <p id="install-status" class="status-box">Vérification de l'installation.</p>
+              <div class="settings-action-list">
+                <button id="export-data" class="secondary wide" type="button">Exporter</button>
+                <button id="import-data" class="secondary wide" type="button">Importer</button>
+                <button id="settings-install-button" class="secondary wide" type="button">Ajouter ÉLAN à l'écran d'accueil</button>
+                <button id="reset-data" class="danger-button" type="button">Réinitialiser</button>
+              </div>
+              <input id="import-data-file" class="settings-file-input" type="file" accept="application/json">
+              <p id="install-help" class="small-muted">Si le bouton ne fonctionne pas, ouvre le menu Chrome ⋮ puis choisis “Ajouter à l'écran d'accueil”.</p>
+              <div class="settings-version-mini">
+                <strong id="app-version">Version : v0.12.1</strong>
+                <span id="app-updated" class="muted">Dernière mise à jour : 2026-05-27</span>
+                <ul id="app-changes" class="version-changes">
+                  <li>Domaine Travail retiré</li>
+                </ul>
+              </div>
+            </article>
+          </div>
         </section>
       </main>
 
