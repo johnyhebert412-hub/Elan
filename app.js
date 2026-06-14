@@ -986,9 +986,14 @@
       const availableTasks = roomTasks.filter((task) => isHouseTaskAvailable(task));
       taskList.replaceChildren(...availableTasks.map((task) => {
         const difficulty = houseTaskDifficulty(task);
-        const card = document.createElement("article");
-        card.className = "house-mission-card";
+        const isSelected = selectedInRoom.includes(task.id);
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `house-mission-card${isSelected ? " selected" : ""}`;
+        card.dataset.houseTask = task.id;
+        card.setAttribute("aria-pressed", String(isSelected));
         card.innerHTML = `
+          <span class="house-mission-check" aria-hidden="true">✓</span>
           <div class="house-mission-copy">
             <span class="house-mission-icon" aria-hidden="true">${houseMissionIcon(task)}</span>
             <div>
@@ -1001,7 +1006,6 @@
             <span>⏱ ${formatHouseDuration(houseTaskDurationMinutes(task))}</span>
             <span>${difficulty.stars} ${difficulty.label}</span>
           </div>
-          <button class="primary wide" type="button" data-start-house-task="${task.id}">Commencer</button>
         `;
         return card;
       }));
@@ -1020,7 +1024,7 @@
       const reward = tasks.reduce((sum, task) => sum + task.reward, 0);
       const duration = totalHouseTaskDurationMinutes(tasks);
       selectedSummary.classList.toggle("hidden", !tasks.length || Boolean(activeTask));
-      $("house-selected-count").textContent = `${tasks.length} mission${tasks.length > 1 ? "s" : ""} sélectionnée${tasks.length > 1 ? "s" : ""}`;
+      $("house-selected-count").textContent = `${tasks.length} objectif${tasks.length > 1 ? "s" : ""} sélectionné${tasks.length > 1 ? "s" : ""}`;
       $("house-selected-duration").textContent = `⏱ ${formatHouseDuration(duration)}`;
       $("house-selected-reward").textContent = `💰 +${reward} jetons`;
     } else {
