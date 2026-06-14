@@ -429,7 +429,8 @@
                       label: task.label.trim(),
                       roomId: task.roomId,
                       reward: Math.max(1, Math.round(Number(task.reward) || 5)),
-                      repeatDays: Math.max(1, Math.round(Number(task.repeatDays) || 7))
+                      repeatDays: Math.max(1, Math.round(Number(task.repeatDays) || 7)),
+                      durationMinutes: Math.max(1, Math.min(180, Math.round(Number(task.durationMinutes) || 5)))
                     }))
                     .filter((task) => task.label && houseRooms.some((room) => room.id === task.roomId))
                     .slice(-30)
@@ -777,11 +778,51 @@
     };
   }
 
+  function houseTaskDurationMinutes(task) {
+    if (!task) return 2;
+    if (Number.isFinite(task.durationMinutes)) {
+      return Math.max(1, Math.min(180, Math.round(task.durationMinutes)));
+    }
+    const id = String(task.id || "");
+    const label = String(task.label || "").toLowerCase();
+    if (id.includes("chaussures")) return 1;
+    if (id.includes("manteaux")) return 2;
+    if (id.includes("lit")) return 2;
+    if (id.includes("comptoir") || id.includes("lavabo") || id.includes("miroir") || id.includes("evier") || id.includes("table")) return 3;
+    if (id.includes("vaisselle") || id.includes("poubelle") || id.includes("dechets") || id.includes("serviettes") || id.includes("arroser")) return 5;
+    if (id.includes("balayer") || label === "balayer") return 5;
+    if (id.includes("toilette")) return 7;
+    if (id.includes("aspirateur") || id.includes("depoussierer") || id.includes("vetements") || id.includes("epicerie") || id.includes("secheuse") || id.includes("tapis") || id.includes("porte") || id.includes("branches") || id.includes("deglacer") || id.includes("voiture")) return 10;
+    if (id.includes("douche") || id.includes("plancher") || id.includes("desherber") || id.includes("patio")) return 15;
+    if (id.includes("micro-ondes")) return 12;
+    if (id.includes("frigo")) return 30;
+    if (id.includes("pelouse")) return 45;
+    if (id.includes("deneiger")) return 25;
+    if (id.includes("sabler")) return 8;
+    if (task.reward >= 15) return 25;
+    if (task.reward >= 10) return 10;
+    return 5;
+  }
+
   function houseTaskDurationMs(task) {
-    if (!task) return 2 * 60000;
-    if (task.reward >= 15) return 8 * 60000;
-    if (task.reward >= 10) return 5 * 60000;
-    return 2 * 60000;
+    return houseTaskDurationMinutes(task) * 60000;
+  }
+
+  function formatHouseDuration(minutes) {
+    const value = Math.max(1, Math.round(Number(minutes) || 1));
+    return `${value} min`;
+  }
+
+  function houseTaskDifficulty(task) {
+    const minutes = houseTaskDurationMinutes(task);
+    if (minutes <= 2) return { label: "Facile", stars: "⭐" };
+    if (minutes <= 7) return { label: "Moyen", stars: "⭐⭐" };
+    if (minutes <= 20) return { label: "Soutenu", stars: "⭐⭐⭐" };
+    return { label: "Long", stars: "⭐⭐⭐⭐" };
+  }
+
+  function totalHouseTaskDurationMinutes(tasks) {
+    return tasks.reduce((sum, task) => sum + houseTaskDurationMinutes(task), 0);
   }
 
   function activeHouseSeriesLabel() {
@@ -903,12 +944,15 @@
     if ($("house-quick-list")) {
       $("house-quick-list").replaceChildren(...quickTasks.map((task) => {
         const item = document.createElement("p");
-        item.innerHTML = `<span>☑ ${task.label}</span><strong>+${task.reward}</strong>`;
+        const difficulty = houseTaskDifficulty(task);
+        item.innerHTML = `<span>☑ ${task.label}<em>⏱ ${formatHouseDuration(houseTaskDurationMinutes(task))} · ${difficulty.stars} ${difficulty.label}</em></span><strong>+${task.reward}</strong>`;
         return item;
       }));
     }
     if ($("house-quick-reward")) {
-      $("house-quick-reward").textContent = `+${quickTasks.reduce((sum, task) => sum + task.reward, 0)}`;
+      const quickReward = quickTasks.reduce((sum, task) => sum + task.reward, 0);
+      const quickDuration = totalHouseTaskDurationMinutes(quickTasks);
+      $("house-quick-reward").textContent = quickTasks.length ? `⏱ ${formatHouseDuration(quickDuration)} · +${quickReward}` : "+0";
     }
     if ($("house-start-quick")) {
       $("house-start-quick").disabled = !quickTasks.length || Boolean(activeTask);
@@ -941,6 +985,7 @@
       const roomTasks = houseTasksForRoom(selectedRoom.id);
       const availableTasks = roomTasks.filter((task) => isHouseTaskAvailable(task));
       taskList.replaceChildren(...availableTasks.map((task) => {
+        const difficulty = houseTaskDifficulty(task);
         const card = document.createElement("article");
         card.className = "house-mission-card";
         card.innerHTML = `
@@ -952,6 +997,10 @@
             </div>
           </div>
           <p class="house-mission-reward">+${task.reward} jetons</p>
+          <div class="house-mission-meta">
+            <span>⏱ ${formatHouseDuration(houseTaskDurationMinutes(task))}</span>
+            <span>${difficulty.stars} ${difficulty.label}</span>
+          </div>
           <button class="primary wide" type="button" data-start-house-task="${task.id}">Commencer</button>
         `;
         return card;
@@ -969,9 +1018,11 @@
     if (selectedSummary && selectedRoom) {
       const tasks = selectedTasks.filter((task) => task.roomId === selectedRoom.id);
       const reward = tasks.reduce((sum, task) => sum + task.reward, 0);
+      const duration = totalHouseTaskDurationMinutes(tasks);
       selectedSummary.classList.toggle("hidden", !tasks.length || Boolean(activeTask));
-      $("house-selected-count").textContent = `${tasks.length} objectif${tasks.length > 1 ? "s" : ""} sélectionné${tasks.length > 1 ? "s" : ""}`;
-      $("house-selected-reward").textContent = `+${reward} jetons`;
+      $("house-selected-count").textContent = `${tasks.length} mission${tasks.length > 1 ? "s" : ""} sélectionnée${tasks.length > 1 ? "s" : ""}`;
+      $("house-selected-duration").textContent = `⏱ ${formatHouseDuration(duration)}`;
+      $("house-selected-reward").textContent = `💰 +${reward} jetons`;
     } else {
       selectedSummary?.classList.add("hidden");
     }
@@ -1002,6 +1053,8 @@
       $("house-active-task-name").textContent = `${houseMissionIcon(activeTask)} ${activeTask.label}`;
       $("house-active-task-room").textContent = `${activeTask.roomIcon} ${activeTask.roomLabel}`;
       $("house-active-task-reward").textContent = `+${activeTask.reward} jetons`;
+      const difficulty = houseTaskDifficulty(activeTask);
+      $("house-active-task-meta").textContent = `⏱ ${formatHouseDuration(houseTaskDurationMinutes(activeTask))} · ${difficulty.stars} ${difficulty.label}`;
       activePanel?.classList.toggle("house-single-mission", isSingleMission);
       $("house-skip-task")?.classList.toggle("hidden", isSingleMission);
       $("house-timer-display").textContent = formatRemaining(remainingMs);
@@ -1153,6 +1206,7 @@
     const roomId = $("house-task-room")?.value || state.houseCoach?.selectedRoom || "cuisine";
     const repeatDays = Math.max(1, Math.round(Number($("house-task-frequency")?.value) || 7));
     const reward = Math.max(1, Math.min(50, Math.round(Number($("house-task-reward")?.value) || 5)));
+    const durationMinutes = Math.max(1, Math.min(180, Math.round(Number($("house-task-duration")?.value) || 5)));
     if (!label) {
       showToast("Écris une tâche.");
       return;
@@ -1167,7 +1221,8 @@
       label,
       roomId,
       reward,
-      repeatDays
+      repeatDays,
+      durationMinutes
     };
     state.houseCoach = {
       ...(state.houseCoach || defaultState.houseCoach),
@@ -1177,6 +1232,7 @@
     saveState();
     nameInput.value = "";
     $("house-task-reward").value = "5";
+    $("house-task-duration").value = "5";
     closeHouseTaskForm();
     renderHouseCoach();
     showToast("Tâche ajoutée.");

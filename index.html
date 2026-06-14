@@ -146,7 +146,8 @@
               <p class="domain-section-label">Disponibles maintenant</p>
               <div id="house-task-list" class="house-task-list"></div>
               <div id="house-selected-summary" class="house-selected-summary hidden">
-                <p><strong id="house-selected-count">0 objectif sélectionné</strong><span id="house-selected-reward">+0 jetons</span></p>
+                <p><strong id="house-selected-count">0 objectif sélectionné</strong></p>
+                <p class="house-selected-details"><span id="house-selected-duration">⏱ 0 min</span><span id="house-selected-reward">💰 +0 jetons</span></p>
                 <button id="house-start-selected" class="primary wide" type="button">Commencer la série</button>
               </div>
               <div id="house-completed-section" class="house-completed-section hidden">
@@ -160,6 +161,7 @@
               <h3 id="house-active-task-name">Faire la vaisselle</h3>
               <p id="house-active-task-room" class="small-muted">Cuisine</p>
               <p id="house-active-task-reward" class="house-active-reward">+5 jetons</p>
+              <p id="house-active-task-meta" class="house-active-meta">⏱ 2 min · ⭐ Facile</p>
               <div class="house-mission-timer" aria-label="Timer de mission">
                 <span id="house-timer-status">Mission en cours</span>
                 <strong id="house-timer-display">02:00</strong>
@@ -739,6 +741,10 @@
         <label class="idea-label">
           <span>Récompense en jetons</span>
           <input id="house-task-reward" type="number" min="1" max="50" value="5">
+        </label>
+        <label class="idea-label">
+          <span>Durée estimée</span>
+          <input id="house-task-duration" type="number" min="1" max="180" value="5">
         </label>
         <div class="domain-form-actions">
           <button id="save-house-task" class="primary wide" type="button">Ajouter</button>

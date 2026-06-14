@@ -301,7 +301,9 @@ p { line-height: 1.4; }
 
 #house-quick-reward {
   color: var(--brand);
-  font-size: 1rem;
+  font-size: 0.9rem;
+  max-width: 148px;
+  text-align: right;
 }
 
 .house-quick-list {
@@ -321,6 +323,19 @@ p { line-height: 1.4; }
   justify-content: space-between;
   margin: 0;
   padding: 9px 10px;
+}
+
+.house-quick-list p span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.house-quick-list p em {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 800;
 }
 
 .house-completed-list p {
@@ -533,6 +548,35 @@ p { line-height: 1.4; }
   margin: 0;
 }
 
+.house-mission-meta {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.house-mission-meta span,
+.house-active-meta {
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(222, 216, 205, 0.9);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 850;
+  min-width: 0;
+  overflow: hidden;
+  padding: 7px 9px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.house-active-meta {
+  display: inline-flex;
+  justify-content: center;
+  margin: 8px auto 0;
+  max-width: 100%;
+}
+
 .house-mission-card button {
   border-radius: 18px;
   font-weight: 900;
@@ -607,6 +651,16 @@ p { line-height: 1.4; }
   display: flex;
   justify-content: space-between;
   margin: 0;
+}
+
+.house-selected-summary .house-selected-details {
+  gap: 8px;
+}
+
+.house-selected-summary .house-selected-details span {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 7px 10px;
 }
 
 .house-selected-summary span {
