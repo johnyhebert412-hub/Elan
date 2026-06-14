@@ -99,10 +99,17 @@
       label: "Salon",
       tasks: [
         { id: "salon-aspirateur", label: "Passer l'aspirateur", reward: 10, repeatDays: 7 },
+        { id: "salon-aspirateur-divan", label: "Aspirateur sous le divan", reward: 10, repeatDays: 14 },
         { id: "salon-depoussierer", label: "Dépoussiérer", reward: 5, repeatDays: 7 },
         { id: "salon-ranger-objets", label: "Ranger les objets", reward: 5, repeatDays: 1 },
         { id: "salon-nettoyer-table", label: "Nettoyer la table", reward: 5, repeatDays: 3 },
+        { id: "salon-television", label: "Nettoyer la télévision", reward: 5, repeatDays: 14 },
+        { id: "salon-cables", label: "Organiser les câbles", reward: 5, repeatDays: 30 },
+        { id: "salon-magazines", label: "Ranger les magazines", reward: 5, repeatDays: 7 },
         { id: "salon-nettoyer-vitres", label: "Nettoyer les vitres", reward: 10, repeatDays: 60 },
+        { id: "salon-cadres", label: "Dépoussiérer les cadres", reward: 5, repeatDays: 14 },
+        { id: "salon-couvertures", label: "Laver les couvertures", reward: 10, repeatDays: 30 },
+        { id: "salon-interrupteurs", label: "Nettoyer les interrupteurs", reward: 5, repeatDays: 14 },
         { id: "salon-dechets", label: "Ramasser les déchets", reward: 5, repeatDays: 1 }
       ]
     },
@@ -117,7 +124,17 @@
         { id: "cuisine-poubelles", label: "Sortir les poubelles", reward: 5, repeatDays: 7 },
         { id: "cuisine-micro-ondes", label: "Nettoyer le micro-ondes", reward: 10, repeatDays: 14 },
         { id: "cuisine-epicerie", label: "Ranger l'épicerie", reward: 5, repeatDays: 3 },
-        { id: "cuisine-evier", label: "Nettoyer l'évier", reward: 5, repeatDays: 3 }
+        { id: "cuisine-evier", label: "Nettoyer l'évier", reward: 5, repeatDays: 3 },
+        { id: "cuisine-four", label: "Nettoyer le four", reward: 15, repeatDays: 30 },
+        { id: "cuisine-cafetiere", label: "Nettoyer la cafetière", reward: 5, repeatDays: 14 },
+        { id: "cuisine-grille-pain", label: "Nettoyer le grille-pain", reward: 5, repeatDays: 14 },
+        { id: "cuisine-garde-manger", label: "Organiser le garde-manger", reward: 10, repeatDays: 30 },
+        { id: "cuisine-expires", label: "Vérifier les aliments expirés", reward: 10, repeatDays: 14 },
+        { id: "cuisine-poignees-armoires", label: "Nettoyer les poignées d'armoires", reward: 5, repeatDays: 14 },
+        { id: "cuisine-hotte", label: "Nettoyer la hotte", reward: 10, repeatDays: 30 },
+        { id: "cuisine-table", label: "Laver la table", reward: 5, repeatDays: 3 },
+        { id: "cuisine-chaises", label: "Nettoyer les chaises", reward: 5, repeatDays: 14 },
+        { id: "cuisine-surfaces", label: "Désinfecter les surfaces", reward: 5, repeatDays: 3 }
       ]
     },
     {
@@ -126,9 +143,16 @@
       label: "Chambre",
       tasks: [
         { id: "chambre-lit", label: "Faire le lit", reward: 5, repeatDays: 1 },
+        { id: "chambre-draps", label: "Changer les draps", reward: 10, repeatDays: 14 },
         { id: "chambre-vetements", label: "Ranger les vêtements", reward: 5, repeatDays: 3 },
+        { id: "chambre-commode", label: "Organiser la commode", reward: 10, repeatDays: 30 },
+        { id: "chambre-trier-vetements", label: "Trier les vêtements", reward: 10, repeatDays: 30 },
+        { id: "chambre-table-nuit", label: "Ranger la table de nuit", reward: 5, repeatDays: 7 },
+        { id: "chambre-literie", label: "Laver la literie", reward: 10, repeatDays: 30 },
         { id: "chambre-aspirateur", label: "Aspirateur", reward: 10, repeatDays: 7 },
         { id: "chambre-depoussierer", label: "Dépoussiérer", reward: 5, repeatDays: 7 },
+        { id: "chambre-meubles", label: "Dépoussiérer les meubles", reward: 5, repeatDays: 14 },
+        { id: "chambre-garde-robe", label: "Organiser le garde-robe", reward: 10, repeatDays: 30 },
         { id: "chambre-poubelle", label: "Vider la poubelle", reward: 5, repeatDays: 7 }
       ]
     },
@@ -143,7 +167,14 @@
         { id: "bain-douche", label: "Nettoyer la douche", reward: 10, repeatDays: 14 },
         { id: "bain-serviettes", label: "Changer les serviettes", reward: 5, repeatDays: 7 },
         { id: "bain-balayer", label: "Balayer", reward: 5, repeatDays: 7 },
-        { id: "bain-plancher", label: "Laver le plancher", reward: 10, repeatDays: 14 }
+        { id: "bain-plancher", label: "Laver le plancher", reward: 10, repeatDays: 14 },
+        { id: "bain-poignees", label: "Désinfecter les poignées", reward: 5, repeatDays: 14 },
+        { id: "bain-ventilateur", label: "Nettoyer le ventilateur", reward: 10, repeatDays: 30 },
+        { id: "bain-armoire", label: "Organiser l'armoire", reward: 10, repeatDays: 30 },
+        { id: "bain-produits-expires", label: "Vérifier les produits expirés", reward: 5, repeatDays: 30 },
+        { id: "bain-joints", label: "Nettoyer les joints", reward: 15, repeatDays: 30 },
+        { id: "bain-rideau", label: "Laver le rideau de douche", reward: 10, repeatDays: 30 },
+        { id: "bain-accessoires", label: "Nettoyer les accessoires", reward: 5, repeatDays: 14 }
       ]
     },
     {
@@ -154,6 +185,10 @@
         { id: "buanderie-brassee", label: "Faire une brassée", reward: 5, repeatDays: 3 },
         { id: "buanderie-plier", label: "Plier les vêtements", reward: 5, repeatDays: 3 },
         { id: "buanderie-ranger", label: "Ranger les vêtements", reward: 5, repeatDays: 3 },
+        { id: "buanderie-filtre", label: "Nettoyer le filtre de la sécheuse", reward: 5, repeatDays: 7 },
+        { id: "buanderie-produits", label: "Organiser les produits ménagers", reward: 10, repeatDays: 30 },
+        { id: "buanderie-savon", label: "Vérifier les réserves de savon", reward: 5, repeatDays: 14 },
+        { id: "buanderie-laveuse", label: "Nettoyer la laveuse", reward: 10, repeatDays: 30 },
         { id: "buanderie-secheuse", label: "Nettoyer la sécheuse", reward: 5, repeatDays: 30 },
         { id: "buanderie-plancher", label: "Nettoyer le plancher", reward: 5, repeatDays: 14 }
       ]
@@ -166,6 +201,11 @@
         { id: "entree-chaussures", label: "Ranger les chaussures", reward: 5, repeatDays: 1 },
         { id: "entree-manteaux", label: "Ranger les manteaux", reward: 5, repeatDays: 3 },
         { id: "entree-balayer", label: "Balayer", reward: 5, repeatDays: 7 },
+        { id: "entree-poignees", label: "Nettoyer les poignées", reward: 5, repeatDays: 14 },
+        { id: "entree-organiser-chaussures", label: "Organiser les chaussures", reward: 5, repeatDays: 7 },
+        { id: "entree-organiser-manteaux", label: "Organiser les manteaux", reward: 5, repeatDays: 14 },
+        { id: "entree-miroir", label: "Nettoyer le miroir", reward: 5, repeatDays: 14 },
+        { id: "entree-accessoires", label: "Ranger les accessoires", reward: 5, repeatDays: 7 },
         { id: "entree-porte", label: "Nettoyer la porte", reward: 5, repeatDays: 30 },
         { id: "entree-tapis", label: "Nettoyer le tapis", reward: 5, repeatDays: 14 }
       ]
@@ -181,8 +221,11 @@
         { id: "exterieur-pelouse", label: "Tondre la pelouse", reward: 15, repeatDays: 7, season: "Été" },
         { id: "exterieur-arroser", label: "Arroser les plantes", reward: 5, repeatDays: 3, season: "Été" },
         { id: "exterieur-patio", label: "Nettoyer le patio", reward: 10, repeatDays: 30, season: "Été" },
+        { id: "exterieur-bbq", label: "Nettoyer le BBQ", reward: 10, repeatDays: 30, season: "Été" },
+        { id: "exterieur-outils", label: "Ranger les outils", reward: 5, repeatDays: 14, season: "Été" },
         { id: "exterieur-automne-feuilles", label: "Ramasser les feuilles", reward: 10, repeatDays: 7, season: "Automne" },
         { id: "exterieur-automne-preparer", label: "Préparer l'hiver", reward: 10, repeatDays: 30, season: "Automne" },
+        { id: "exterieur-automne-gouttieres", label: "Vérifier les gouttières", reward: 10, repeatDays: 30, season: "Automne" },
         { id: "exterieur-automne-verifier", label: "Vérifier l'extérieur", reward: 5, repeatDays: 30, season: "Automne" },
         { id: "exterieur-deneiger", label: "Déneiger l'entrée", reward: 15, repeatDays: 1, season: "Hiver" },
         { id: "exterieur-deglacer", label: "Déglacer les marches", reward: 10, repeatDays: 3, season: "Hiver" },
@@ -746,14 +789,34 @@
     if (label.includes("manteau")) return "🧥";
     if (label.includes("balayer") || label.includes("plancher")) return "🧹";
     if (label.includes("vaisselle") || label.includes("evier")) return "🍽️";
-    if (label.includes("comptoir") || label.includes("table")) return "🧽";
+    if (label.includes("comptoir") || label.includes("table") || label.includes("surface")) return "🧽";
     if (label.includes("poubelle") || label.includes("dechet")) return "🗑️";
     if (label.includes("lit")) return "🛏️";
-    if (label.includes("vetement") || label.includes("brassee")) return "🧺";
+    if (label.includes("vetement") || label.includes("brassee") || label.includes("drap") || label.includes("literie") || label.includes("couverture")) return "🧺";
     if (label.includes("aspirateur")) return "🌀";
     if (label.includes("toilette") || label.includes("lavabo") || label.includes("douche")) return "🚿";
     if (label.includes("miroir") || label.includes("vitre")) return "🪟";
     if (label.includes("micro")) return "🍳";
+    if (label.includes("four")) return "🔥";
+    if (label.includes("cafet")) return "☕";
+    if (label.includes("grille-pain")) return "🍞";
+    if (label.includes("garde-manger") || label.includes("garde-robe") || label.includes("armoire") || label.includes("commode")) return "🗄️";
+    if (label.includes("expire")) return "🔎";
+    if (label.includes("poignee") || label.includes("interrupteur")) return "✨";
+    if (label.includes("hotte") || label.includes("ventilateur")) return "💨";
+    if (label.includes("chaise")) return "🪑";
+    if (label.includes("television")) return "📺";
+    if (label.includes("cable")) return "🔌";
+    if (label.includes("magazine")) return "📰";
+    if (label.includes("cadre")) return "🖼️";
+    if (label.includes("rideau")) return "🚿";
+    if (label.includes("accessoire")) return "🧤";
+    if (label.includes("filtre")) return "🧼";
+    if (label.includes("savon")) return "🧴";
+    if (label.includes("laveuse")) return "🫧";
+    if (label.includes("bbq")) return "♨️";
+    if (label.includes("outil")) return "🧰";
+    if (label.includes("gouttiere")) return "🏠";
     if (label.includes("feuille")) return "🍂";
     if (label.includes("printemps")) return "🌿";
     if (label.includes("patio")) return "🪑";
@@ -784,7 +847,7 @@
 
   function houseStats() {
     const completedIds = completedHouseTaskIds();
-    const tasks = allHouseTasks();
+    const tasks = allHouseTasks().filter((task) => isHouseTaskInActiveSeason(task));
     const totalTokens = tasks.reduce((sum, task) => sum + task.reward, 0);
     const earnedTokens = tasks
       .filter((task) => completedIds.includes(task.id))
@@ -809,12 +872,12 @@
     if (id.includes("chaussures")) return 1;
     if (id.includes("manteaux")) return 2;
     if (id.includes("lit")) return 2;
-    if (id.includes("comptoir") || id.includes("lavabo") || id.includes("miroir") || id.includes("evier") || id.includes("table")) return 3;
-    if (id.includes("vaisselle") || id.includes("poubelle") || id.includes("dechets") || id.includes("serviettes") || id.includes("arroser")) return 5;
+    if (id.includes("comptoir") || id.includes("lavabo") || id.includes("miroir") || id.includes("evier") || id.includes("table") || id.includes("interrupteurs") || id.includes("poignees") || id.includes("savon")) return 3;
+    if (id.includes("vaisselle") || id.includes("poubelle") || id.includes("dechets") || id.includes("serviettes") || id.includes("arroser") || id.includes("grille-pain") || id.includes("cafetiere") || id.includes("television") || id.includes("magazines") || id.includes("accessoires") || id.includes("filtre") || id.includes("outils")) return 5;
     if (id.includes("balayer") || label === "balayer") return 5;
     if (id.includes("toilette")) return 7;
-    if (id.includes("aspirateur") || id.includes("depoussierer") || id.includes("vetements") || id.includes("epicerie") || id.includes("secheuse") || id.includes("tapis") || id.includes("porte") || id.includes("branches") || id.includes("deglacer") || id.includes("voiture") || id.includes("feuilles") || id.includes("verifier")) return 10;
-    if (id.includes("douche") || id.includes("plancher") || id.includes("desherber") || id.includes("patio")) return 15;
+    if (id.includes("aspirateur") || id.includes("depoussierer") || id.includes("vetements") || id.includes("epicerie") || id.includes("secheuse") || id.includes("tapis") || id.includes("porte") || id.includes("branches") || id.includes("deglacer") || id.includes("voiture") || id.includes("feuilles") || id.includes("verifier") || id.includes("cables") || id.includes("cadres") || id.includes("table-nuit") || id.includes("draps") || id.includes("commode") || id.includes("trier") || id.includes("meubles") || id.includes("armoire") || id.includes("produits") || id.includes("joints") || id.includes("rideau") || id.includes("laveuse") || id.includes("bbq") || id.includes("gouttieres")) return 10;
+    if (id.includes("douche") || id.includes("plancher") || id.includes("desherber") || id.includes("patio") || id.includes("four") || id.includes("garde-manger") || id.includes("garde-robe") || id.includes("literie") || id.includes("ventilateur")) return 15;
     if (id.includes("printemps-nettoyage") || id.includes("preparer")) return 20;
     if (id.includes("fenetres")) return 25;
     if (id.includes("micro-ondes")) return 12;
@@ -963,7 +1026,7 @@
     hero?.classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask));
     overview?.classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask));
 
-    if ($("house-quick-mission")) $("house-quick-mission").classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask) || !quickTasks.length);
+    if ($("house-quick-mission")) $("house-quick-mission").classList.toggle("hidden", Boolean(selectedRoom) || Boolean(activeTask));
     if ($("house-quick-list")) {
       $("house-quick-list").replaceChildren(...quickTasks.map((task) => {
         const item = document.createElement("p");

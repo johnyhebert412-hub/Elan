@@ -285,31 +285,51 @@ p { line-height: 1.4; }
 }
 
 .house-quick-mission {
+  align-items: center;
   background: #fff9e8;
   border: 1px solid #eadfb8;
-  border-radius: 22px;
-  box-shadow: 0 14px 30px rgba(23, 39, 33, 0.07);
-  margin-top: 14px;
-  padding: 14px;
+  border-radius: 16px;
+  box-shadow: none;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr auto;
+  margin-top: 10px;
+  padding: 10px;
 }
 
 .house-quick-mission h3 {
   color: var(--ink);
-  font-size: 1.08rem;
+  font-size: 0.92rem;
+  line-height: 1.15;
   margin: 0;
 }
 
 #house-quick-reward {
   color: var(--brand);
-  font-size: 0.9rem;
-  max-width: 148px;
+  font-size: 0.78rem;
+  max-width: 112px;
   text-align: right;
 }
 
 .house-quick-list {
-  display: grid;
-  gap: 7px;
-  margin: 10px 0;
+  display: none;
+}
+
+.house-quick-mission .compact-header {
+  margin: 0;
+  min-width: 0;
+}
+
+.house-quick-mission .step {
+  font-size: 0.68rem;
+}
+
+.house-quick-mission .primary {
+  border-radius: 999px;
+  font-size: 0.84rem;
+  min-height: 38px;
+  padding: 8px 12px;
+  width: auto;
 }
 
 .house-quick-list p,
