@@ -3258,6 +3258,16 @@ body.goal-series-active.challenge-open .app-shell {
   padding-inline: 12px;
 }
 
+.domain-return-button {
+  background: rgba(33, 112, 94, 0.10);
+  border: 1px solid rgba(33, 112, 94, 0.18);
+  border-radius: 999px;
+  color: var(--brand);
+  font-weight: 900;
+  min-height: 42px;
+  padding: 9px 14px;
+}
+
 .domain-immersive .house-hero,
 .domain-immersive .training-hero {
   border: 0;
@@ -3409,7 +3419,10 @@ body.goal-series-active.challenge-open .app-shell {
   min-height: calc(100dvh - var(--bottom-nav-height) - 150px);
 }
 
+.domain-immersive.house-room-open .immersive-header,
 .domain-immersive.house-active-domain .immersive-header,
+.domain-immersive.training-level-domain .immersive-header,
+.domain-immersive.training-program-domain .immersive-header,
 .domain-immersive.training-active-domain .immersive-header,
 .domain-immersive.training-level-domain .training-hero,
 .domain-immersive.training-program-domain .training-hero,
