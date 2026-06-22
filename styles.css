@@ -1836,6 +1836,10 @@ input[type="date"], input[type="time"], input[type="text"], select {
   background: linear-gradient(135deg, #f4efe3, #fffaf2);
 }
 
+.agenda-shell-card {
+  background: linear-gradient(135deg, #f4efe3, #fffaf2);
+}
+
 .agenda-month-controls {
   align-items: center;
   display: grid;
@@ -1843,7 +1847,23 @@ input[type="date"], input[type="time"], input[type="text"], select {
   grid-template-columns: 1fr 1.2fr 1fr;
 }
 
+.agenda-range-controls {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  margin: 12px 0;
+}
+
 .agenda-month-controls .text-button {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 0.82rem;
+  min-height: 44px;
+}
+
+.agenda-range-controls .text-button {
   background: white;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1931,6 +1951,10 @@ input[type="date"], input[type="time"], input[type="text"], select {
   gap: 6px;
 }
 
+.agenda-form textarea {
+  resize: vertical;
+}
+
 .agenda-view-tabs {
   background: var(--soft);
   border: 1px solid var(--border);
@@ -1971,6 +1995,10 @@ input[type="date"], input[type="time"], input[type="text"], select {
   gap: 10px;
 }
 
+.agenda-list-card {
+  min-height: 180px;
+}
+
 .agenda-date-group {
   color: var(--muted);
   font-size: 0.82rem;
@@ -1989,6 +2017,12 @@ input[type="date"], input[type="time"], input[type="text"], select {
   color: var(--ink);
   display: block;
   font-size: 0.98rem;
+}
+
+.agenda-description {
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin: 4px 0 0;
 }
 
 .agenda-plan-chips {

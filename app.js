@@ -83,7 +83,9 @@
     Habitude: "#e8eddc",
     "Bloc de temps": "#ebe6f3",
     Finance: "#f6f0dc",
-    Budget: "#f6f0dc"
+    Budget: "#f6f0dc",
+    Agenda: "#e7f0f3",
+    Événement: "#e7f0f3"
   };
 
   const homeDomains = {
@@ -448,7 +450,7 @@
           : cloneState(defaultState.goalQueue),
         agenda: Array.isArray(saved.agenda) ? saved.agenda : [],
         agendaDate: typeof saved.agendaDate === "string" ? saved.agendaDate : "",
-        agendaView: ["today", "week", "next30"].includes(saved.agendaView) ? saved.agendaView : "today",
+        agendaView: ["today", "week", "month", "next30"].includes(saved.agendaView) ? (saved.agendaView === "next30" ? "month" : saved.agendaView) : "today",
         activeChallenge: saved.activeChallenge && typeof saved.activeChallenge === "object" ? saved.activeChallenge : null,
         coins: Number.isFinite(saved.coins) ? saved.coins : (Number.isFinite(saved.wins) ? saved.wins * COINS_PER_TASK : 0),
         purchasedRewards: Array.isArray(saved.purchasedRewards) ? saved.purchasedRewards : [],
@@ -3302,30 +3304,49 @@
     return dateKey(date);
   }
 
-  function budgetOccurrenceDatesBetween(entry, start, end) {
+  function addYears(dateValue, years) {
+    const date = new Date(`${dateValue}T12:00:00`);
+    date.setFullYear(date.getFullYear() + years);
+    return dateKey(date);
+  }
+
+  function occurrenceStepDate(dateValue, repeat, customIntervalDays = 1) {
+    if (repeat === "daily") return addDays(dateValue, 1);
+    if (repeat === "weekly") return addDays(dateValue, 7);
+    if (repeat === "biweekly") return addDays(dateValue, 14);
+    if (repeat === "monthly") return addMonths(dateValue, 1);
+    if (repeat === "yearly") return addYears(dateValue, 1);
+    if (repeat === "custom") return addDays(dateValue, Math.max(1, Math.min(365, Math.round(Number(customIntervalDays) || 1))));
+    return "";
+  }
+
+  function occurrenceDatesBetween(entry, start, end) {
     if (!entry.date) return [];
     const dates = [];
     let current = entry.date;
     const repeat = entry.repeat || "";
+    const customIntervalDays = entry.customIntervalDays || entry.intervalDays || 1;
     let guard = 0;
 
     while (current < start && repeat && guard < 120) {
-      if (repeat === "weekly") current = addDays(current, 7);
-      else if (repeat === "biweekly") current = addDays(current, 14);
-      else if (repeat === "monthly") current = addMonths(current, 1);
-      else break;
+      const next = occurrenceStepDate(current, repeat, customIntervalDays);
+      if (!next) break;
+      current = next;
       guard += 1;
     }
 
     while (current >= start && current <= end && guard < 160) {
       dates.push(current);
-      if (repeat === "weekly") current = addDays(current, 7);
-      else if (repeat === "biweekly") current = addDays(current, 14);
-      else if (repeat === "monthly") current = addMonths(current, 1);
-      else break;
+      const next = occurrenceStepDate(current, repeat, customIntervalDays);
+      if (!next) break;
+      current = next;
       guard += 1;
     }
     return dates;
+  }
+
+  function budgetOccurrenceDatesBetween(entry, start, end) {
+    return occurrenceDatesBetween(entry, start, end);
   }
 
   function budgetOccurrenceDates(entry) {
@@ -3348,11 +3369,14 @@
 
   function budgetRepeatText(value) {
     const labels = {
-      weekly: "Hebdomadaire",
+      daily: "Chaque jour",
+      weekly: "Chaque semaine",
       biweekly: "Aux 2 semaines",
-      monthly: "Mensuel"
+      monthly: "Chaque mois",
+      yearly: "Chaque année",
+      custom: "Personnalisé"
     };
-    return labels[value] || "Unique";
+    return labels[value] || "Une fois";
   }
 
   function budgetCategoryText(value) {
@@ -3632,29 +3656,52 @@
     return budgetRepeatText(value);
   }
 
+  function agendaWeekRange(anchorDate) {
+    const date = new Date(`${anchorDate}T12:00:00`);
+    const offset = (date.getDay() + 6) % 7;
+    const startDate = new Date(date);
+    startDate.setDate(date.getDate() - offset);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    return { start: dateKey(startDate), end: dateKey(endDate) };
+  }
+
+  function agendaMonthRange(anchorDate) {
+    const date = new Date(`${anchorDate}T12:00:00`);
+    const start = new Date(date.getFullYear(), date.getMonth(), 1, 12);
+    const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 12);
+    return { start: dateKey(start), end: dateKey(end) };
+  }
+
   function agendaViewRange() {
-    const start = todayKey();
-    const view = ["today", "week", "next30"].includes(state.agendaView) ? state.agendaView : "today";
-    if (view === "week") return { view, start, end: addDays(start, 6), title: "Cette semaine" };
-    if (view === "next30") return { view, start, end: addDays(start, 30), title: "30 prochains jours" };
-    return { view: "today", start, end: start, title: "Aujourd'hui" };
+    const anchor = selectedAgendaDate();
+    const view = ["today", "week", "month"].includes(state.agendaView) ? state.agendaView : "today";
+    if (view === "week") {
+      const range = agendaWeekRange(anchor);
+      return { view, ...range, title: "Semaine" };
+    }
+    if (view === "month") {
+      const range = agendaMonthRange(anchor);
+      return { view, ...range, title: agendaMonthLabel(anchor) };
+    }
+    return { view: "today", start: todayKey(), end: todayKey(), title: "Aujourd'hui" };
   }
 
   function agendaManualOccurrencesForRange(start, end) {
-    const financialTypes = new Set(["Finance", "Budget"]);
     return (state.agenda || [])
       .filter((item) => !(item.sourceId || "").startsWith("budget-"))
-      .filter((item) => financialTypes.has(item.type) || financialTypes.has(item.domain))
-      .flatMap((item) => budgetOccurrenceDatesBetween(item, start, end).map((date) => ({
+      .flatMap((item) => occurrenceDatesBetween(item, start, end).map((date) => ({
         id: `${item.id}-${date}`,
         sourceId: item.sourceId || item.id,
         date,
-        domain: item.domain || item.type || "Agenda",
-        type: item.type || "Agenda",
+        domain: item.domain || "Agenda",
+        type: item.type || "Événement",
         title: item.text || item.title || "Événement",
+        description: item.description || "",
         amount: Number(item.amount) || 0,
         tokens: Number(item.tokens) || 0,
         repeat: item.repeat || "",
+        customIntervalDays: item.customIntervalDays || 0,
         time: item.time || "",
         reminder: item.reminder || "none",
         done: Boolean(item.done),
@@ -3734,11 +3781,18 @@
       const meta = document.createElement("p");
       meta.className = "agenda-meta";
       const details = [event.domain || event.type, event.type];
-      if (event.repeat) details.push(agendaRepeatText(event.repeat));
+      if (event.repeat) {
+        details.push(event.repeat === "custom" && event.customIntervalDays
+          ? `Tous les ${event.customIntervalDays} jours`
+          : agendaRepeatText(event.repeat));
+      }
       if (event.time) details.push(event.time);
       meta.textContent = details.filter(Boolean).join(" · ");
       const titleNode = document.createElement("strong");
       titleNode.textContent = `${agendaEventDomainIcon(event)} ${event.title}`;
+      const description = document.createElement("p");
+      description.className = "agenda-description";
+      description.textContent = event.description || "";
       const chips = document.createElement("div");
       chips.className = "agenda-plan-chips";
       if (event.amount) {
@@ -3752,6 +3806,7 @@
         chips.append(chip);
       }
       main.append(meta, titleNode);
+      if (event.description) main.append(description);
       if (chips.childElementCount) main.append(chips);
       row.append(main);
       nodes.push(row);
@@ -3804,95 +3859,60 @@
   }
 
   function renderAgenda() {
-    const list = $("agenda-list");
     const selectedDate = selectedAgendaDate();
     state.agendaDate = selectedDate;
     const agendaDateInput = $("agenda-date");
-    const monthLabel = $("agenda-month-label");
     if (agendaDateInput) agendaDateInput.value = selectedDate;
-    if (monthLabel) monthLabel.textContent = agendaMonthLabel(selectedDate);
     renderAgendaCalendar(selectedDate);
     renderAgendaFinanceUpcoming();
-    if (!list) return;
-    const items = agendaItemsForSelectedDate();
-    const count = $("agenda-count");
-    if (count) count.textContent = `${items.length} item${items.length > 1 ? "s" : ""}`;
-    if (!items.length) {
-      const empty = document.createElement("p");
-      empty.className = "small-muted";
-      empty.textContent = "Rien de prévu. Ajoute une petite chose si tu veux.";
-      list.replaceChildren(empty);
-      return;
-    }
-    list.replaceChildren(...items.map((item) => {
-      const row = document.createElement("article");
-      row.className = `agenda-item${item.done ? " done" : ""}`;
-      row.style.borderLeftColor = agendaTypeColors[item.type] || "#e8eddc";
-      const body = document.createElement("div");
-      const meta = document.createElement("p");
-      meta.className = "agenda-meta";
-      const timeText = item.time ? `${item.time} · ` : "";
-      meta.textContent = `${timeText}${item.type} · ${reminderLabel(item.reminder)}`;
-      const title = document.createElement("strong");
-      title.textContent = item.text;
-      const tag = document.createElement("span");
-      tag.className = "agenda-type-pill";
-      tag.style.background = agendaTypeColors[item.type] || "#e8eddc";
-      tag.textContent = item.type;
-      body.append(meta, title, tag);
-
-      const actions = document.createElement("div");
-      actions.className = "agenda-actions";
-      const done = document.createElement("button");
-      done.type = "button";
-      done.className = "secondary";
-      done.textContent = item.done ? "Fait" : "Faire";
-      done.addEventListener("click", () => toggleAgendaItem(item.id));
-      const edit = document.createElement("button");
-      edit.type = "button";
-      edit.className = "text-button";
-      edit.textContent = "Modifier";
-      edit.addEventListener("click", () => editAgendaItem(item.id));
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "text-button";
-      remove.textContent = "Supprimer";
-      remove.addEventListener("click", () => deleteAgendaItem(item.id));
-      actions.append(done, edit, remove);
-      row.append(body, actions);
-      return row;
-    }));
   }
 
   function saveAgendaItem() {
     const textInput = $("agenda-text");
     const text = textInput.value.trim();
+    const date = $("agenda-event-date")?.value || selectedAgendaDate();
     if (!text) {
-      showToast("Écris une chose à faire.");
+      showToast("Ajoute un titre.");
       return;
     }
-    const reminder = $("agenda-reminder").value;
-    if (reminder !== "none" && !$("agenda-time").value) {
+    if (!date) {
+      showToast("Choisis une date.");
+      return;
+    }
+    const time = $("agenda-time")?.value || "";
+    const reminder = $("agenda-reminder")?.value || "none";
+    const repeat = $("agenda-repeat")?.value || "";
+    const customIntervalDays = repeat === "custom"
+      ? Math.max(1, Math.min(365, Math.round(Number($("agenda-custom-days")?.value) || 1)))
+      : 0;
+    if (reminder !== "none" && !time) {
       showToast("Choisis une heure pour activer un rappel.");
       return;
     }
     const item = {
       id: `${Date.now()}`,
-      date: selectedAgendaDate(),
-      type: $("agenda-type").value,
+      date,
+      domain: "Agenda",
+      type: "Événement",
       text,
-      time: $("agenda-time").value,
+      description: $("agenda-description")?.value.trim() || "",
+      time,
       reminder,
-      repeat: $("agenda-repeat")?.value || "",
+      repeat,
+      customIntervalDays,
       notified: false,
       done: false
     };
     state.agenda = [...state.agenda, item].slice(-80);
     saveState();
     textInput.value = "";
-    $("agenda-time").value = "";
-    $("agenda-reminder").value = "none";
+    if ($("agenda-event-date")) $("agenda-event-date").value = selectedAgendaDate();
+    if ($("agenda-description")) $("agenda-description").value = "";
+    if ($("agenda-time")) $("agenda-time").value = "";
+    if ($("agenda-reminder")) $("agenda-reminder").value = "none";
     if ($("agenda-repeat")) $("agenda-repeat").value = "";
+    if ($("agenda-custom-days")) $("agenda-custom-days").value = "";
+    toggleAgendaCustomRepeat();
     closeAgendaForm();
     renderAgenda();
     scheduleAgendaReminders();
@@ -3963,6 +3983,16 @@
     renderAgenda();
   }
 
+  function changeAgendaRange(direction) {
+    const view = ["today", "week", "month"].includes(state.agendaView) ? state.agendaView : "today";
+    if (view === "month") {
+      changeAgendaMonth(direction);
+      return;
+    }
+    const days = view === "week" ? 7 : 1;
+    changeAgendaDate(direction * days);
+  }
+
   function setAgendaDate(value) {
     if (!value) return;
     state.agendaDate = value;
@@ -3971,12 +4001,19 @@
   }
 
   function openAgendaForm() {
+    if ($("agenda-event-date")) $("agenda-event-date").value = selectedAgendaDate();
+    toggleAgendaCustomRepeat();
     $("agenda-form-card")?.classList.remove("hidden");
     $("agenda-text")?.focus();
   }
 
   function closeAgendaForm() {
     $("agenda-form-card")?.classList.add("hidden");
+  }
+
+  function toggleAgendaCustomRepeat() {
+    const isCustom = $("agenda-repeat")?.value === "custom";
+    $("agenda-custom-repeat-row")?.classList.toggle("hidden", !isCustom);
   }
 
   async function requestAgendaNotificationPermission() {
@@ -5129,6 +5166,9 @@
     $("agenda-today")?.addEventListener("click", () => setAgendaDate(todayKey()));
     $("agenda-prev-month")?.addEventListener("click", () => changeAgendaMonth(-1));
     $("agenda-next-month")?.addEventListener("click", () => changeAgendaMonth(1));
+    $("agenda-prev-range")?.addEventListener("click", () => changeAgendaRange(-1));
+    $("agenda-next-range")?.addEventListener("click", () => changeAgendaRange(1));
+    $("agenda-repeat")?.addEventListener("change", toggleAgendaCustomRepeat);
     document.querySelectorAll("[data-agenda-view]").forEach((button) => {
       button.addEventListener("click", () => {
         state.agendaView = button.dataset.agendaView;

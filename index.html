@@ -366,65 +366,55 @@
 
         <section id="view-agenda" class="view" aria-labelledby="agenda-title">
           <div class="section-heading">
-            <p class="step">Calendrier doux</p>
-            <h2 id="agenda-title">Agenda</h2>
+            <p class="step">Planification</p>
+            <h2 id="agenda-title">📅 Agenda</h2>
+            <p>Une version simple du calendrier, reliée au Budget.</p>
           </div>
 
-          <article class="card agenda-month-card">
+          <article class="card agenda-shell-card">
             <div class="card-header">
               <div>
-                <p class="step">Mois</p>
-                <h2 id="agenda-month-label">Ce mois-ci</h2>
-              </div>
-              <button id="agenda-today" class="secondary" type="button">Aujourd'hui</button>
-            </div>
-            <div class="agenda-month-controls">
-              <button id="agenda-prev-month" class="text-button" type="button">Mois avant</button>
-              <input id="agenda-date" type="date">
-              <button id="agenda-next-month" class="text-button" type="button">Mois après</button>
-            </div>
-            <div class="agenda-weekdays" aria-hidden="true">
-              <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
-            </div>
-            <div id="agenda-calendar" class="agenda-calendar" aria-label="Calendrier du mois"></div>
-          </article>
-
-          <article class="card">
-            <div class="card-header">
-              <div>
-                <p class="step">Planification</p>
+                <p class="step">Vue</p>
                 <h2 id="agenda-planning-title">Aujourd'hui</h2>
               </div>
               <span id="agenda-planning-count" class="small-muted">0 événement</span>
             </div>
+
             <div class="agenda-view-tabs" role="tablist" aria-label="Vue agenda">
-              <button class="agenda-view-tab" type="button" data-agenda-view="today">Aujourd'hui</button>
-              <button class="agenda-view-tab" type="button" data-agenda-view="week">Semaine</button>
-              <button class="agenda-view-tab" type="button" data-agenda-view="next30">30 prochains jours</button>
+              <button class="agenda-view-tab" type="button" data-agenda-view="today">📅 Aujourd'hui</button>
+              <button class="agenda-view-tab" type="button" data-agenda-view="week">📅 Semaine</button>
+              <button class="agenda-view-tab" type="button" data-agenda-view="month">📅 Mois</button>
             </div>
-            <div id="agenda-planning-list" class="agenda-planning-list"></div>
+
+            <div class="agenda-range-controls">
+              <button id="agenda-prev-range" class="text-button" type="button">Avant</button>
+              <input id="agenda-date" type="date" aria-label="Date de référence">
+              <button id="agenda-next-range" class="text-button" type="button">Après</button>
+            </div>
+            <button id="agenda-today" class="secondary wide" type="button">Aujourd'hui</button>
           </article>
 
           <article id="agenda-form-card" class="card agenda-card hidden">
             <div class="card-header">
-              <h2>Ajouter</h2>
+              <h2>➕ Ajouter un événement</h2>
               <button id="close-agenda-form" class="text-button" type="button">Fermer</button>
             </div>
-            <p class="small-muted">Une chose claire suffit.</p>
             <div class="agenda-form">
               <label>
-                Type
-                <select id="agenda-type">
-                  <option value="Finance">Finance</option>
-                </select>
-              </label>
-              <label>
                 Titre
-                <input id="agenda-text" type="text" maxlength="90" placeholder="Ex.: paiement, paie, assurance">
+                <input id="agenda-text" type="text" maxlength="90" placeholder="Ex.: Hockey">
               </label>
               <label>
-                Heure optionnelle
+                Date
+                <input id="agenda-event-date" type="date">
+              </label>
+              <label>
+                Heure
                 <input id="agenda-time" type="time">
+              </label>
+              <label>
+                Description
+                <textarea id="agenda-description" maxlength="180" rows="3" placeholder="Note courte, optionnelle"></textarea>
               </label>
               <label>
                 Rappel
@@ -440,15 +430,26 @@
               <label>
                 Récurrence
                 <select id="agenda-repeat">
-                  <option value="">Unique</option>
-                  <option value="weekly">Hebdomadaire</option>
+                  <option value="">Une fois</option>
+                  <option value="daily">Chaque jour</option>
+                  <option value="weekly">Chaque semaine</option>
                   <option value="biweekly">Aux 2 semaines</option>
-                  <option value="monthly">Mensuel</option>
+                  <option value="monthly">Chaque mois</option>
+                  <option value="yearly">Chaque année</option>
+                  <option value="custom">Personnalisé</option>
                 </select>
               </label>
-              <button id="save-agenda-item" class="primary wide" type="button">Ajouter à l'agenda</button>
+              <label id="agenda-custom-repeat-row" class="hidden">
+                Tous les combien de jours ?
+                <input id="agenda-custom-days" type="number" min="1" max="365" inputmode="numeric" placeholder="Ex.: 10">
+              </label>
+              <button id="save-agenda-item" class="primary wide" type="button">Ajouter l'événement</button>
             </div>
             <p class="small-muted">Les rappels fonctionnent quand ÉLAN reste ouvert.</p>
+          </article>
+
+          <article class="card agenda-list-card">
+            <div id="agenda-planning-list" class="agenda-planning-list"></div>
           </article>
 
           <button id="open-agenda-form" class="agenda-fab" type="button" aria-label="Ajouter un événement">+</button>
