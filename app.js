@@ -4013,6 +4013,13 @@
     renderAgenda();
   }
 
+  function goToAgendaToday() {
+    state.agendaDate = todayKey();
+    state.agendaView = "today";
+    saveState();
+    renderAgenda();
+  }
+
   function setAgendaDay(value) {
     if (!value) return;
     state.agendaDate = value;
@@ -5185,7 +5192,7 @@
       if (event.key === "Enter") saveAgendaItem();
     });
     $("agenda-date")?.addEventListener("change", (event) => setAgendaDate(event.target.value));
-    $("agenda-today")?.addEventListener("click", () => setAgendaDate(todayKey()));
+    $("agenda-today")?.addEventListener("click", goToAgendaToday);
     $("agenda-prev-month")?.addEventListener("click", () => changeAgendaMonth(-1));
     $("agenda-next-month")?.addEventListener("click", () => changeAgendaMonth(1));
     $("agenda-prev-range")?.addEventListener("click", () => changeAgendaRange(-1));

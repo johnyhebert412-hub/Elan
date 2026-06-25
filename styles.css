@@ -2026,7 +2026,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
   display: grid;
   gap: 6px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 12px 0;
+  margin: 10px 0 6px;
   padding: 5px;
 }
 
@@ -2047,6 +2047,16 @@ input[type="date"], input[type="time"], input[type="text"], select {
   color: var(--brand);
 }
 
+.agenda-today-link {
+  color: var(--brand);
+  display: inline-flex;
+  font-size: 0.8rem;
+  justify-self: center;
+  margin: 0 auto 6px;
+  min-height: 30px;
+  padding: 4px 8px;
+}
+
 .agenda-list {
   display: flex;
   flex-direction: column;
@@ -2061,6 +2071,17 @@ input[type="date"], input[type="time"], input[type="text"], select {
 
 .agenda-list-card {
   min-height: 180px;
+}
+
+.agenda-list-card .card-header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+}
+
+.agenda-list-card h2 {
+  text-transform: capitalize;
 }
 
 .agenda-date-group {
