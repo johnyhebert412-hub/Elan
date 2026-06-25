@@ -3838,7 +3838,7 @@
       const date = new Date(start);
       date.setDate(start.getDate() + index);
       const key = dateKey(date);
-      const items = agendaItemsForDate(key);
+      const items = key < today ? [] : agendaItemsForDate(key);
       const button = document.createElement("button");
       button.type = "button";
       button.className = "agenda-day";
@@ -3851,17 +3851,12 @@
       number.textContent = date.getDate();
       const events = document.createElement("span");
       events.className = "agenda-day-events";
-      items.slice(0, 2).forEach((item) => {
-        const event = document.createElement("span");
-        event.className = "agenda-day-event";
-        event.textContent = `${agendaEventDomainIcon(item)} ${item.title}`;
-        events.append(event);
-      });
-      if (items.length > 2) {
-        const more = document.createElement("span");
-        more.className = "agenda-day-more";
-        more.textContent = `+${items.length - 2}`;
-        events.append(more);
+      if (items.length) {
+        const indicator = document.createElement("span");
+        indicator.className = "agenda-day-indicator";
+        indicator.textContent = items.length === 1 ? agendaEventDomainIcon(items[0]) : `${items.length}`;
+        indicator.setAttribute("aria-hidden", "true");
+        events.append(indicator);
       }
       button.append(number, events);
       button.addEventListener("click", () => setAgendaDay(key));

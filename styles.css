@@ -1858,9 +1858,9 @@ input[type="date"], input[type="time"], input[type="text"], select {
 .agenda-month-nav {
   align-items: center;
   display: grid;
-  gap: 10px;
-  grid-template-columns: 48px 1fr 48px;
-  margin: 12px 0 6px;
+  gap: 8px;
+  grid-template-columns: 40px 1fr 40px;
+  margin: 8px 0 4px;
 }
 
 .agenda-month-controls .text-button {
@@ -1882,9 +1882,9 @@ input[type="date"], input[type="time"], input[type="text"], select {
 .agenda-month-nav .text-button {
   background: white;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  font-size: 1.4rem;
-  min-height: 46px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  min-height: 38px;
   padding: 4px;
 }
 
@@ -1894,7 +1894,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
   border-radius: 14px;
   color: var(--brand);
   display: grid;
-  min-height: 46px;
+  min-height: 38px;
   place-items: center;
   text-transform: capitalize;
 }
@@ -1910,7 +1910,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
 .agenda-weekdays,
 .agenda-calendar {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
@@ -1918,28 +1918,28 @@ input[type="date"], input[type="time"], input[type="text"], select {
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 700;
-  margin: 16px 0 8px;
+  margin: 10px 0 6px;
   text-align: center;
   text-transform: uppercase;
 }
 
 .agenda-day {
-  align-items: flex-start;
+  align-items: center;
   aspect-ratio: 1;
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(214, 202, 184, 0.75);
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--ink);
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  justify-content: flex-start;
+  gap: 3px;
+  justify-content: center;
   max-width: 100%;
-  min-height: 72px;
+  min-height: 42px;
   min-width: 0;
   overflow: hidden;
-  padding: 6px;
-  text-align: left;
+  padding: 4px;
+  text-align: center;
   width: 100%;
 }
 
@@ -1965,28 +1965,26 @@ input[type="date"], input[type="time"], input[type="text"], select {
 
 .agenda-day-events {
   display: grid;
-  gap: 2px;
+  min-height: 15px;
+  place-items: center;
   width: 100%;
 }
 
-.agenda-day-event,
-.agenda-day-more {
-  background: rgba(255, 255, 255, 0.74);
-  border-radius: 7px;
+.agenda-day-indicator {
+  align-items: center;
+  background: rgba(22, 84, 70, 0.12);
+  border-radius: 999px;
   color: var(--brand);
-  display: block;
-  font-size: 0.58rem;
+  display: inline-flex;
+  font-size: 0.62rem;
   font-weight: 800;
-  line-height: 1.15;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 2px 3px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  height: 15px;
+  justify-content: center;
+  min-width: 15px;
+  padding: 0 4px;
 }
 
-.agenda-day.selected .agenda-day-event,
-.agenda-day.selected .agenda-day-more {
+.agenda-day.selected .agenda-day-indicator {
   background: rgba(255, 255, 255, 0.9);
 }
 
