@@ -368,28 +368,33 @@
           <div class="section-heading">
             <p class="step">Planification</p>
             <h2 id="agenda-title">📅 Agenda</h2>
-            <p>Une version simple du calendrier, reliée au Budget.</p>
           </div>
 
           <article class="card agenda-shell-card">
             <div class="card-header">
               <div>
-                <p class="step">Vue</p>
-                <h2 id="agenda-planning-title">Aujourd'hui</h2>
+                <p class="step">Calendrier</p>
+                <h2 id="agenda-month-label">Ce mois-ci</h2>
               </div>
               <span id="agenda-planning-count" class="small-muted">0 événement</span>
             </div>
+
+            <div class="agenda-month-nav">
+              <button id="agenda-prev-range" class="text-button" type="button" aria-label="Période précédente">‹</button>
+              <strong id="agenda-month-control-label" class="agenda-month-control-label">Mois</strong>
+              <button id="agenda-next-range" class="text-button" type="button" aria-label="Période suivante">›</button>
+            </div>
+            <input id="agenda-date" class="agenda-date-hidden" type="date" aria-label="Date de référence">
+
+            <div class="agenda-weekdays" aria-hidden="true">
+              <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div id="agenda-calendar" class="agenda-calendar" aria-label="Calendrier du mois"></div>
 
             <div class="agenda-view-tabs" role="tablist" aria-label="Vue agenda">
               <button class="agenda-view-tab" type="button" data-agenda-view="today">📅 Aujourd'hui</button>
               <button class="agenda-view-tab" type="button" data-agenda-view="week">📅 Semaine</button>
               <button class="agenda-view-tab" type="button" data-agenda-view="month">📅 Mois</button>
-            </div>
-
-            <div class="agenda-range-controls">
-              <button id="agenda-prev-range" class="text-button" type="button">Avant</button>
-              <input id="agenda-date" type="date" aria-label="Date de référence">
-              <button id="agenda-next-range" class="text-button" type="button">Après</button>
             </div>
             <button id="agenda-today" class="secondary wide" type="button">Aujourd'hui</button>
           </article>
@@ -449,6 +454,12 @@
           </article>
 
           <article class="card agenda-list-card">
+            <div class="card-header">
+              <div>
+                <p class="step">Événements</p>
+                <h2 id="agenda-planning-title">Aujourd'hui</h2>
+              </div>
+            </div>
             <div id="agenda-planning-list" class="agenda-planning-list"></div>
           </article>
 

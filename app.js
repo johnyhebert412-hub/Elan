@@ -3684,7 +3684,7 @@
       const range = agendaMonthRange(anchor);
       return { view, ...range, title: agendaMonthLabel(anchor) };
     }
-    return { view: "today", start: todayKey(), end: todayKey(), title: "Aujourd'hui" };
+    return { view: "today", start: anchor, end: anchor, title: agendaDateLabel(anchor) };
   }
 
   function agendaManualOccurrencesForRange(start, end) {
@@ -3819,6 +3819,11 @@
     return new Intl.DateTimeFormat("fr-CA", { month: "long", year: "numeric" }).format(date);
   }
 
+  function agendaMonthControlLabel(dateValue) {
+    const date = new Date(`${dateValue}T12:00:00`);
+    return new Intl.DateTimeFormat("fr-CA", { month: "long" }).format(date);
+  }
+
   function renderAgendaCalendar(selectedDate) {
     const calendar = $("agenda-calendar");
     if (!calendar) return;
@@ -3844,15 +3849,22 @@
 
       const number = document.createElement("strong");
       number.textContent = date.getDate();
-      const dots = document.createElement("span");
-      dots.className = "agenda-dots";
-      items.slice(0, 3).forEach((item) => {
-        const dot = document.createElement("i");
-        dot.style.background = agendaTypeColors[item.type] || "#e8eddc";
-        dots.append(dot);
+      const events = document.createElement("span");
+      events.className = "agenda-day-events";
+      items.slice(0, 2).forEach((item) => {
+        const event = document.createElement("span");
+        event.className = "agenda-day-event";
+        event.textContent = `${agendaEventDomainIcon(item)} ${item.title}`;
+        events.append(event);
       });
-      button.append(number, dots);
-      button.addEventListener("click", () => setAgendaDate(key));
+      if (items.length > 2) {
+        const more = document.createElement("span");
+        more.className = "agenda-day-more";
+        more.textContent = `+${items.length - 2}`;
+        events.append(more);
+      }
+      button.append(number, events);
+      button.addEventListener("click", () => setAgendaDay(key));
       days.push(button);
     }
     calendar.replaceChildren(...days);
@@ -3862,7 +3874,11 @@
     const selectedDate = selectedAgendaDate();
     state.agendaDate = selectedDate;
     const agendaDateInput = $("agenda-date");
+    const monthLabel = $("agenda-month-label");
+    const monthControlLabel = $("agenda-month-control-label");
     if (agendaDateInput) agendaDateInput.value = selectedDate;
+    if (monthLabel) monthLabel.textContent = agendaMonthLabel(selectedDate);
+    if (monthControlLabel) monthControlLabel.textContent = agendaMonthControlLabel(selectedDate);
     renderAgendaCalendar(selectedDate);
     renderAgendaFinanceUpcoming();
   }
@@ -3998,6 +4014,15 @@
     state.agendaDate = value;
     saveState();
     renderAgenda();
+  }
+
+  function setAgendaDay(value) {
+    if (!value) return;
+    state.agendaDate = value;
+    state.agendaView = "today";
+    saveState();
+    renderAgenda();
+    $("agenda-planning-list")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function openAgendaForm() {

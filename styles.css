@@ -1855,6 +1855,14 @@ input[type="date"], input[type="time"], input[type="text"], select {
   margin: 12px 0;
 }
 
+.agenda-month-nav {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 48px 1fr 48px;
+  margin: 12px 0 6px;
+}
+
 .agenda-month-controls .text-button {
   background: white;
   border: 1px solid var(--border);
@@ -1871,10 +1879,38 @@ input[type="date"], input[type="time"], input[type="text"], select {
   min-height: 44px;
 }
 
+.agenda-month-nav .text-button {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  font-size: 1.4rem;
+  min-height: 46px;
+  padding: 4px;
+}
+
+.agenda-month-control-label {
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--brand);
+  display: grid;
+  min-height: 46px;
+  place-items: center;
+  text-transform: capitalize;
+}
+
+.agenda-date-hidden {
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+}
+
 .agenda-weekdays,
 .agenda-calendar {
   display: grid;
-  gap: 7px;
+  gap: 6px;
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
@@ -1888,25 +1924,28 @@ input[type="date"], input[type="time"], input[type="text"], select {
 }
 
 .agenda-day {
-  align-items: center;
+  align-items: flex-start;
   aspect-ratio: 1;
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(214, 202, 184, 0.75);
-  border-radius: 15px;
+  border-radius: 12px;
   color: var(--ink);
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  justify-content: center;
+  gap: 4px;
+  justify-content: flex-start;
   max-width: 100%;
-  min-height: 44px;
+  min-height: 72px;
   min-width: 0;
-  padding: 5px;
+  overflow: hidden;
+  padding: 6px;
+  text-align: left;
   width: 100%;
 }
 
 .agenda-day strong {
-  font-size: 0.94rem;
+  font-size: 0.82rem;
+  line-height: 1;
 }
 
 .agenda-day.muted-day {
@@ -1922,6 +1961,33 @@ input[type="date"], input[type="time"], input[type="text"], select {
 .agenda-day.selected {
   background: var(--brand);
   color: white;
+}
+
+.agenda-day-events {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+}
+
+.agenda-day-event,
+.agenda-day-more {
+  background: rgba(255, 255, 255, 0.74);
+  border-radius: 7px;
+  color: var(--brand);
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.15;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 2px 3px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-day.selected .agenda-day-event,
+.agenda-day.selected .agenda-day-more {
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .agenda-dots {
