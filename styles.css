@@ -2173,28 +2173,40 @@ input[type="date"], input[type="time"], input[type="text"], select {
 
 .budget-summary-grid {
   display: grid;
-  gap: 10px;
-  margin: 16px 0;
+  gap: 12px;
+  margin: 14px 0 18px;
 }
 
 .budget-summary-card {
-  background: #f6f0dc;
+  background: linear-gradient(135deg, #fffdf8, #f6f0dc);
   border: 1px solid #e5dac0;
   border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(57, 64, 24, 0.06);
   display: grid;
   gap: 6px;
+  min-height: 92px;
   padding: 14px;
 }
 
 .budget-summary-card span {
   color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 .budget-summary-card strong {
   color: var(--ink);
-  font-size: 1.45rem;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.budget-summary-card-main {
+  background: linear-gradient(135deg, #eef7f2, #fffdf8);
+  border-color: rgba(22, 84, 70, 0.2);
+}
+
+.budget-summary-card-main strong {
+  color: var(--brand);
 }
 
 .budget-section {
@@ -2282,7 +2294,7 @@ input[type="date"], input[type="time"], input[type="text"], select {
 
 @media (min-width: 480px) {
   .budget-summary-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

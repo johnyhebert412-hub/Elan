@@ -3512,9 +3512,11 @@
     const monthEvents = budgetFinanceOccurrencesForRange(monthRange.start, monthRange.end);
     const monthIncome = monthEvents.filter((item) => item.kind === "income").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
     const monthPayments = monthEvents.filter((item) => item.kind === "payment").reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const monthAvailable = monthIncome - monthPayments;
 
     if ($("budget-month-income")) $("budget-month-income").textContent = money(monthIncome);
     if ($("budget-month-payments")) $("budget-month-payments").textContent = money(monthPayments);
+    if ($("budget-month-available")) $("budget-month-available").textContent = money(monthAvailable);
     if ($("budget-upcoming-count")) $("budget-upcoming-count").textContent = `${upcoming.length}`;
 
     renderBudgetList("budget-income-list", incomes, "income");

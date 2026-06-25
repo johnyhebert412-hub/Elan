@@ -290,17 +290,20 @@
           </article>
 
           <article id="domain-budget" class="card domain-panel budget-panel hidden">
-            <div class="card-header"><h2>Budget</h2><button class="text-button" data-close-domain type="button">Changer</button></div>
-            <p class="muted">Planificateur financier relié à ton agenda.</p>
+            <div class="card-header"><h2>💰 Budget</h2><button class="text-button" data-close-domain type="button">Changer</button></div>
 
             <section class="budget-summary-grid" aria-label="Résumé du budget">
               <div class="budget-summary-card">
-                <span>Entrées prévues ce mois-ci</span>
+                <span>Entrées prévues</span>
                 <strong id="budget-month-income">0 $</strong>
               </div>
               <div class="budget-summary-card">
-                <span>Sorties prévues ce mois-ci</span>
+                <span>Sorties prévues</span>
                 <strong id="budget-month-payments">0 $</strong>
+              </div>
+              <div class="budget-summary-card budget-summary-card-main">
+                <span>Disponible estimé</span>
+                <strong id="budget-month-available">0 $</strong>
               </div>
               <div class="budget-summary-card">
                 <span>Événements à venir</span>
@@ -309,6 +312,14 @@
             </section>
 
             <section class="budget-section">
+              <div class="card-header compact-header">
+                <h3>À venir</h3>
+                <span class="small-muted">30 prochains jours</span>
+              </div>
+              <div id="budget-upcoming-list" class="budget-list"></div>
+            </section>
+
+            <section class="budget-section budget-entry-section">
               <div class="card-header compact-header">
                 <h3>Revenus prévus</h3>
               </div>
@@ -351,14 +362,6 @@
                 <h3>Objectifs financiers</h3>
                 <span class="small-muted">Future évolution</span>
               </div>
-            </section>
-
-            <section class="budget-section">
-              <div class="card-header compact-header">
-                <h3>À venir</h3>
-                <span class="small-muted">30 prochains jours</span>
-              </div>
-              <div id="budget-upcoming-list" class="budget-list"></div>
             </section>
           </article>
 
